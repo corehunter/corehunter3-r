@@ -1,0 +1,18 @@
+Package: corehunter
+Title: Fast and Flexible Core Subset Selection
+Version: 0.0.0.9000
+Authors@R: c(person("Herman", "De Beukelaer", email = "herman.debeukelaer@gmail.com", role = c("aut", "cre")),
+             person("Guy", "Davenport", email = "daveneti@gmail.com", role = "aut"),
+             person("Veerle", "Fack", email = "veerle.fack@ugent.be", role = "ths"))
+Description: This package provides an R interface to the Core Hunter software
+    for core subset selection. Cores can be constructed based on genetic marker
+    data, phenotypic traits, a precomputed distance matrix or any combination of
+    these. Various measures are included such as Modified Rogers' distance and
+    Shannon's diversity index (for genotypes) and Gower's distance (for phenotypes).
+    Core Hunter can also optimize a weighted combination of several measures, to
+    meet both the breeder's and geneticist's expectations.
+Depends:
+    R (>= 3.2.3)
+License: Apache License (== 2.0)
+LazyData: true
+RoxygenNote: 5.0.1
