@@ -1,2 +1,2 @@
 # corehunter3-r
-R package for the Core Hunter version 3
+R package for Core Hunter version 3
