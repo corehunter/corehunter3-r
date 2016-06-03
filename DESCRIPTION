@@ -11,8 +11,8 @@ Description: This package provides an R interface to the Core Hunter software
     Shannon's diversity index (for genotypes) and Gower's distance (for phenotypes).
     Core Hunter can also optimize a weighted combination of several measures, to
     meet both the breeder's and geneticist's expectations.
-Depends:
-    R (>= 3.2.3)
+Depends: R (>= 3.2.3), rJava (>= 0.9-8)
+SystemRequirements: Java JDK 1.8 or higher
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
