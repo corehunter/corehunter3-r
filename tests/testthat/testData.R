@@ -1,4 +1,5 @@
 context("distances data")
+print(dir())
 .jinit(Sys.glob("../../inst/java/*.jar"))
 
 test_that("arguments are checked", {
