@@ -4,13 +4,13 @@ language: r
 
 r_github_packages:
   - jimhester/covr
-  
-jdk:
-  - oraclejdk8
 
 warnings_are_errors: true
 
-before_install: echo "options(repos = c(CRAN='http://cran.r-project.org'))" > ~/.Rprofile
+before_install: 
+  - echo "options(repos = c(CRAN='http://cran.r-project.org'))" > ~/.Rprofile
+  - export LD_LIBRARY_PATH=/usr/lib/jvm/java-8-oracle/lib/amd64:/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
+  - sudo R CMD javareconf
 
 after_success:
   - Rscript -e 'covr::coveralls()'
