@@ -1,6 +1,7 @@
 Package: corehunter
 Title: Fast and Flexible Core Subset Selection
 Version: 0.0.0.9000
+Date: 2016-06-06
 Authors@R: c(person("Herman", "De Beukelaer", email = "herman.debeukelaer@gmail.com", role = c("aut", "cre")),
              person("Guy", "Davenport", email = "daveneti@gmail.com", role = "aut"),
              person("Veerle", "Fack", email = "veerle.fack@ugent.be", role = "ths"))

@@ -1,4 +1,5 @@
 context("distances data")
+.jinit(Sys.glob("../../inst/java/*.jar"))
 
 test_that("arguments are checked", {
   expect_error(ch.distances(matrix = matrix(0, nrow = 5, ncol = 5), file = "file"), "specify either matrix or file")
