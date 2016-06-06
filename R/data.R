@@ -171,6 +171,8 @@ print.chdist <- function(x, ...){
 
 #' Retrieve precomputed distance matrix.
 #'
+#' @param data data object containing distances
+#'
 #' @return distance matrix (numeric)
 #' @export
 getDistanceMatrix <- function(data){

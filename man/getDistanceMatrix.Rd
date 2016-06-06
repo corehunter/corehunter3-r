@@ -6,6 +6,9 @@
 \usage{
 getDistanceMatrix(data)
 }
+\arguments{
+\item{data}{data object containing distances}
+}
 \value{
 distance matrix (numeric)
 }
