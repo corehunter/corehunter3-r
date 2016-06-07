@@ -73,6 +73,9 @@ print.chdata <- function(x, ...){
 
 #' @export
 getDistanceMatrix.chdata <- function(data){
+  if(!data$java$hasDistances()){
+    stop("No distances in given Core Hunter data.")
+  }
   distances2matrix(data$java$getDistancesData())
 }
 
@@ -149,7 +152,7 @@ distances <- function(matrix, file){
     file = file,
     java = java.obj
   )
-  class(distances) <- c("chdist", class(distances))
+  class(distances) <- c("chdist", "chdata", class(distances))
 
   return(distances)
 
@@ -162,7 +165,16 @@ getDistanceMatrix.chdist <- function(data){
 
 #' @export
 print.chdist <- function(x, ...){
-  cat(sprintf("Precomputed distance matrix for %d individuals.", x$java$getSize()))
+  cat(sprintf("Precomputed distance matrix for %d individuals.", getSize(x)))
+}
+
+# ------- #
+# GENERAL #
+# ------- #
+
+#' @export
+getSize.chdata <- function(data){
+  data$java$getSize()
 }
 
 # ---------- #
@@ -177,6 +189,16 @@ print.chdist <- function(x, ...){
 #' @export
 getDistanceMatrix <- function(data){
   UseMethod("getDistanceMatrix")
+}
+
+#' Retrieve dataset size.
+#'
+#' @param data data object
+#'
+#' @return dataset size
+#' @export
+getSize <- function(data){
+  UseMethod("getSize")
 }
 
 # ----------------- #

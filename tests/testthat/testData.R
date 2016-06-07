@@ -1,19 +1,8 @@
-.jinit(Sys.glob("../../inst/java/*.jar"))
+source("testUtils.R")
 
 #########################
 context("Distance data")
 #########################
-
-# utility functions
-distanceMatrixFile <- function(){
-  system.file("extdata", "distances.csv", package = "corehunter")
-}
-readDistanceMatrix <- function(){
-  file <- distanceMatrixFile()
-  matrix <- as.matrix(read.csv(file, row.names = 1, header = T))
-  colnames(matrix) <- rownames(matrix)
-  return(matrix)
-}
 
 test_that("arguments are checked", {
   expect_error(distances(matrix = matrix(0, nrow = 5, ncol = 5), file = "file"), "specify either matrix or file")
@@ -26,7 +15,7 @@ test_that("arguments are checked", {
 })
 
 test_that("read distance data from file", {
-  dist <- distances(file = distanceMatrixFile())
+  dist <- distanceData()
   expect_equal(dist$file, distanceMatrixFile())
   expect_equal(getDistanceMatrix(dist), readDistanceMatrix())
 })
@@ -38,6 +27,10 @@ test_that("create distance data from matrix", {
   expect_equal(getDistanceMatrix(dist), matrix)
 })
 
+test_that("size", {
+  expect_equal(getSize(distanceData()), 100)
+})
+
 ###########################
 context("Core Hunter data")
 ###########################
@@ -47,6 +40,14 @@ test_that("arguments are checked", {
   expect_error(coreHunterData(genotypes = 123), "class 'chgeno'")
   expect_error(coreHunterData(phenotypes = "123"), "class 'chpheno'")
   expect_error(coreHunterData(distances = list(1, "a")), "class 'chdist'")
+})
+
+test_that("distance matrix is correct", {
+  expect_equal(getDistanceMatrix(testData()), readDistanceMatrix())
+})
+
+test_that("size", {
+  expect_equal(getSize(testData()), 100)
 })
 
 

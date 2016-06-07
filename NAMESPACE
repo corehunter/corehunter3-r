@@ -2,9 +2,13 @@
 
 S3method(getDistanceMatrix,chdata)
 S3method(getDistanceMatrix,chdist)
+S3method(getSize,chdata)
 S3method(print,chdata)
 S3method(print,chdist)
 export(coreHunterData)
 export(distances)
 export(getDistanceMatrix)
+export(getSize)
+export(objective)
+export(sampleCore)
 import(rJava)
