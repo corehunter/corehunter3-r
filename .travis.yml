@@ -1,6 +1,13 @@
 language: r
 
-sudo: required
+r:
+  - oldrel
+  - release
+  - devel
+
+cache: packages
+
+sudo: false
 
 jdk:
   - oraclejdk8
