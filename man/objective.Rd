@@ -8,11 +8,22 @@ objective(type = c("EN", "AN", "EE", "SH", "HE", "CV"), measure = c("PD",
   "GD", "MR", "CE"), weight = 1)
 }
 \arguments{
-\item{type}{...}
+\item{type}{Objective type, one of \code{EN} (default), \code{AN}, \code{EE},
+\code{SH}, \code{HE} or \code{CV} (see description). The former three
+objectives are distance based and require to choose a distance
+\code{measure}. By default, the precomputed distance matrix is used (if
+available).}
 
-\item{measure}{...}
+\item{measure}{Distance measure used to compute the distance between two
+individuals, one of \code{PD} (default), \code{GD}, \code{MR} or \code{CE}
+(see description). Ignored when \code{type} is \code{SH}, \code{HE} or
+\code{CV}.}
 
-\item{weight}{...}
+\item{weight}{Weight assigned to the objective, when maximizing a weighted
+index. Defaults to 1.0.}
+}
+\value{
+Core Hunter objective (\code{chobj}).
 }
 \description{
 The following optimization objectives are supported by Core Hunter:
@@ -55,20 +66,20 @@ The following optimization objectives are supported by Core Hunter:
    retained in the selected core. Requires genotoypes.
  }
 }
-The first three objective types (\code{EN}, \code{AN} and \code{EE}) are based on pairwise distances
+The first three objective types (\code{EN}, \code{AN} and \code{EE}) aggregate pairwise distances
 between individuals. These distances can be computed using various measures:
 \describe{
  \item{\code{PD}}{
-   Precomputed distances (default). Use the precomputed distance matrix of the dataset.
+   Precomputed distances (default). Uses the precomputed distance matrix of the dataset.
  }
  \item{\code{GD}}{
-   ...
+   Gower distance. Requires phenotypes.
  }
  \item{\code{MR}}{
-   ...
+   Modified Rogers distance. Requires genotypes.
  }
  \item{\code{CE}}{
-   ...
+   Cavalli-Sforza and Edwards distance. Requires genotypes.
  }
 }
 }

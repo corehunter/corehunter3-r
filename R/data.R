@@ -6,9 +6,13 @@
 #'
 #' The data may contain genotypes, phenotypes and/or a precomputed distance matrix.
 #'
-#' @param genotypes Genetic marker data of class 'chgeno' as returned by function 'genotypes'.
-#' @param phenotypes Phenotypic trait data of class 'chpheno' as returned by function 'phenotypes'.
-#' @param distances Precomputed distance matrix of class 'chdist' as returned by function 'distances'.
+#' @param genotypes Genetic marker data (\code{chgeno}).
+#' @param phenotypes Phenotypic trait data (\code{chpheno}).
+#' @param distances Precomputed distance matrix (\code{chdist}).
+#'
+#' @return Core Hunter data (\code{chdata}).
+#'
+#' @seealso \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 #'
 #' @export
 coreHunterData <- function(genotypes, phenotypes, distances){
@@ -90,7 +94,7 @@ getDistanceMatrix.chdata <- function(data){
 #' @param matrix Symmetric distance matrix. Row and column names are required and used as item ids.
 #' @param file File from which to read the distance matrix.
 #'
-#' @return distance matrix data of class 'chdist'
+#' @return distance matrix data (\code{chdist}).
 #'
 #' @import rJava
 #' @export
@@ -166,6 +170,34 @@ getDistanceMatrix.chdist <- function(data){
 #' @export
 print.chdist <- function(x, ...){
   cat(sprintf("Precomputed distance matrix for %d individuals.", getSize(x)))
+}
+
+# ------------- #
+# GENOTYPE DATA #
+# ------------- #
+
+#' Create genotype data.
+#'
+#' To do.
+#'
+#' @import rJava
+#' @export
+genotypes <- function(){
+
+}
+
+# -------------- #
+# PHENOTYPE DATA #
+# -------------- #
+
+#' Create phenotype data.
+#'
+#' To do.
+#'
+#' @import rJava
+#' @export
+phenotypes <- function(){
+
 }
 
 # ------- #

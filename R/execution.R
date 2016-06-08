@@ -4,18 +4,32 @@
 
 #' Sample a core collection from the given data.
 #'
-#'
-#' @param data Core Hunter data of class 'chdata' containing genotypes,
+#' @param data Core Hunter data (\code{chdata}) containing genotypes,
 #'   phenotypes and/or a precomputed distance matrix.
 #' @param size Desired core subset size (numeric). If larger than one the value
-#'   is used as the absolute core size after rounding. Else it is used as the sampling
-#'   rate and multiplied with the dataset size to determine the size of the core.
-#'   The default sampling rate is 0.2.
-#' @param objectives List of objectives.
+#'   is used as the absolute core size after rounding. Else it is used as the
+#'   sampling rate and multiplied with the dataset size to determine the size of
+#'   the core. The default sampling rate is 0.2.
+#' @param obj Objective or list of objectives (\code{chobj}).
+#'   If no objectives are specified and the data contains
+#'   only genotypes, phenotypes or precomputed distances, the average
+#'   entry-to-nearest entry distance (\code{EN}) is maximized, using
+#'   Modified Rogers distance (\code{MR}) for genotypes and Gower
+#'   distance (\code{GD}) for phenotypes, respectively.
+#' @param indices If \code{TRUE} the result contains the indices instead of names
+#'   (default) of the selected individuals.
+#'
+#' @return Core subset (\code{chcore}). It has an element \code{sel}
+#'  which is a character or numeric vector containing the names or indices,
+#'  respectively, of the selected individuals (see argument \code{indices}).
+#'  In addition the result has one or more elements that indicate the value
+#'  of each objective function that was included in the optimization.
+#'
+#' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
 #'
 #' @import rJava
 #' @export
-sampleCore <- function(data, size = 0.2, objectives){
+sampleCore <- function(data, size = 0.2, obj, indices = FALSE){
 
   # check data class
   if(!is(data, "chdata")){
@@ -35,8 +49,59 @@ sampleCore <- function(data, size = 0.2, objectives){
     stop(sprintf("Core 'size' should be >= 2 and < %d (dataset size). Got: %d.", n, size))
   }
 
-  # check objectives or set to default
-  # ...
+  # set default objectives or check given objectives
+  j.data <- data$java
+  if(missing(obj)){
+    # check: only genotypes, phenotypes or distances provided
+    if(sum(j.data$hasGenotypes(), j.data$hasPhenotypes(), j.data$hasDistances()) != 1){
+      stop("Default objective applicable only when data contains only genotypes, phenotypes
+            or precomputed distances. Please specify at least one objective.")
+    }
+    # set default objective
+    meas <- "PD"
+    if(j.data$hasGenotypes()){
+      meas <- "MR"
+    }
+    if(j.data$hasPhenotypes()){
+      meas <- "GD"
+    }
+    obj <- objective(type = "EN", measure = meas)
+  }
+  # wrap single objective in list
+  if(is(obj, 'chobj')){
+    obj <- list(obj)
+  }
+  # check objectives
+  if(!all(sapply(obj, is, 'chobj'))){
+    stop("Objectives should be of class 'chobj'.")
+  }
+  if(length(unique(obj)) != length(obj)){
+    stop("Duplicate objectives.")
+  }
+
+  # convert objectives to Java objects
+  j.obj <- ch.objectives(obj)
+
+  # create Core Hunter arguments
+  api <- ch.api()
+  j.size <- as.integer(size)
+  j.obj.array <- .jarray(j.obj, contents.class = ch.obj()@name)
+  j.args <- api$createArguments(j.data, j.size, j.obj.array)
+
+  # run Core Hunter
+  sel <- api$sampleCore(j.args)
+  # convert indices to names if requested
+  if(!indices){
+    sel <- api$getIdsFromIndices(j.data, .jarray(sel))
+  }
+
+  # wrap result
+  # TODO: add objective function value(s)
+  core <-list(
+    sel = sel
+  )
+  class(core) <- c("chcore", class(core))
+  return(core)
 
 }
 
@@ -86,26 +151,36 @@ sampleCore <- function(data, size = 0.2, objectives){
 #'    retained in the selected core. Requires genotoypes.
 #'  }
 #' }
-#' The first three objective types (\code{EN}, \code{AN} and \code{EE}) are based on pairwise distances
+#' The first three objective types (\code{EN}, \code{AN} and \code{EE}) aggregate pairwise distances
 #' between individuals. These distances can be computed using various measures:
 #' \describe{
 #'  \item{\code{PD}}{
-#'    Precomputed distances (default). Use the precomputed distance matrix of the dataset.
+#'    Precomputed distances (default). Uses the precomputed distance matrix of the dataset.
 #'  }
 #'  \item{\code{GD}}{
-#'    ...
+#'    Gower distance. Requires phenotypes.
 #'  }
 #'  \item{\code{MR}}{
-#'    ...
+#'    Modified Rogers distance. Requires genotypes.
 #'  }
 #'  \item{\code{CE}}{
-#'    ...
+#'    Cavalli-Sforza and Edwards distance. Requires genotypes.
 #'  }
 #' }
 #'
-#' @param type ...
-#' @param measure ...
-#' @param weight ...
+#' @param type Objective type, one of \code{EN} (default), \code{AN}, \code{EE},
+#'   \code{SH}, \code{HE} or \code{CV} (see description). The former three
+#'   objectives are distance based and require to choose a distance
+#'   \code{measure}. By default, the precomputed distance matrix is used (if
+#'   available).
+#' @param measure Distance measure used to compute the distance between two
+#'   individuals, one of \code{PD} (default), \code{GD}, \code{MR} or \code{CE}
+#'   (see description). Ignored when \code{type} is \code{SH}, \code{HE} or
+#'   \code{CV}.
+#' @param weight Weight assigned to the objective, when maximizing a weighted
+#'   index. Defaults to 1.0.
+#'
+#' @return Core Hunter objective (\code{chobj}).
 #'
 #' @export
 objective <- function(type = c("EN", "AN", "EE", "SH", "HE", "CV"),

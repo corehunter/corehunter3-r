@@ -1,26 +1,43 @@
-#' @import rJava
+# --- #
+# API #
+# --- #
+
 ch.api <- function(){
   J("org.corehunter.API")
 }
 
-#' @import rJava
-ch.executor <- function(){
-  new(J("org.corehunter.CoreHunter"))
-}
+# ---- #
+# DATA #
+# ---- #
 
-#' @import rJava
 ch.data <- function(){
   J("org.corehunter.data.CoreHunterData")
 }
-#' @import rJava
 ch.distances <- function(){
   J("org.corehunter.data.DistanceMatrixData")
 }
-#' @import rJava
 ch.genotypes <- function(){
   J("org.corehunter.data.GenotypeData")
 }
-#' @import rJava
 ch.phenotypes <- function(){
   J("uno.informatics.data.dataset.FeatureData")
 }
+
+# ---------- #
+# OBJECTIVES #
+# ---------- #
+
+ch.obj <- function(){
+  J("org.corehunter.CoreHunterObjective")
+}
+
+ch.objectives <- function(objectives){
+  api <- ch.api()
+  j.objectives <- lapply(objectives, function(obj){
+    api$createObjective(obj$type, obj$meas, obj$weight)
+  })
+  return(j.objectives)
+}
+
+
+

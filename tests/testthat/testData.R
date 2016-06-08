@@ -14,6 +14,10 @@ test_that("arguments are checked", {
   expect_error(distances(matrix = matrix(0, nrow = 5, ncol = 5)), "names are required")
 })
 
+test_that("class is correct", {
+  expect_is(distanceData(), "chdist")
+})
+
 test_that("read distance data from file", {
   dist <- distanceData()
   expect_equal(dist$file, distanceMatrixFile())
@@ -40,6 +44,10 @@ test_that("arguments are checked", {
   expect_error(coreHunterData(genotypes = 123), "class 'chgeno'")
   expect_error(coreHunterData(phenotypes = "123"), "class 'chpheno'")
   expect_error(coreHunterData(distances = list(1, "a")), "class 'chdist'")
+})
+
+test_that("class is correct", {
+  expect_is(testData(), "chdata")
 })
 
 test_that("distance matrix is correct", {

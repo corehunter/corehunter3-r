@@ -12,7 +12,7 @@ distances(matrix, file)
 \item{file}{File from which to read the distance matrix.}
 }
 \value{
-distance matrix data of class 'chdist'
+distance matrix data (\code{chdist}).
 }
 \description{
 Specify either a symmetric distance matrix or the file from which to read the matrix.

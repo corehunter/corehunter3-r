@@ -15,6 +15,34 @@ test_that("arguments are checked", {
   expect_error(sampleCore(data, size = 1.4), "size")
   expect_error(sampleCore(data, size = getSize(data)), "size")
   expect_error(sampleCore(data, size = getSize(data) + sample(1:10, size = 1)), "size")
+  expect_error(sampleCore(data, obj = "abc"), "class 'chobj'")
+  expect_error(sampleCore(data, obj = list(123)), "class 'chobj'")
+  expect_error(sampleCore(data, obj = list(objective("SH"), objective("SH"))), "Duplicate objectives.")
+})
+
+test_that("No default objective when data contains multiple types", {
+  # ...
+})
+
+# !!! TODO: use fast mode in tests
+
+test_that("result contains indices or names", {
+  data <- testData()
+  expect_true(is.character(sampleCore(data)$sel))
+  expect_true(is.numeric(sampleCore(data, indices = TRUE)$sel))
+})
+
+test_that("default objective for distance data only", {
+  expect_silent(sampleCore(testData()))
+})
+
+#####################
+context("Objectives")
+#####################
+
+test_that("class is correct", {
+  obj <- objective()
+  expect_is(obj, "chobj")
 })
 
 

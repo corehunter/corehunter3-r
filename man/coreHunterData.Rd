@@ -7,13 +7,19 @@
 coreHunterData(genotypes, phenotypes, distances)
 }
 \arguments{
-\item{genotypes}{Genetic marker data of class 'chgeno' as returned by function 'genotypes'.}
+\item{genotypes}{Genetic marker data (\code{chgeno}).}
 
-\item{phenotypes}{Phenotypic trait data of class 'chpheno' as returned by function 'phenotypes'.}
+\item{phenotypes}{Phenotypic trait data (\code{chpheno}).}
 
-\item{distances}{Precomputed distance matrix of class 'chdist' as returned by function 'distances'.}
+\item{distances}{Precomputed distance matrix (\code{chdist}).}
+}
+\value{
+Core Hunter data (\code{chdata}).
 }
 \description{
 The data may contain genotypes, phenotypes and/or a precomputed distance matrix.
+}
+\seealso{
+\code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 }
 

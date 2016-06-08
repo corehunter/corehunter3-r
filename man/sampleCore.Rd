@@ -4,20 +4,38 @@
 \alias{sampleCore}
 \title{Sample a core collection from the given data.}
 \usage{
-sampleCore(data, size = 0.2, objectives)
+sampleCore(data, size = 0.2, obj, indices = FALSE)
 }
 \arguments{
-\item{data}{Core Hunter data of class 'chdata' containing genotypes,
+\item{data}{Core Hunter data (\code{chdata}) containing genotypes,
 phenotypes and/or a precomputed distance matrix.}
 
 \item{size}{Desired core subset size (numeric). If larger than one the value
-is used as the absolute core size after rounding. Else it is used as the sampling
-rate and multiplied with the dataset size to determine the size of the core.
-The default sampling rate is 0.2.}
+is used as the absolute core size after rounding. Else it is used as the
+sampling rate and multiplied with the dataset size to determine the size of
+the core. The default sampling rate is 0.2.}
 
-\item{objectives}{List of objectives.}
+\item{obj}{Objective or list of objectives (\code{chobj}).
+If no objectives are specified and the data contains
+only genotypes, phenotypes or precomputed distances, the average
+entry-to-nearest entry distance (\code{EN}) is maximized, using
+Modified Rogers distance (\code{MR}) for genotypes and Gower
+distance (\code{GD}) for phenotypes, respectively.}
+
+\item{indices}{If \code{TRUE} the result contains the indices instead of names
+(default) of the selected individuals.}
+}
+\value{
+Core subset (\code{chcore}). It has an element \code{sel}
+ which is a character or numeric vector containing the names or indices,
+ respectively, of the selected individuals (see argument \code{indices}).
+ In addition the result has one or more elements that indicate the value
+ of each objective function that was included in the optimization.
 }
 \description{
 Sample a core collection from the given data.
+}
+\seealso{
+\code{\link{coreHunterData}}, \code{\link{objective}}
 }
 
