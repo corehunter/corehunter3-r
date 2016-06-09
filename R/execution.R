@@ -16,8 +16,22 @@
 #'   entry-to-nearest entry distance (\code{EN}) is maximized, using
 #'   Modified Rogers distance (\code{MR}) for genotypes and Gower
 #'   distance (\code{GD}) for phenotypes, respectively.
+#' @param mode Execution mode (\code{default} or \code{fast}). In default mode,
+#'   Core Hunter uses an advanced parallel tempering search algorithm and terminates
+#'   when no improvement is found for 5 seconds. In fast mode, a simple stochastic
+#'   hill-climbing algorithm is applied and Core Hunter terminates as soon as no
+#'   improvement is made for 1 second. Stop conditions can be overriden with
+#'   arguments \code{time} and \code{impr.time}.
+#' @param time Absolute runtime limit in seconds. Not used by default. If used
+#'   it should be a strictly positive value and is rounded to the nearest integer.
+#' @param impr.time Maximum time without improvement in seconds. When set to
+#'   \code{NA} a default value is set depending on the execution \code{mode}.
+#'   If set to another value it should be strictly positive and is rounded
+#'   to the nearest integer.
 #' @param indices If \code{TRUE} the result contains the indices instead of names
 #'   (default) of the selected individuals.
+#' @param silent If \code{TRUE} no search progress messages are printed to the console.
+#'   Defaults to \code{FALSE}.
 #'
 #' @return Core subset (\code{chcore}). It has an element \code{sel}
 #'  which is a character or numeric vector containing the names or indices,
@@ -29,7 +43,8 @@
 #'
 #' @import rJava
 #' @export
-sampleCore <- function(data, size = 0.2, obj, indices = FALSE){
+sampleCore <- function(data, size = 0.2, obj, mode = c("default", "fast"),
+                       time = NA, impr.time = NA, indices = FALSE, silent = FALSE){
 
   # check data class
   if(!is(data, "chdata")){
@@ -47,6 +62,26 @@ sampleCore <- function(data, size = 0.2, obj, indices = FALSE){
   size <- round(size)
   if(size < 2 || size >= n){
     stop(sprintf("Core 'size' should be >= 2 and < %d (dataset size). Got: %d.", n, size))
+  }
+
+  # chek mode and stop conditions
+  mode <- match.arg(mode)
+  if(!is.na(time)){
+    time <- as.integer(round(time))
+    if(time <= 0){
+      stop("Time limit should positive a number (seconds).")
+    }
+  }
+  if(!is.na(impr.time)){
+    impr.time <- as.integer(round(impr.time))
+    if(impr.time <= 0){
+      stop("Maximum time without improvement should positive a number (seconds).")
+    }
+  }
+
+  # check silence
+  if(!is.logical(silent)){
+    stop("Argument 'silent' should be a logical.")
   }
 
   # set default objectives or check given objectives
@@ -89,7 +124,13 @@ sampleCore <- function(data, size = 0.2, obj, indices = FALSE){
   j.args <- api$createArguments(j.data, j.size, j.obj.array)
 
   # run Core Hunter
-  sel <- api$sampleCore(j.args)
+  if(is.na(time)){
+    time <- as.integer(-1)
+  }
+  if(is.na(impr.time)){
+    impr.time <- as.integer(-1)
+  }
+  sel <- api$sampleCore(j.args, mode, time, impr.time, silent)
   # convert indices to names if requested
   if(!indices){
     sel <- api$getIdsFromIndices(j.data, .jarray(sel))

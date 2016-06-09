@@ -4,7 +4,8 @@
 \alias{sampleCore}
 \title{Sample a core collection from the given data.}
 \usage{
-sampleCore(data, size = 0.2, obj, indices = FALSE)
+sampleCore(data, size = 0.2, obj, mode = c("default", "fast"), time = NA,
+  impr.time = NA, indices = FALSE, silent = FALSE)
 }
 \arguments{
 \item{data}{Core Hunter data (\code{chdata}) containing genotypes,
@@ -22,8 +23,26 @@ entry-to-nearest entry distance (\code{EN}) is maximized, using
 Modified Rogers distance (\code{MR}) for genotypes and Gower
 distance (\code{GD}) for phenotypes, respectively.}
 
+\item{mode}{Execution mode (\code{default} or \code{fast}). In default mode,
+Core Hunter uses an advanced parallel tempering search algorithm and terminates
+when no improvement is found for 5 seconds. In fast mode, a simple stochastic
+hill-climbing algorithm is applied and Core Hunter terminates as soon as no
+improvement is made for 1 second. Stop conditions can be overriden with
+arguments \code{time} and \code{impr.time}.}
+
+\item{time}{Absolute runtime limit in seconds. Not used by default. If used
+it should be a strictly positive value and is rounded to the nearest integer.}
+
+\item{impr.time}{Maximum time without improvement in seconds. When set to
+\code{NA} a default value is set depending on the execution \code{mode}.
+If set to another value it should be strictly positive and is rounded
+to the nearest integer.}
+
 \item{indices}{If \code{TRUE} the result contains the indices instead of names
 (default) of the selected individuals.}
+
+\item{silent}{If \code{TRUE} no search progress messages are printed to the console.
+Defaults to \code{FALSE}.}
 }
 \value{
 Core subset (\code{chcore}). It has an element \code{sel}

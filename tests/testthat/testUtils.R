@@ -18,3 +18,7 @@ readDistanceMatrix <- function(){
   colnames(matrix) <- rownames(matrix)
   return(matrix)
 }
+
+testSampleCore <- function(...){
+  corehunter::sampleCore(..., mode = "f", time = 1, silent = TRUE)
+}

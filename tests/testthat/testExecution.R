@@ -24,16 +24,14 @@ test_that("No default objective when data contains multiple types", {
   # ...
 })
 
-# !!! TODO: use fast mode in tests
-
 test_that("result contains indices or names", {
   data <- testData()
-  expect_true(is.character(sampleCore(data)$sel))
-  expect_true(is.numeric(sampleCore(data, indices = TRUE)$sel))
+  expect_true(is.character(testSampleCore(data)$sel))
+  expect_true(is.numeric(testSampleCore(data, indices = TRUE)$sel))
 })
 
 test_that("default objective for distance data only", {
-  expect_silent(sampleCore(testData()))
+  expect_silent(testSampleCore(testData()))
 })
 
 #####################
