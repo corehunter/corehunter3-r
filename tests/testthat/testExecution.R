@@ -19,7 +19,7 @@ test_that("arguments are checked", {
   expect_error(sampleCore(data, obj = list(123)), "class 'chobj'")
   expect_error(sampleCore(data, obj = list(objective("SH"), objective("SH"))), "Duplicate objectives.")
   expect_error(sampleCore(data, indices = "no"), "logical")
-  expect_error(sampleCore(data, silent = "yes"), "logical")
+  expect_error(sampleCore(data, verbose = "yes"), "logical")
   expect_error(sampleCore(data, time = "abc"), "numeric")
   expect_error(sampleCore(data, impr.time = "def"), "numeric")
   expect_error(sampleCore(data, time = 0), "positive")

@@ -19,6 +19,12 @@ Core Hunter data (\code{chdata}).
 \description{
 The data may contain genotypes, phenotypes and/or a precomputed distance matrix.
 }
+\examples{
+dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
+chData <- coreHunterData(distances = distances(file = dist.file))
+chData
+
+}
 \seealso{
 \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 }

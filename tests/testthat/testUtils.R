@@ -20,5 +20,5 @@ readDistanceMatrix <- function(){
 }
 
 testSampleCore <- function(...){
-  corehunter::sampleCore(..., mode = "f", time = 1, silent = TRUE)
+  corehunter::sampleCore(..., mode = "f", time = 1)
 }

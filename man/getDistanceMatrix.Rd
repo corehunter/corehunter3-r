@@ -15,4 +15,10 @@ distance matrix (numeric)
 \description{
 Retrieve precomputed distance matrix.
 }
+\examples{
+data <- exampleData()
+m <- getDistanceMatrix(data)
+m
+
+}
 

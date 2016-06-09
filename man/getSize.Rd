@@ -15,4 +15,9 @@ dataset size
 \description{
 Retrieve dataset size.
 }
+\examples{
+data <- exampleData()
+getSize(data)
+
+}
 

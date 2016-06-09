@@ -1,3 +1,25 @@
+# ------------ #
+# EXAMPLE DATA #
+# ------------ #
+
+#' Read example data for 100 individuals.
+#'
+#' Reads a precomputed distance matrix from \code{extdata/distances.csv}.
+#'
+#' @source ...
+#'
+#' @return data of class \code{chdata}
+#' @export
+exampleData <- function(){
+  getFile <- function(file){
+    system.file("extdata", file, package = "corehunter")
+  }
+  # TODO include genotypes and phenotypes
+  coreHunterData(
+    distances = distances(file = getFile("distances.csv"))
+  )
+}
+
 # ---------------- #
 # CORE HUNTER DATA #
 # ---------------- #
@@ -11,6 +33,11 @@
 #' @param distances Precomputed distance matrix (\code{chdist}).
 #'
 #' @return Core Hunter data (\code{chdata}).
+#'
+#' @examples
+#' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
+#' chData <- coreHunterData(distances = distances(file = dist.file))
+#' chData
 #'
 #' @seealso \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 #'
@@ -93,6 +120,24 @@ getDistanceMatrix.chdata <- function(data){
 #'
 #' @param matrix Symmetric distance matrix. Row and column names are required and used as item ids.
 #' @param file File from which to read the distance matrix.
+#'
+#' @examples
+#' # read from file
+#'
+#' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
+#' dist <- distances(file = dist.file)
+#'
+#' # create from distance matrix
+#'
+#' m <- matrix(runif(100), nrow = 10, ncol = 10)
+#' diag(m) <- 0
+#' # make symmetric
+#' m[lower.tri(m)] <- t(m)[lower.tri(m)]
+#' # set headers
+#' rownames(m) <- colnames(m) <- paste("i", 1:10, sep = "-")
+#'
+#' dist <- distances(m)
+#' dist
 #'
 #' @return distance matrix data (\code{chdist}).
 #'
@@ -217,6 +262,11 @@ getSize.chdata <- function(data){
 #'
 #' @param data data object containing distances
 #'
+#' @examples
+#' data <- exampleData()
+#' m <- getDistanceMatrix(data)
+#' m
+#'
 #' @return distance matrix (numeric)
 #' @export
 getDistanceMatrix <- function(data){
@@ -226,6 +276,10 @@ getDistanceMatrix <- function(data){
 #' Retrieve dataset size.
 #'
 #' @param data data object
+#'
+#' @examples
+#' data <- exampleData()
+#' getSize(data)
 #'
 #' @return dataset size
 #' @export

@@ -5,7 +5,7 @@
 \title{Sample a core collection from the given data.}
 \usage{
 sampleCore(data, size = 0.2, obj, mode = c("default", "fast"), time = NA,
-  impr.time = NA, indices = FALSE, silent = FALSE)
+  impr.time = NA, indices = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{data}{Core Hunter data (\code{chdata}) containing genotypes,
@@ -41,7 +41,7 @@ to the nearest integer.}
 \item{indices}{If \code{TRUE} the result contains the indices instead of names
 (default) of the selected individuals.}
 
-\item{silent}{If \code{TRUE} no search progress messages are printed to the console.
+\item{verbose}{If \code{TRUE} search progress messages are printed to the console.
 Defaults to \code{FALSE}.}
 }
 \value{
@@ -53,6 +53,39 @@ Core subset (\code{chcore}). It has an element \code{sel}
 }
 \description{
 Sample a core collection from the given data.
+}
+\examples{
+data <- exampleData()
+
+# default size and objective (fast mode)
+sampleCore(data, mode = "f")
+
+\dontrun{
+# absolute size
+sampleCore(data, size = 25)
+# relative size
+sampleCore(data, size = 0.1)
+
+# custom objective
+sampleCore(data, obj = objective(type = "AN", meas = "PD"))
+# multiple objectives (equal weight)
+sampleCore(data, obj = list(
+ objective("EN", "PD"),
+ objective("AN", "PD")
+))
+# multiple objectives (custom weight)
+sampleCore(data, obj = list(
+ objective("EN", "PD", weight = 0.3),
+ objective("AN", "PD", weight = 0.7)
+))
+
+# custom stop conditions
+sampleCore(data, time = 5, impr.time = 2)
+
+# print progress messages
+sampleCore(data, verbose = TRUE)
+}
+
 }
 \seealso{
 \code{\link{coreHunterData}}, \code{\link{objective}}

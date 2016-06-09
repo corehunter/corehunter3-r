@@ -12,6 +12,13 @@
 #'
 #' @return Value of the core when evaluated with the chosen objective (numeric).
 #'
+#' @examples
+#' data <- exampleData()
+#' core <- sampleCore(data, mode = "f")
+#' evaluateCore(core, data, objective("EN", "PD"))
+#' evaluateCore(core, data, objective("AN", "PD"))
+#' evaluateCore(core, data, objective("EE", "PD"))
+#'
 #' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
 #'
 #' @import rJava

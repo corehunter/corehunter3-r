@@ -83,4 +83,11 @@ between individuals. These distances can be computed using various measures:
  }
 }
 }
+\examples{
+objective()
+objective(meas = "MR")
+objective("EE", "GD")
+objective("HE")
+
+}
 

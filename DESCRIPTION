@@ -13,6 +13,7 @@ Description: Interface to the Core Hunter software for core subset selection.
     optimize a weighted combination of several measures, to meet both the breeder's
     and geneticist's expectations.
 Depends: R (>= 3.2.3), rJava (>= 0.9-8)
+Imports: naturalsort (>= 0.1.2)
 SystemRequirements: Java JDK 1.8 or higher
 License: MIT + file LICENSE
 LazyData: true

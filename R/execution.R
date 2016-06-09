@@ -30,7 +30,7 @@
 #'   to the nearest integer.
 #' @param indices If \code{TRUE} the result contains the indices instead of names
 #'   (default) of the selected individuals.
-#' @param silent If \code{TRUE} no search progress messages are printed to the console.
+#' @param verbose If \code{TRUE} search progress messages are printed to the console.
 #'   Defaults to \code{FALSE}.
 #'
 #' @return Core subset (\code{chcore}). It has an element \code{sel}
@@ -39,12 +39,45 @@
 #'  In addition the result has one or more elements that indicate the value
 #'  of each objective function that was included in the optimization.
 #'
+#' @examples
+#' data <- exampleData()
+#'
+#' # default size and objective (fast mode)
+#' sampleCore(data, mode = "f")
+#'
+#' \dontrun{
+#' # absolute size
+#' sampleCore(data, size = 25)
+#' # relative size
+#' sampleCore(data, size = 0.1)
+#'
+#' # custom objective
+#' sampleCore(data, obj = objective(type = "AN", meas = "PD"))
+#' # multiple objectives (equal weight)
+#' sampleCore(data, obj = list(
+#'  objective("EN", "PD"),
+#'  objective("AN", "PD")
+#' ))
+#' # multiple objectives (custom weight)
+#' sampleCore(data, obj = list(
+#'  objective("EN", "PD", weight = 0.3),
+#'  objective("AN", "PD", weight = 0.7)
+#' ))
+#'
+#' # custom stop conditions
+#' sampleCore(data, time = 5, impr.time = 2)
+#'
+#' # print progress messages
+#' sampleCore(data, verbose = TRUE)
+#' }
+#'
 #' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
 #'
 #' @import rJava
+#' @import naturalsort
 #' @export
 sampleCore <- function(data, size = 0.2, obj, mode = c("default", "fast"),
-                       time = NA, impr.time = NA, indices = FALSE, silent = FALSE){
+                       time = NA, impr.time = NA, indices = FALSE, verbose = FALSE){
 
   # check data class
   if(!is(data, "chdata")){
@@ -89,8 +122,8 @@ sampleCore <- function(data, size = 0.2, obj, mode = c("default", "fast"),
   if(!is.logical(indices)){
     stop("Argument 'indices' should be a logical.")
   }
-  if(!is.logical(silent)){
-    stop("Argument 'silent' should be a logical.")
+  if(!is.logical(verbose)){
+    stop("Argument 'verbose' should be a logical.")
   }
 
   # set default objectives or check given objectives
@@ -139,13 +172,13 @@ sampleCore <- function(data, size = 0.2, obj, mode = c("default", "fast"),
   if(is.na(impr.time)){
     impr.time <- as.integer(-1)
   }
-  sel <- api$sampleCore(j.args, mode, time, impr.time, silent)
+  sel <- api$sampleCore(j.args, mode, time, impr.time, !verbose)
   # convert indices to names if requested
   if(!indices){
     sel <- api$getIdsFromIndices(j.data, .jarray(sel))
   }
   # sort selection
-  sel <- sort(sel)
+  sel <- naturalsort(sel)
 
   # wrap result
   core <-list(
@@ -245,6 +278,12 @@ sampleCore <- function(data, size = 0.2, obj, mode = c("default", "fast"),
 #'   index. Defaults to 1.0.
 #'
 #' @return Core Hunter objective (\code{chobj}).
+#'
+#' @examples
+#' objective()
+#' objective(meas = "MR")
+#' objective("EE", "GD")
+#' objective("HE")
 #'
 #' @export
 objective <- function(type = c("EN", "AN", "EE", "SH", "HE", "CV"),
