@@ -49,7 +49,7 @@ evaluateCore.numeric <- function(core, data, objective){
 
   # evaluate core
   api <- ch.api()
-  j.core <- as.integer(core)
+  j.core <- .jarray(as.integer(core))
   j.data <- data$java
   value <- api$evaluateCore(j.core, j.data, j.objective)
 

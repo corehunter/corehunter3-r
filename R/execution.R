@@ -67,19 +67,28 @@ sampleCore <- function(data, size = 0.2, obj, mode = c("default", "fast"),
   # chek mode and stop conditions
   mode <- match.arg(mode)
   if(!is.na(time)){
+    if(!is.numeric(time)){
+      stop("Time limit should be numeric.")
+    }
     time <- as.integer(round(time))
     if(time <= 0){
       stop("Time limit should positive a number (seconds).")
     }
   }
   if(!is.na(impr.time)){
+    if(!is.numeric(impr.time)){
+      stop("Maximum time without improvement should be numeric.")
+    }
     impr.time <- as.integer(round(impr.time))
     if(impr.time <= 0){
       stop("Maximum time without improvement should positive a number (seconds).")
     }
   }
 
-  # check silence
+  # check logicals
+  if(!is.logical(indices)){
+    stop("Argument 'indices' should be a logical.")
+  }
   if(!is.logical(silent)){
     stop("Argument 'silent' should be a logical.")
   }
