@@ -94,12 +94,26 @@ sampleCore <- function(data, size = 0.2, obj, indices = FALSE){
   if(!indices){
     sel <- api$getIdsFromIndices(j.data, .jarray(sel))
   }
+  # sort selection
+  sel <- sort(sel)
 
   # wrap result
-  # TODO: add objective function value(s)
   core <-list(
     sel = sel
   )
+  # add objective function values
+  for(o in obj){
+    value <- evaluateCore(sel, data, o)
+    if(is.null(o$meas)){
+      core[[o$type]] <- value
+    } else {
+      if(is.null(core[[o$type]])){
+        core[[o$type]] <- list()
+      }
+      core[[o$type]][[o$meas]] <- value
+    }
+  }
+  # set class and return
   class(core) <- c("chcore", class(core))
   return(core)
 

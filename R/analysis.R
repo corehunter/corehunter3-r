@@ -17,7 +17,7 @@
 #' @import rJava
 #' @export
 evaluateCore <- function(core, data, objective){
-  UseMethod("analyzeCore")
+  UseMethod("evaluateCore")
 }
 
 #' @export
@@ -27,8 +27,10 @@ evaluateCore.chcore <- function(core, data, objective){
 
 #' @export
 evaluateCore.character <- function(core, data, objective){
-  # TODO: convert names to indices and call method below
-  # ...
+  # convert names to indices
+  api <- ch.api()
+  core <- api$getIndicesFromIds(data$java, .jarray(core))
+  evaluateCore(core, data, objective)
 }
 
 #' @export
