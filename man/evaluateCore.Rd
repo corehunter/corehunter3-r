@@ -7,14 +7,16 @@
 evaluateCore(core, data, objective)
 }
 \arguments{
+\item{core}{A core collection of class \code{chcore}, or a
+numeric or character vector indicating the indices or names,
+respectively, of the individuals in the evaluated core.}
+
 \item{data}{Core Hunter data (\code{chdata}) containing genotypes,
 phenotypes and/or a precomputed distance matrix. Can also be an
 object of class \code{chdist}, \code{chgeno} or \code{chpheno}
 if only one type of data is provided.}
 
 \item{objective}{Objective function (\code{chobj}) used to evaluate the core.}
-
-\item{data}{Core Hunter data (\code{chdata}) contain}
 }
 \value{
 Value of the core when evaluated with the chosen objective (numeric).
