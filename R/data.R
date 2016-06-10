@@ -325,14 +325,65 @@ print.chgeno <- function(x, ...){
 # PHENOTYPE DATA #
 # -------------- #
 
-#' Create phenotype data.
+#' Read phenotype data from file.
 #'
-#' To do.
+#' See \url{www.corehunter.org} for documentation and examples
+#' of the phenotype data format used by Core Hunter.
+#'
+#' @param file File containing the phenotype data.
+#'
+#' @return Phenotype data of class \code{chpheno} with elements
+#' \describe{
+#'  \item{\code{data}}{Phenotypes (data frame).}
+#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
+#'  \item{\code{java}}{Java version of the data object.}
+#' }
+#'
+#' @examples
+#' pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
+#' pheno <- phenotypes(pheno.file)
 #'
 #' @import rJava
 #' @export
-phenotypes <- function(){
+phenotypes <- function(file){
 
+  # check input
+  if(missing(file)){
+    stop("File path is required.")
+  }
+
+  api <- ch.api()
+
+  # read from file
+
+  # check file path
+  if(!is.character(file)){
+    stop("Argument 'file' should be a file path (character).")
+  }
+  if(!file.exists(file)){
+    stop("File 'file' does not exist.")
+  }
+
+  # read from file
+  java.obj <- api$readPhenotypeData(file)
+  # read raw data
+  data <- read.csv(file, row.names = 1, check.names = FALSE, as.is = TRUE)
+
+  # create R object
+  pheno <- list(
+    data = data,
+    file = file,
+    java = java.obj
+  )
+  class(pheno) <- c("chpheno", "chdata", class(pheno))
+
+  return(pheno)
+
+}
+
+#' @export
+print.chpheno <- function(x, ...){
+  cat(sprintf("Phenotypes for %d individuals.", getSize(x)))
 }
 
 # ------- #

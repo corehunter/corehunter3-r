@@ -2,11 +2,28 @@
 % Please edit documentation in R/data.R
 \name{phenotypes}
 \alias{phenotypes}
-\title{Create phenotype data.}
+\title{Read phenotype data from file.}
 \usage{
-phenotypes()
+phenotypes(file)
+}
+\arguments{
+\item{file}{File containing the phenotype data.}
+}
+\value{
+Phenotype data of class \code{chpheno} with elements
+\describe{
+ \item{\code{data}}{Phenotypes (data frame).}
+ \item{\code{file}}{Path of file from which data was read (if applicable).}
+ \item{\code{java}}{Java version of the data object.}
+}
 }
 \description{
-To do.
+See \url{www.corehunter.org} for documentation and examples
+of the phenotype data format used by Core Hunter.
+}
+\examples{
+pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
+pheno <- phenotypes(pheno.file)
+
 }
 

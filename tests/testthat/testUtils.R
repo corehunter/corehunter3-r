@@ -17,8 +17,8 @@ testData <- function(){
 distanceData <- function(){
   distances(file = distanceFile())
 }
-genotypeData <- function(){
-  genotypes(file = genotypeFile())
+genotypeData <- function(format = c("default", "biparental", "frequency")){
+  genotypes(file = genotypeFile(format))
 }
 
 distanceFile <- function(){
