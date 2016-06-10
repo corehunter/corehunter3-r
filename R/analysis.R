@@ -4,10 +4,11 @@
 
 #' Evaluate a core collection using the specified objective.
 #'
-#' @param core Can be either a core collection reference (\code{chcore}) or a
-#'   numeric or character vector indicating the indices or names, respectively,
-#'   of the individuals in the evaluated core.
-#' @param data Core Hunter data (\code{chdata}).
+#' @param data Core Hunter data (\code{chdata}) containing genotypes,
+#'   phenotypes and/or a precomputed distance matrix. Can also be an
+#'   object of class \code{chdist}, \code{chgeno} or \code{chpheno}
+#'   if only one type of data is provided.
+#' @param data Core Hunter data (\code{chdata}) contain
 #' @param objective Objective function (\code{chobj}) used to evaluate the core.
 #'
 #' @return Value of the core when evaluated with the chosen objective (numeric).
@@ -43,6 +44,7 @@ evaluateCore.character <- function(core, data, objective){
 #' @export
 evaluateCore.numeric <- function(core, data, objective){
 
+  data <- wrapData(data)
   # check arguments
   if(!is(data, 'chdata')){
     stop("Argument 'data' should be of class 'chdata' (see function 'coreHunterData').")

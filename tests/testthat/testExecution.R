@@ -28,34 +28,63 @@ test_that("arguments are checked", {
 })
 
 test_that("No default objective when data contains multiple types", {
-  # ...
+  expect_error(sampleCore(testData(), "specify at least one objective"))
 })
 
 test_that("result contains indices or names", {
   data <- testData()
-  expect_true(is.character(testSampleCore(data)$sel))
-  expect_true(is.numeric(testSampleCore(data, indices = TRUE)$sel))
+  obj <- objective("EE", "PD")
+  expect_true(is.character(testSampleCore(data, obj)$sel))
+  expect_true(is.numeric(testSampleCore(data, obj, indices = TRUE)$sel))
 })
 
 test_that("default objective for distance data only", {
-  expect_silent(testSampleCore(testData()))
+  expect_silent(testSampleCore(testData()$dist))
 })
 
-test_that("explicit objective", {
-  expect_silent(testSampleCore(testData(), obj = objective("EE", "PD")))
+test_that("default objective for genotypes only", {
+  expect_silent(testSampleCore(testData()$geno))
 })
+
+# test_that("default objective for phenotypes only", {
+#   expect_silent(testSampleCore(testData()$pheno))
+# })
 
 test_that("multiple objectives", {
   expect_silent(testSampleCore(testData(), obj = list(objective("AN", "PD"), objective("EE", "PD"))))
 })
 
 test_that("core has expected class and elements", {
-  core <- testSampleCore(testData())
+  data <- testData()
+  # distances only
+  core <- testSampleCore(data$dist)
   expect_is(core, "chcore")
   expect_false(is.null(core$sel))
   expect_false(is.null(core$EN))
   expect_false(is.null(core$EN$PD))
-  expect_equal(core$EN$PD, evaluateCore(core, testData(), objective("EN", "PD")))
+  expect_equal(core$EN$PD, evaluateCore(core, data$dist, objective("EN", "PD")))
+  # genotypes only
+  core <- testSampleCore(data$geno)
+  expect_is(core, "chcore")
+  expect_false(is.null(core$sel))
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$MR))
+  expect_equal(core$EN$MR, evaluateCore(core, data$geno, objective("EN", "MR")))
+  # phenotypes only
+  # ...
+  # combined
+  core <- testSampleCore(data, list(
+    # TODO: include objective for phenotypes
+    objective("EE", "PD"),
+    objective("SH")
+  ))
+  expect_is(core, "chcore")
+  expect_false(is.null(core$sel))
+  expect_false(is.null(core$EE))
+  expect_false(is.null(core$EE$PD))
+  expect_false(is.null(core$SH))
+  expect_equal(core$EE$PD, evaluateCore(core, data, objective("EE", "PD")))
+  expect_equal(core$SH, evaluateCore(core, data, objective("SH")))
 })
 
 #####################

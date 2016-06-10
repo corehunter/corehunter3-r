@@ -4,17 +4,20 @@
 \alias{coreHunterData}
 \title{Initialize Core Hunter data.}
 \usage{
-coreHunterData(genotypes, phenotypes, distances)
+coreHunterData(distances, genotypes, phenotypes)
 }
 \arguments{
+\item{distances}{Precomputed distance matrix (\code{chdist}).}
+
 \item{genotypes}{Genetic marker data (\code{chgeno}).}
 
 \item{phenotypes}{Phenotypic trait data (\code{chpheno}).}
-
-\item{distances}{Precomputed distance matrix (\code{chdist}).}
 }
 \value{
-Core Hunter data (\code{chdata}).
+Core Hunter data (\code{chdata}) with elements \code{dist},
+ \code{geno} and/or \code{pheno}, depending on which data is provided,
+ as well as an element \code{java} that holds the Java version of the
+ data object.
 }
 \description{
 The data may contain genotypes, phenotypes and/or a precomputed distance matrix.

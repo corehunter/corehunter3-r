@@ -4,17 +4,14 @@
 \alias{sampleCore}
 \title{Sample a core collection from the given data.}
 \usage{
-sampleCore(data, size = 0.2, obj, mode = c("default", "fast"), time = NA,
+sampleCore(data, obj, size = 0.2, mode = c("default", "fast"), time = NA,
   impr.time = NA, indices = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{data}{Core Hunter data (\code{chdata}) containing genotypes,
-phenotypes and/or a precomputed distance matrix.}
-
-\item{size}{Desired core subset size (numeric). If larger than one the value
-is used as the absolute core size after rounding. Else it is used as the
-sampling rate and multiplied with the dataset size to determine the size of
-the core. The default sampling rate is 0.2.}
+phenotypes and/or a precomputed distance matrix. Can also be an
+object of class \code{chdist}, \code{chgeno} or \code{chpheno}
+if only one type of data is provided.}
 
 \item{obj}{Objective or list of objectives (\code{chobj}).
 If no objectives are specified and the data contains
@@ -22,6 +19,11 @@ only genotypes, phenotypes or precomputed distances, the average
 entry-to-nearest entry distance (\code{EN}) is maximized, using
 Modified Rogers distance (\code{MR}) for genotypes and Gower
 distance (\code{GD}) for phenotypes, respectively.}
+
+\item{size}{Desired core subset size (numeric). If larger than one the value
+is used as the absolute core size after rounding. Else it is used as the
+sampling rate and multiplied with the dataset size to determine the size of
+the core. The default sampling rate is 0.2.}
 
 \item{mode}{Execution mode (\code{default} or \code{fast}). In default mode,
 Core Hunter uses an advanced parallel tempering search algorithm and terminates

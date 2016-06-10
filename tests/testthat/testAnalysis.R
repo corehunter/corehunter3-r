@@ -14,14 +14,13 @@ test_that("arguments are checked", {
 
 test_that("larger cores are more representative but have higher redundancy", {
   data <- testData()
-  core.small <- testSampleCore(data, size = 5)
-  core.large <- testSampleCore(data, size = 95)
   objs <- list(
-    objective("EN"),
-    objective("EE"),
-    objective("AN")
+    objective("EN", "CE"),
+    objective("AN", "PD")
   )
   for(obj in objs){
+    core.small <- testSampleCore(data, size = 5, obj)
+    core.large <- testSampleCore(data, size = 95, obj)
     expect_gte(evaluateCore(core.small, data, obj), evaluateCore(core.large, data, obj))
   }
 })

@@ -32,7 +32,10 @@ exampleData <- function(){
 #' @param phenotypes Phenotypic trait data (\code{chpheno}).
 #' @param distances Precomputed distance matrix (\code{chdist}).
 #'
-#' @return Core Hunter data (\code{chdata}).
+#' @return Core Hunter data (\code{chdata}) with elements \code{dist},
+#'  \code{geno} and/or \code{pheno}, depending on which data is provided,
+#'  as well as an element \code{java} that holds the Java version of the
+#'  data object.
 #'
 #' @examples
 #' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
@@ -42,34 +45,34 @@ exampleData <- function(){
 #' @seealso \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 #'
 #' @export
-coreHunterData <- function(genotypes, phenotypes, distances){
+coreHunterData <- function(distances, genotypes, phenotypes){
 
   # check arguments
+  if(!missing(distances) && !is(distances, "chdist")){
+    stop("Argument 'distances' should contain Core Hunter distance matrix data of class 'chdist'.")
+  }
   if(!missing(genotypes) && !is(genotypes, "chgeno")){
     stop("Argument 'genotypes' should contain Core Hunter genotype data of class 'chgeno'.")
   }
   if(!missing(phenotypes) && !is(phenotypes, "chpheno")){
     stop("Argument 'phenotypes' should contain Core Hunter phenotype data of class 'chpheno'.")
   }
-  if(!missing(distances) && !is(distances, "chdist")){
-    stop("Argument 'distances' should contain Core Hunter distance matrix data of class 'chdist'.")
-  }
   if(missing(genotypes) && missing(phenotypes) && missing(distances)){
     stop("Please specify at least one type of data (genotypes, phenotypes and/or distances).")
   }
 
   # create data
+  j.dist <- .jnull(ch.distances())
   j.geno <- .jnull(ch.genotypes())
   j.pheno <- .jnull(ch.phenotypes())
-  j.dist <- .jnull(ch.distances())
+  if(!missing(distances)){
+    j.dist <- distances$java
+  }
   if(!missing(genotypes)){
     j.geno <- genotypes$java
   }
   if(!missing(phenotypes)){
     j.pheno <- phenotypes$java
-  }
-  if(!missing(distances)){
-    j.dist <- distances$java
   }
   java.obj <- new(ch.data(), j.geno, j.pheno, j.dist)
 
@@ -77,6 +80,15 @@ coreHunterData <- function(genotypes, phenotypes, distances){
   data <- list(
     java = java.obj
   )
+  if(!missing(distances)){
+    data$dist <- distances
+  }
+  if(!missing(genotypes)){
+    data$geno <- genotypes
+  }
+  if(!missing(phenotypes)){
+    data$pheno <- phenotypes
+  }
   class(data) <- c("chdata", class(data))
 
   return(data)
@@ -102,14 +114,6 @@ print.chdata <- function(x, ...){
   cat(sprintf("Core Hunter data containing %s for %d individuals.", available, data$getSize()))
 }
 
-#' @export
-getDistanceMatrix.chdata <- function(data){
-  if(!data$java$hasDistances()){
-    stop("No distances in given Core Hunter data.")
-  }
-  distances2matrix(data$java$getDistancesData())
-}
-
 # -------------------- #
 # DISTANCE MATRIX DATA #
 # -------------------- #
@@ -117,9 +121,25 @@ getDistanceMatrix.chdata <- function(data){
 #' Create distances data from matrix or file.
 #'
 #' Specify either a symmetric distance matrix or the file from which to read the matrix.
+#' See \url{www.corehunter.org} for documentation and examples of the distance matrix
+#' file format used by Core Hunter.
 #'
-#' @param matrix Symmetric distance matrix. Row and column names are required and used as item ids.
+#' @param data Symmetric distance matrix. Unique row and column names are required,
+#'  should be the same and are used as item ids. Can be a \code{numeric} matrix or a data frame.
+#'  The data frame may optionally include a first column \code{NAME} (\code{character})
+#'  used to assign a name to some or all individuals. The remaining columns should
+#'  be \code{numeric}.
 #' @param file File from which to read the distance matrix.
+#'
+#' @return Distance matrix data of class \code{chdist} with elements
+#' \describe{
+#'  \item{\code{data}}{
+#'    Distance matrix. Data frame or \code{numeric} matrix, as provided.
+#'    Data frame if read from a file.
+#'  }
+#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
+#'  \item{\code{java}}{Java version of the data object.}
+#' }
 #'
 #' @examples
 #' # read from file
@@ -139,17 +159,15 @@ getDistanceMatrix.chdata <- function(data){
 #' dist <- distances(m)
 #' dist
 #'
-#' @return distance matrix data (\code{chdist}).
-#'
 #' @import rJava
 #' @export
-distances <- function(matrix, file){
+distances <- function(data, file){
 
   # check input
-  if(missing(matrix) && missing(file)){
+  if(missing(data) && missing(file)){
     stop("Please specify matrix or file.")
   }
-  if(!missing(matrix) && !missing(file)){
+  if(!missing(data) && !missing(file)){
     stop("Please specify either matrix or file, not both.")
   }
 
@@ -157,9 +175,7 @@ distances <- function(matrix, file){
 
   if(!missing(file)){
 
-    ##################
-    # read from file #
-    ##################
+    # read from file
 
     # check file path
     if(!is.character(file)){
@@ -169,17 +185,38 @@ distances <- function(matrix, file){
       stop("File 'file' does not exist.")
     }
 
-    # read from file
+    # create Java object from file
     java.obj <- api$readDistanceMatrixData(file)
+    # read matrix as data frame
+    data <- read.csv(file, row.names = 1, check.names = FALSE, as.is = TRUE)
 
   } else {
 
-    #############
-    # in memory #
-    #############
+    # in memory
 
-    if(!is.matrix(matrix) || !is.numeric(matrix)){
-      stop("Argument 'matrix' should be a numeric matrix.")
+    # check type
+    if(!is.data.frame(data) && !is.matrix(data)){
+      stop("Argument 'matrix' should be a matrix or a data frame.")
+    }
+
+    # extract matrix
+    names <- NULL
+    if(is.matrix(data)){
+      matrix <- data
+    } else {
+      # strip names if provided and convert to matrix
+      names <- data$NAME
+      if(!is.null(names) && !is.character(names)){
+        stop("Column NAME should be of class 'character'.")
+      }
+      data.without.names <- data
+      data.without.names$NAME <- NULL
+      matrix <- as.matrix(data.without.names)
+    }
+
+    # check matrix
+    if(!is.numeric(matrix)){
+      stop("Distance matrix should be numeric")
     }
     if(is.null(rownames(matrix)) || is.null(colnames(matrix))){
       stop("Row and column names are required.")
@@ -189,27 +226,27 @@ distances <- function(matrix, file){
     }
 
     j.matrix <- .jarray(matrix, dispatch = TRUE)
-    j.ids <- .jarray(rownames(matrix))
-    j.names <- .jnull("[S") # no explicit names assigned
+    j.ids <- .jarray(rownames(data))
+    j.names <- .jnull("[S")
+    if(!is.null(names)){
+      j.names <- .jarray(names)
+    }
     java.obj <- api$createDistanceMatrixData(j.matrix, j.ids, j.names)
 
   }
 
   # create R object
-  file <- ifelse(missing(file), NA, file)
-  distances <- list(
-    file = file,
+  dist <- list(
+    data = data,
     java = java.obj
   )
-  class(distances) <- c("chdist", "chdata", class(distances))
+  if(!missing(file)){
+    dist$file = file
+  }
+  class(dist) <- c("chdist", "chdata", class(dist))
 
-  return(distances)
+  return(dist)
 
-}
-
-#' @export
-getDistanceMatrix.chdist <- function(data){
-  distances2matrix(data$java)
 }
 
 #' @export
@@ -221,14 +258,67 @@ print.chdist <- function(x, ...){
 # GENOTYPE DATA #
 # ------------- #
 
-#' Create genotype data.
+#' Read genotype data from file.
 #'
-#' To do.
+#' See \url{www.corehunter.org} for documentation and examples of the different
+#' genotype data formats supported by Core Hunter.
+#'
+#' @param file File containing the genotype data.
+#' @param format Genotype data format, one of \code{default}, \code{biparental} or \code{frequency}.
+#'
+#' @return Genotype data of class \code{chdist} with elements
+#' \describe{
+#'  \item{\code{data}}{Genotypes (data frame).}
+#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
+#'  \item{\code{java}}{Java version of the data object.}
+#' }
+#'
+#' @examples
+#' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
+#' geno <- genotypes(geno.file)
 #'
 #' @import rJava
 #' @export
-genotypes <- function(){
+genotypes <- function(file, format = c("default", "biparental", "frequency")){
 
+  # check input
+  if(missing(file)){
+    stop("File path is required.")
+  }
+  format <- match.arg(format)
+
+  api <- ch.api()
+
+  # read from file
+
+  # check file path
+  if(!is.character(file)){
+    stop("Argument 'file' should be a file path (character).")
+  }
+  if(!file.exists(file)){
+    stop("File 'file' does not exist.")
+  }
+
+  # read from file
+  java.obj <- api$readGenotypeData(file, format)
+  # read raw data
+  data <- read.csv(file, row.names = 1, check.names = FALSE, as.is = TRUE)
+
+  # create R object
+  geno <- list(
+    data = data,
+    file = file,
+    java = java.obj
+  )
+  class(geno) <- c("chgeno", "chdata", class(geno))
+
+  return(geno)
+
+}
+
+#' @export
+print.chgeno <- function(x, ...){
+  cat(sprintf("Genotypes for %d individuals.", getSize(x)))
 }
 
 # -------------- #
@@ -258,21 +348,6 @@ getSize.chdata <- function(data){
 # S3 METHODS #
 # ---------- #
 
-#' Retrieve precomputed distance matrix.
-#'
-#' @param data data object containing distances
-#'
-#' @examples
-#' data <- exampleData()
-#' m <- getDistanceMatrix(data)
-#' m
-#'
-#' @return distance matrix (numeric)
-#' @export
-getDistanceMatrix <- function(data){
-  UseMethod("getDistanceMatrix")
-}
-
 #' Retrieve dataset size.
 #'
 #' @param data data object
@@ -291,15 +366,21 @@ getSize <- function(data){
 # PRIVATE UTILITIES #
 # ----------------- #
 
-distances2matrix <- function(java.obj){
-  api <- ch.api()
-  # extract matrix from java object
-  matrix <- .jevalArray(api$getDistanceMatrix(java.obj), simplify = TRUE)
-  # set headers
-  colnames(matrix) <- rownames(matrix) <- api$getIds(java.obj)
-  return(matrix)
+# Wrap distances, genotypes or phenotypes in Core Hunter data.
+# If the given data does not match any of these three classes
+# it is returned unchanged.
+wrapData <- function(data){
+  if(is(data, "chdist")){
+    data <- coreHunterData(distances = data)
+  }
+  if(is(data, "chgeno")){
+    data <- coreHunterData(genotypes = data)
+  }
+  if(is(data, "chpheno")){
+    data <- coreHunterData(phenotypes = data)
+  }
+  return(data)
 }
-
 
 
 

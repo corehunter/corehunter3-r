@@ -1,24 +1,49 @@
 .jinit(Sys.glob("../../inst/java/*.jar"))
 
+# --------- #
+# TEST DATA #
+# --------- #
+
+getFile <- function(file){
+  system.file("extdata", file, package = "corehunter")
+}
+
 testData <- function(){
   coreHunterData(
-    distances = distanceData()
+    distances = distanceData(),
+    genotypes = genotypeData()
   )
 }
 distanceData <- function(){
-  distances(file = distanceMatrixFile())
+  distances(file = distanceFile())
+}
+genotypeData <- function(){
+  genotypes(file = genotypeFile())
 }
 
-distanceMatrixFile <- function(){
-  system.file("extdata", "distances.csv", package = "corehunter")
+distanceFile <- function(){
+  getFile("distances.csv")
 }
 readDistanceMatrix <- function(){
-  file <- distanceMatrixFile()
-  matrix <- as.matrix(read.csv(file, row.names = 1, header = T))
-  colnames(matrix) <- rownames(matrix)
+  file <- distanceFile()
+  matrix <- read.csv(file, row.names = 1, check.names = F, as.is = T)
   return(matrix)
 }
 
+genotypeFile <- function(format = c("default", "biparental", "frequency")){
+  format <- match.arg(format)
+  file <- switch(format,
+    "default" = "genotypes.csv",
+    "biparental" = "genotypes-biparental.csv",
+    "frequency" = "genotypes-frequency.csv"
+  )
+  getFile(file)
+}
+
+# ----------------- #
+# UTILITY FUNCTIONS #
+# ----------------- #
+
 testSampleCore <- function(...){
-  corehunter::sampleCore(..., mode = "f", time = 1)
+  sampleCore(..., mode = "f", time = 1)
 }

@@ -2,11 +2,30 @@
 % Please edit documentation in R/data.R
 \name{genotypes}
 \alias{genotypes}
-\title{Create genotype data.}
+\title{Read genotype data from file.}
 \usage{
-genotypes()
+genotypes(file, format = c("default", "biparental", "frequency"))
+}
+\arguments{
+\item{file}{File containing the genotype data.}
+
+\item{format}{Genotype data format, one of \code{default}, \code{biparental} or \code{frequency}.}
+}
+\value{
+Genotype data of class \code{chdist} with elements
+\describe{
+ \item{\code{data}}{Genotypes (data frame).}
+ \item{\code{file}}{Path of file from which data was read (if applicable).}
+ \item{\code{java}}{Java version of the data object.}
+}
 }
 \description{
-To do.
+See \url{www.corehunter.org} for documentation and examples of the different
+genotype data formats supported by Core Hunter.
+}
+\examples{
+geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
+geno <- genotypes(geno.file)
+
 }
 

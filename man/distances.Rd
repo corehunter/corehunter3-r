@@ -4,18 +4,32 @@
 \alias{distances}
 \title{Create distances data from matrix or file.}
 \usage{
-distances(matrix, file)
+distances(data, file)
 }
 \arguments{
-\item{matrix}{Symmetric distance matrix. Row and column names are required and used as item ids.}
+\item{data}{Symmetric distance matrix. Unique row and column names are required,
+should be the same and are used as item ids. Can be a \code{numeric} matrix or a data frame.
+The data frame may optionally include a first column \code{NAME} (\code{character})
+used to assign a name to some or all individuals. The remaining columns should
+be \code{numeric}.}
 
 \item{file}{File from which to read the distance matrix.}
 }
 \value{
-distance matrix data (\code{chdist}).
+Distance matrix data of class \code{chdist} with elements
+\describe{
+ \item{\code{data}}{
+   Distance matrix. Data frame or \code{numeric} matrix, as provided.
+   Data frame if read from a file.
+ }
+ \item{\code{file}}{Path of file from which data was read (if applicable).}
+ \item{\code{java}}{Java version of the data object.}
+}
 }
 \description{
 Specify either a symmetric distance matrix or the file from which to read the matrix.
+See \url{www.corehunter.org} for documentation and examples of the distance matrix
+file format used by Core Hunter.
 }
 \examples{
 # read from file
