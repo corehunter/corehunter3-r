@@ -26,10 +26,12 @@ Evaluate a core collection using the specified objective.
 }
 \examples{
 data <- exampleData()
-core <- sampleCore(data, mode = "f")
+core <- sampleCore(data, mode = "f", objective("EN", "PD"))
 evaluateCore(core, data, objective("EN", "PD"))
-evaluateCore(core, data, objective("AN", "PD"))
-evaluateCore(core, data, objective("EE", "PD"))
+evaluateCore(core, data, objective("AN", "MR"))
+evaluateCore(core, data, objective("EE", "GD"))
+evaluateCore(core, data, objective("CV"))
+evaluateCore(core, data, objective("HE"))
 
 }
 \seealso{

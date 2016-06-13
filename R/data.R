@@ -8,8 +8,12 @@
 #' genotypes from \code{"extdata/genotypes.csv"} and phenotypes from
 #' \code{"extdata/phenotypes.csv"}.
 #'
-#' @source TODO \url{...} Currently PowerCore but genotypes and phenotypes
-#'   are not really from the same individuals. Looking for better dataset.
+#' Genotypes and phenotypes are taken from the PowerCore project and, although
+#' this is not really the case, it is assumed here that they both describe
+#' the same population. Only the first 100 individuals are included.
+#' The distance matrix is computed from the phenotypic traits (Gower distance).
+#'
+#' @source \url{http://bioinformatics.oxfordjournals.org/content/23/16/2155.long}
 #'
 #' @return data of class \code{chdata}
 #' @export

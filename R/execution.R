@@ -44,16 +44,17 @@
 #' @examples
 #' data <- exampleData()
 #'
-#' # default size and objective (fast mode)
-#' sampleCore(data, mode = "f")
+#' # default size, fast mode, maximize entry-to-nearest-entry Modified Rogers distance
+#' obj <- objective("EE", "MR")
+#' sampleCore(data, mode = "f", obj)
 #'
 #' \dontrun{
 #' # absolute size
-#' sampleCore(data, size = 25)
+#' sampleCore(data, obj, size = 25)
 #' # relative size
-#' sampleCore(data, size = 0.1)
+#' sampleCore(data, obj, size = 0.1)
 #'
-#' # custom objective
+#' # other objective: minimize accession-to-nearest-entry precomputed distance
 #' sampleCore(data, obj = objective(type = "AN", meas = "PD"))
 #' # multiple objectives (equal weight)
 #' sampleCore(data, obj = list(
@@ -67,10 +68,10 @@
 #' ))
 #'
 #' # custom stop conditions
-#' sampleCore(data, time = 5, impr.time = 2)
+#' sampleCore(data, obj, time = 5, impr.time = 2)
 #'
 #' # print progress messages
-#' sampleCore(data, verbose = TRUE)
+#' sampleCore(data, obj, verbose = TRUE)
 #' }
 #'
 #' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
