@@ -24,6 +24,16 @@ test_that("read distance data from file", {
   expect_equal(dist$data, readDistanceMatrix())
 })
 
+test_that("read genotype data from file", {
+  geno <- genotypeData()
+  expect_equal(geno$file, genotypeFile())
+})
+
+test_that("read phenotype data from file", {
+  pheno <- phenotypeData()
+  expect_equal(pheno$file, phenotypeFile())
+})
+
 test_that("create distance data from matrix", {
   matrix <- readDistanceMatrix()
   # as data frame
@@ -56,6 +66,9 @@ test_that("arguments are checked", {
 
 test_that("class is correct", {
   expect_is(testData(), "chdata")
+  expect_is(distanceData(), "chdist")
+  expect_is(genotypeData(), "chgeno")
+  expect_is(phenotypeData(), "chpheno")
 })
 
 test_that("distance matrix is correct", {

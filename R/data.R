@@ -2,11 +2,14 @@
 # EXAMPLE DATA #
 # ------------ #
 
-#' Read example data for 100 individuals.
+#' Example dataset with 100 individuals.
 #'
-#' Reads a precomputed distance matrix from \code{extdata/distances.csv}.
+#' Reads a precomputed distance matrix from \code{"extdata/distances.csv"},
+#' genotypes from \code{"extdata/genotypes.csv"} and phenotypes from
+#' \code{"extdata/phenotypes.csv"}.
 #'
-#' @source ...
+#' @source TODO \url{...} Currently PowerCore but genotypes and phenotypes
+#'   are not really from the same individuals. Looking for better dataset.
 #'
 #' @return data of class \code{chdata}
 #' @export
@@ -14,9 +17,10 @@ exampleData <- function(){
   getFile <- function(file){
     system.file("extdata", file, package = "corehunter")
   }
-  # TODO include genotypes and phenotypes
   coreHunterData(
-    distances = distances(file = getFile("distances.csv"))
+    distances = distances(file = getFile("distances.csv")),
+    genotypes = genotypes(file = getFile("genotypes.csv")),
+    phenotypes = phenotypes(file = getFile("phenotypes.csv"))
   )
 }
 
@@ -318,7 +322,7 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
 
 #' @export
 print.chgeno <- function(x, ...){
-  cat(sprintf("Genotypes for %d individuals.", getSize(x)))
+  cat(sprintf("Genotypes for %d individuals (%d markers).", getSize(x), x$java$getNumberOfMarkers()))
 }
 
 # -------------- #
@@ -383,7 +387,7 @@ phenotypes <- function(file){
 
 #' @export
 print.chpheno <- function(x, ...){
-  cat(sprintf("Phenotypes for %d individuals.", getSize(x)))
+  cat(sprintf("Phenotypes for %d individuals (%d traits).", getSize(x) , x$java$getFeatures()$size()))
 }
 
 # ------- #

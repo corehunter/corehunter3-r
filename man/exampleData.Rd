@@ -2,9 +2,10 @@
 % Please edit documentation in R/data.R
 \name{exampleData}
 \alias{exampleData}
-\title{Read example data for 100 individuals.}
+\title{Example dataset with 100 individuals.}
 \source{
-...
+TODO \url{...} Currently PowerCore but genotypes and phenotypes
+  are not really from the same individuals. Looking for better dataset.
 }
 \usage{
 exampleData()
@@ -13,6 +14,8 @@ exampleData()
 data of class \code{chdata}
 }
 \description{
-Reads a precomputed distance matrix from \code{extdata/distances.csv}.
+Reads a precomputed distance matrix from \code{"extdata/distances.csv"},
+genotypes from \code{"extdata/genotypes.csv"} and phenotypes from
+\code{"extdata/phenotypes.csv"}.
 }
 

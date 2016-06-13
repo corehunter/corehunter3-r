@@ -39,6 +39,7 @@ evaluateCore.chcore <- function(core, data, objective){
 evaluateCore.character <- function(core, data, objective){
   # convert names to indices
   api <- ch.api()
+  data <- wrapData(data)
   core <- api$getIndicesFromIds(data$java, .jarray(core))
   evaluateCore(core, data, objective)
 }

@@ -46,12 +46,16 @@ test_that("default objective for genotypes only", {
   expect_silent(testSampleCore(testData()$geno))
 })
 
-# test_that("default objective for phenotypes only", {
-#   expect_silent(testSampleCore(testData()$pheno))
-# })
+test_that("default objective for phenotypes only", {
+  expect_silent(testSampleCore(testData()$pheno))
+})
 
 test_that("multiple objectives", {
-  expect_silent(testSampleCore(testData(), obj = list(objective("AN", "PD"), objective("EE", "PD"))))
+  expect_silent(testSampleCore(testData(), obj = list(
+    objective("AN", "PD"),
+    objective("EE", "PD"),
+    objective("EN", "GD")
+  )))
 })
 
 test_that("core has expected class and elements", {
@@ -71,20 +75,27 @@ test_that("core has expected class and elements", {
   expect_false(is.null(core$EN$MR))
   expect_equal(core$EN$MR, evaluateCore(core, data$geno, objective("EN", "MR")))
   # phenotypes only
-  # ...
+  core <- testSampleCore(data$pheno)
+  expect_false(is.null(core$sel))
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$GD))
+  expect_equal(core$EN$GD, evaluateCore(core, data$pheno, objective("EN", "GD")))
   # combined
   core <- testSampleCore(data, list(
-    # TODO: include objective for phenotypes
     objective("EE", "PD"),
-    objective("SH")
+    objective("SH"),
+    objective("AN", "GD")
   ))
   expect_is(core, "chcore")
   expect_false(is.null(core$sel))
   expect_false(is.null(core$EE))
   expect_false(is.null(core$EE$PD))
   expect_false(is.null(core$SH))
+  expect_false(is.null(core$AN))
+  expect_false(is.null(core$AN$GD))
   expect_equal(core$EE$PD, evaluateCore(core, data, objective("EE", "PD")))
   expect_equal(core$SH, evaluateCore(core, data, objective("SH")))
+  expect_equal(core$AN$GD, evaluateCore(core, data, objective("AN", "GD")))
 })
 
 #####################

@@ -11,7 +11,8 @@ getFile <- function(file){
 testData <- function(){
   coreHunterData(
     distances = distanceData(),
-    genotypes = genotypeData()
+    genotypes = genotypeData(),
+    phenotypes = phenotypeData()
   )
 }
 distanceData <- function(){
@@ -19,6 +20,9 @@ distanceData <- function(){
 }
 genotypeData <- function(format = c("default", "biparental", "frequency")){
   genotypes(file = genotypeFile(format))
+}
+phenotypeData <- function(){
+  phenotypes(file = phenotypeFile())
 }
 
 distanceFile <- function(){
@@ -38,6 +42,10 @@ genotypeFile <- function(format = c("default", "biparental", "frequency")){
     "frequency" = "genotypes-frequency.csv"
   )
   getFile(file)
+}
+
+phenotypeFile <- function(){
+  getFile("phenotypes.csv")
 }
 
 # ----------------- #
