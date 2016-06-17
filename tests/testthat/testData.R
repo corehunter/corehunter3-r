@@ -1,4 +1,5 @@
 source("testUtils.R")
+suppressPackageStartupMessages(library(StatMatch))
 
 #########################
 context("Distance data")
@@ -32,6 +33,13 @@ test_that("read genotype data from file", {
 test_that("read phenotype data from file", {
   pheno <- phenotypeData()
   expect_equal(pheno$file, phenotypeFile())
+  # check average Gower distance of all individuals without any missing data
+  # (Core Hunter treats missing data slightly differently than StatMatch)
+  full.data <- which(!apply(is.na(pheno$data), 1, any))
+  ranges <- as.numeric(apply(pheno$data[,2:40], 2, max, na.rm = T)) - as.numeric(apply(pheno$data[,2:40], 2, min, na.rm = T))
+  gd <- gower.dist(pheno$data[full.data, 2:40], rngs = ranges)
+  gd <- gd[lower.tri(gd)]
+  expect_equal(mean(gd), evaluateCore(full.data, pheno, objective("EE", "GD")))
 })
 
 test_that("create distance data from matrix", {

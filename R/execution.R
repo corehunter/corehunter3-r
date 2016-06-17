@@ -177,8 +177,10 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
     impr.time <- as.integer(-1)
   }
   sel <- api$sampleCore(j.args, mode, time, impr.time, !verbose)
-  # convert indices to names if requested
-  if(!indices){
+  if(indices){
+    sel <- toRIndices(sel)
+  } else {
+    # convert indices to names
     sel <- api$getIdsFromIndices(j.data, .jarray(sel))
   }
   # sort selection

@@ -39,5 +39,16 @@ ch.objectives <- function(objectives){
   return(j.objectives)
 }
 
+# ---------------- #
+# INDEX CONVERSION #
+# ---------------- #
+
+toJavaIndices <- function(indices){
+  as.integer(indices-1)
+}
+
+toRIndices <- function(indices){
+  indices + 1
+}
 
 

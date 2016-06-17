@@ -196,7 +196,7 @@ distances <- function(data, file){
     # create Java object from file
     java.obj <- api$readDistanceMatrixData(file)
     # read matrix as data frame
-    data <- read.csv(file, row.names = 1, check.names = FALSE, as.is = TRUE)
+    data <- read.csv(file, row.names = 1, check.names = F, stringsAsFactors = F)
 
   } else {
 
@@ -310,7 +310,7 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
   # read from file
   java.obj <- api$readGenotypeData(file, format)
   # read raw data
-  data <- read.csv(file, row.names = 1, check.names = FALSE, as.is = TRUE)
+  data <- read.csv(file, row.names = 1, check.names = F, stringsAsFactors = F)
 
   # create R object
   geno <- list(
@@ -343,6 +343,7 @@ print.chgeno <- function(x, ...){
 #' @return Phenotype data of class \code{chpheno} with elements
 #' \describe{
 #'  \item{\code{data}}{Phenotypes (data frame).}
+#'  \item{\code{types}}{Variable types and encodings.}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
 #' }
@@ -375,11 +376,27 @@ phenotypes <- function(file){
   # read from file
   java.obj <- api$readPhenotypeData(file)
   # read raw data
-  data <- read.csv(file, row.names = 1, check.names = FALSE, as.is = TRUE)
+  data <- read.csv(file, row.names = 1, check.names = F, stringsAsFactors = F)
+  # convert columns according to variable type and encoding
+  if("TYPE" %in% rownames(data)){
+    types <- data["TYPE",]
+  } else {
+    types <- rep("NS", ncol(data))
+  }
+  data <- data[rownames(data) != "TYPE",]
+  data.cols <- 1:ncol(data)
+  if(colnames(data)[1] == "NAME"){
+    data.cols <- 2:ncol(data)
+  }
+  for(c in data.cols){
+    data[[c]] <- convert.column(data[[c]], types[c])
+  }
+  types <- types[data.cols]
 
   # create R object
   pheno <- list(
     data = data,
+    types = types,
     file = file,
     java = java.obj
   )
@@ -387,6 +404,37 @@ phenotypes <- function(file){
 
   return(pheno)
 
+}
+
+convert.column <- function(col, type){
+  enc <- substr(type, 2, 2)
+  type <- substr(type, 1, 1)
+  # convert to proper encoding
+  if(enc == "B"){
+    # cfr. Java: boolean
+    col <- as.logical(col)
+  } else if(enc %in% c("T", "I", "L", "R")){
+    # cfr. Java: short, integer, long, big integer
+    col <- as.integer(col)
+  } else if(enc %in% c("F", "D", "M")){
+    # cfr. Java: float, double, big decimal
+    col <- as.numeric(col)
+  } else if(enc == "S"){
+    # cfr. Java: string
+    col <- as.character(col)
+  } else if(enc == "A"){
+    # cfr. Java: date
+    col <- as.Date(col, format = "%Y%m%d%H%M%S%z")
+  } else {
+    stop(sprintf("Unsupported variable encoding '%s'.", enc))
+  }
+  # convert to proper type
+  if(type == "N"){
+    col <- as.factor(col)
+  } else if(type == "O"){
+    col <- as.ordered(col)
+  }
+  return(col)
 }
 
 #' @export

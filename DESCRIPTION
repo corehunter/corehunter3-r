@@ -18,4 +18,4 @@ SystemRequirements: Java JDK 1.8 or higher
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
-Suggests: testthat
+Suggests: testthat, StatMatch

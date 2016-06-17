@@ -34,8 +34,11 @@ test_that("No default objective when data contains multiple types", {
 test_that("result contains indices or names", {
   data <- testData()
   obj <- objective("EE", "PD")
-  expect_true(is.character(testSampleCore(data, obj)$sel))
-  expect_true(is.numeric(testSampleCore(data, obj, indices = TRUE)$sel))
+  core.ids <- testSampleCore(data, obj, size = 5)
+  core.ind <- testSampleCore(data, obj, size = 5, indices = TRUE)
+  expect_true(is.character(core.ids$sel))
+  expect_true(is.numeric(core.ind$sel))
+  expect_equal(core.ids$sel, rownames(data$dist$data)[core.ind$sel])
 })
 
 test_that("default objective for distance data only", {
