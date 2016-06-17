@@ -5,7 +5,7 @@
 #' Evaluate a core collection using the specified objective.
 #'
 #' @param core A core collection of class \code{chcore}, or a
-#'   numeric or character vector indicating the indices or names,
+#'   numeric or character vector indicating the indices or ids,
 #'   respectively, of the individuals in the evaluated core.
 #' @param data Core Hunter data (\code{chdata}) containing genotypes,
 #'   phenotypes and/or a precomputed distance matrix. Can also be an
@@ -39,7 +39,7 @@ evaluateCore.chcore <- function(core, data, objective){
 
 #' @export
 evaluateCore.character <- function(core, data, objective){
-  # convert names to indices
+  # convert ids to indices
   api <- ch.api()
   data <- wrapData(data)
   core <- toRIndices(api$getIndicesFromIds(data$java, .jarray(core)))

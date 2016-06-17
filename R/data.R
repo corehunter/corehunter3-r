@@ -82,11 +82,11 @@ coreHunterData <- function(distances, genotypes, phenotypes){
   if(!missing(phenotypes)){
     j.pheno <- phenotypes$java
   }
-  java.obj <- new(ch.data(), j.geno, j.pheno, j.dist)
+  j.data <- new(ch.data(), j.geno, j.pheno, j.dist)
 
   # create R object
   data <- list(
-    java = java.obj
+    java = j.data
   )
   if(!missing(distances)){
     data$dist <- distances
@@ -132,29 +132,23 @@ print.chdata <- function(x, ...){
 #' See \url{www.corehunter.org} for documentation and examples of the distance matrix
 #' file format used by Core Hunter.
 #'
-#' @param data Symmetric distance matrix. Unique row and column names are required,
+#' @param data Symmetric distance matrix. Unique row and column headers are required,
 #'  should be the same and are used as item ids. Can be a \code{numeric} matrix or a data frame.
 #'  The data frame may optionally include a first column \code{NAME} (\code{character})
-#'  used to assign a name to some or all individuals. The remaining columns should
+#'  used to assign names to some or all individuals. The remaining columns should
 #'  be \code{numeric}.
 #' @param file File from which to read the distance matrix.
 #'
 #' @return Distance matrix data of class \code{chdist} with elements
 #' \describe{
-#'  \item{\code{data}}{
-#'    Distance matrix. Data frame or \code{numeric} matrix, as provided.
-#'    Data frame if read from a file.
-#'  }
+#'  \item{\code{data}}{Distance matrix (\code{numeric} matrix).}
+#'  \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
+#'    the unique id is used as the name as well}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
 #' }
 #'
 #' @examples
-#' # read from file
-#'
-#' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
-#' dist <- distances(file = dist.file)
-#'
 #' # create from distance matrix
 #'
 #' m <- matrix(runif(100), nrow = 10, ncol = 10)
@@ -165,7 +159,11 @@ print.chdata <- function(x, ...){
 #' rownames(m) <- colnames(m) <- paste("i", 1:10, sep = "-")
 #'
 #' dist <- distances(m)
-#' dist
+#'
+#' # read from file
+#'
+#' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
+#' dist <- distances(file = dist.file)
 #'
 #' @import rJava
 #' @export
@@ -181,6 +179,28 @@ distances <- function(data, file){
 
   api <- ch.api()
 
+  extract.matrix <- function(data){
+    # discard names (if set)
+    data$NAME <- NULL
+    # extract matrix
+    matrix <- as.matrix(data)
+    # check matrix
+    check.matrix(matrix)
+    return(matrix)
+  }
+
+  check.matrix <- function(matrix){
+    if(!is.numeric(matrix)){
+      stop("Distance matrix should be numeric")
+    }
+    if(is.null(rownames(matrix)) || is.null(colnames(matrix))){
+      stop("Row and column names are required.")
+    }
+    if(!isSymmetric(matrix)){
+      stop("Distance matrix should be symmetric.")
+    }
+  }
+
   if(!missing(file)){
 
     # read from file
@@ -192,11 +212,14 @@ distances <- function(data, file){
     if(!file.exists(file)){
       stop("File 'file' does not exist.")
     }
+    file <- normalizePath(file)
 
     # create Java object from file
-    java.obj <- api$readDistanceMatrixData(file)
+    j.data <- api$readDistanceMatrixData(file)
     # read matrix as data frame
-    data <- read.csv(file, row.names = 1, check.names = F, stringsAsFactors = F)
+    data <- read.autodelim(file)
+    # extract distance matrix
+    matrix <- extract.matrix(data)
 
   } else {
 
@@ -208,45 +231,30 @@ distances <- function(data, file){
     }
 
     # extract matrix
-    names <- NULL
     if(is.matrix(data)){
+      names <- as.character(rep(NA, nrow(data)))
       matrix <- data
+      check.matrix(matrix)
     } else {
-      # strip names if provided and convert to matrix
-      names <- data$NAME
-      if(!is.null(names) && !is.character(names)){
-        stop("Column NAME should be of class 'character'.")
-      }
-      data.without.names <- data
-      data.without.names$NAME <- NULL
-      matrix <- as.matrix(data.without.names)
-    }
-
-    # check matrix
-    if(!is.numeric(matrix)){
-      stop("Distance matrix should be numeric")
-    }
-    if(is.null(rownames(matrix)) || is.null(colnames(matrix))){
-      stop("Row and column names are required.")
-    }
-    if(!isSymmetric(matrix)){
-      stop("Distance matrix should be symmetric.")
+      # extract names and convert to matrix
+      names <- extract.names(data)
+      matrix <- extract.matrix(data)
     }
 
     j.matrix <- .jarray(matrix, dispatch = TRUE)
     j.ids <- .jarray(rownames(data))
-    j.names <- .jnull("[S")
-    if(!is.null(names)){
-      j.names <- .jarray(names)
-    }
-    java.obj <- api$createDistanceMatrixData(j.matrix, j.ids, j.names)
+    j.names <- .jarray(names)
+    j.data <- api$createDistanceMatrixData(j.matrix, j.ids, j.names)
 
   }
 
+  # extract inferred names
+  names <- api$getNames(j.data)
   # create R object
   dist <- list(
-    data = data,
-    java = java.obj
+    data = matrix,
+    names = names,
+    java = j.data
   )
   if(!missing(file)){
     dist$file = file
@@ -277,6 +285,9 @@ print.chdist <- function(x, ...){
 #' @return Genotype data of class \code{chdist} with elements
 #' \describe{
 #'  \item{\code{data}}{Genotypes (data frame).}
+#'  \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
+#'    the unique id is used as the name as well}
+#'  \item{\code{alleles}}{List of character vectors with allele names per marker.}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
 #' }
@@ -284,6 +295,12 @@ print.chdist <- function(x, ...){
 #' @examples
 #' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 #' geno <- genotypes(geno.file)
+#'
+#' geno.file.biparental <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
+#' geno.biparental <- genotypes(geno.file.biparental, format = "biparental")
+#'
+#' geno.file.freq <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
+#' geno.freq <- genotypes(geno.file.freq, format = "frequency")
 #'
 #' @import rJava
 #' @export
@@ -306,17 +323,30 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
   if(!file.exists(file)){
     stop("File 'file' does not exist.")
   }
+  file <- normalizePath(file)
 
   # read from file
-  java.obj <- api$readGenotypeData(file, format)
+  j.data <- api$readGenotypeData(file, format)
   # read raw data
-  data <- read.csv(file, row.names = 1, check.names = F, stringsAsFactors = F)
+  data <- read.autodelim(file)
+  if(format == "frequency"){
+    # drop allele name row
+    data <- data[rownames(data) != "ALLELE",]
+  }
+  # drop names
+  data$NAME <- NULL
+
+  # obtain names and allele names from Java object
+  names <- api$getNames(j.data)
+  alleles <- lapply(.jevalArray(api$getAlleles(j.data)), .jevalArray)
 
   # create R object
   geno <- list(
     data = data,
+    names = names,
+    alleles  = alleles,
     file = file,
-    java = java.obj
+    java = j.data
   )
   class(geno) <- c("chgeno", "chdata", class(geno))
 
@@ -343,6 +373,8 @@ print.chgeno <- function(x, ...){
 #' @return Phenotype data of class \code{chpheno} with elements
 #' \describe{
 #'  \item{\code{data}}{Phenotypes (data frame).}
+#'  \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
+#'    the unique id is used as the name as well}
 #'  \item{\code{types}}{Variable types and encodings.}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
@@ -372,33 +404,36 @@ phenotypes <- function(file){
   if(!file.exists(file)){
     stop("File 'file' does not exist.")
   }
+  file <- normalizePath(file)
 
   # read from file
-  java.obj <- api$readPhenotypeData(file)
+  j.data <- api$readPhenotypeData(file)
   # read raw data
-  data <- read.csv(file, row.names = 1, check.names = F, stringsAsFactors = F)
-  # convert columns according to variable type and encoding
+  data <- read.autodelim(file)
+  # drop names
+  data$NAME <- NULL
+  # extract variable types and encodings
   if("TYPE" %in% rownames(data)){
     types <- data["TYPE",]
   } else {
     types <- rep("NS", ncol(data))
   }
   data <- data[rownames(data) != "TYPE",]
-  data.cols <- 1:ncol(data)
-  if(colnames(data)[1] == "NAME"){
-    data.cols <- 2:ncol(data)
-  }
-  for(c in data.cols){
+  # convert columns accordingly
+  for(c in 1:ncol(data)){
     data[[c]] <- convert.column(data[[c]], types[c])
   }
-  types <- types[data.cols]
+
+  # obtain names from Java object
+  names <- api$getNames(j.data)
 
   # create R object
   pheno <- list(
     data = data,
+    names = names,
     types = types,
     file = file,
-    java = java.obj
+    java = j.data
   )
   class(pheno) <- c("chpheno", "chdata", class(pheno))
 
@@ -469,6 +504,32 @@ getSize <- function(data){
   UseMethod("getSize")
 }
 
+# --- #
+# I/O #
+# --- #
+
+#' Read delimited file.
+#'
+#' Delegates to \code{\link{read.delim}} where the separator is inferred from the file extension (CSV or TXT).
+#' For CSV files the delimiter is set to \code{","} while for TXT file \code{"\t"} is used. Also sets
+#' some default argument values as used by Core Hunter.
+#'
+#' @param file File path.
+#' @param ... Further arguments to be passed to  \code{\link{read.delim}}.
+#' @inheritParams utils::read.table
+#'
+#' @return Data frame.
+#' @export
+read.autodelim <- function(file, row.names = 1, check.names = FALSE, stringsAsFactors = FALSE, strip.white = TRUE, ...){
+  sep <- switch(tolower(tools::file_ext(file)),
+                "csv" = ",",
+                "txt" = "\t")
+  read.delim(file, sep = sep,
+             row.names = row.names, check.names = check.names,
+             stringsAsFactors = stringsAsFactors, strip.white = strip.white,
+             ...)
+}
+
 # ----------------- #
 # PRIVATE UTILITIES #
 # ----------------- #
@@ -489,7 +550,18 @@ wrapData <- function(data){
   return(data)
 }
 
-
+# Extract NAME column from data frame. If no NAME column is included
+# the row names (unique ids) are used as names.
+extract.names <- function(data){
+  names <- data$NAME
+  if(is.null(names)){
+    names <- rep(NA, nrow(data))
+  }
+  names <- as.character(names)
+  # replace blank names with NAs
+  names[names == ""] <- NA
+  return(names)
+}
 
 
 

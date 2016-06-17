@@ -7,10 +7,10 @@
 distances(data, file)
 }
 \arguments{
-\item{data}{Symmetric distance matrix. Unique row and column names are required,
+\item{data}{Symmetric distance matrix. Unique row and column headers are required,
 should be the same and are used as item ids. Can be a \code{numeric} matrix or a data frame.
 The data frame may optionally include a first column \code{NAME} (\code{character})
-used to assign a name to some or all individuals. The remaining columns should
+used to assign names to some or all individuals. The remaining columns should
 be \code{numeric}.}
 
 \item{file}{File from which to read the distance matrix.}
@@ -18,10 +18,9 @@ be \code{numeric}.}
 \value{
 Distance matrix data of class \code{chdist} with elements
 \describe{
- \item{\code{data}}{
-   Distance matrix. Data frame or \code{numeric} matrix, as provided.
-   Data frame if read from a file.
- }
+ \item{\code{data}}{Distance matrix (\code{numeric} matrix).}
+ \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
+   the unique id is used as the name as well}
  \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
 }
@@ -32,11 +31,6 @@ See \url{www.corehunter.org} for documentation and examples of the distance matr
 file format used by Core Hunter.
 }
 \examples{
-# read from file
-
-dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
-dist <- distances(file = dist.file)
-
 # create from distance matrix
 
 m <- matrix(runif(100), nrow = 10, ncol = 10)
@@ -47,7 +41,11 @@ m[lower.tri(m)] <- t(m)[lower.tri(m)]
 rownames(m) <- colnames(m) <- paste("i", 1:10, sep = "-")
 
 dist <- distances(m)
-dist
+
+# read from file
+
+dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
+dist <- distances(file = dist.file)
 
 }
 

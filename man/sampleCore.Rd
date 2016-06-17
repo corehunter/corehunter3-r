@@ -40,15 +40,15 @@ it should be a strictly positive value and is rounded to the nearest integer.}
 If set to another value it should be strictly positive and is rounded
 to the nearest integer.}
 
-\item{indices}{If \code{TRUE} the result contains the indices instead of names
-(default) of the selected individuals.}
+\item{indices}{If \code{TRUE} the result contains the indices instead of unique
+identifiers (default) of the selected individuals.}
 
 \item{verbose}{If \code{TRUE} search progress messages are printed to the console.
 Defaults to \code{FALSE}.}
 }
 \value{
 Core subset (\code{chcore}). It has an element \code{sel}
- which is a character or numeric vector containing the names or indices,
+ which is a character or numeric vector containing the ids or indices,
  respectively, of the selected individuals (see argument \code{indices}).
  In addition the result has one or more elements that indicate the value
  of each objective function that was included in the optimization.

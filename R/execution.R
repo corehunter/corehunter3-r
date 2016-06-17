@@ -30,13 +30,13 @@
 #'   \code{NA} a default value is set depending on the execution \code{mode}.
 #'   If set to another value it should be strictly positive and is rounded
 #'   to the nearest integer.
-#' @param indices If \code{TRUE} the result contains the indices instead of names
-#'   (default) of the selected individuals.
+#' @param indices If \code{TRUE} the result contains the indices instead of unique
+#'   identifiers (default) of the selected individuals.
 #' @param verbose If \code{TRUE} search progress messages are printed to the console.
 #'   Defaults to \code{FALSE}.
 #'
 #' @return Core subset (\code{chcore}). It has an element \code{sel}
-#'  which is a character or numeric vector containing the names or indices,
+#'  which is a character or numeric vector containing the ids or indices,
 #'  respectively, of the selected individuals (see argument \code{indices}).
 #'  In addition the result has one or more elements that indicate the value
 #'  of each objective function that was included in the optimization.
@@ -180,7 +180,7 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
   if(indices){
     sel <- toRIndices(sel)
   } else {
-    # convert indices to names
+    # convert indices to ids
     sel <- api$getIdsFromIndices(j.data, .jarray(sel))
   }
   # sort selection

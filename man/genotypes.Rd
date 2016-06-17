@@ -15,6 +15,9 @@ genotypes(file, format = c("default", "biparental", "frequency"))
 Genotype data of class \code{chdist} with elements
 \describe{
  \item{\code{data}}{Genotypes (data frame).}
+ \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
+   the unique id is used as the name as well}
+ \item{\code{alleles}}{List of character vectors with allele names per marker.}
  \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
 }
@@ -26,6 +29,12 @@ genotype data formats supported by Core Hunter.
 \examples{
 geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 geno <- genotypes(geno.file)
+
+geno.file.biparental <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
+geno.biparental <- genotypes(geno.file.biparental, format = "biparental")
+
+geno.file.freq <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
+geno.freq <- genotypes(geno.file.freq, format = "frequency")
 
 }
 

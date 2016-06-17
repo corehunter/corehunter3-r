@@ -8,7 +8,7 @@ evaluateCore(core, data, objective)
 }
 \arguments{
 \item{core}{A core collection of class \code{chcore}, or a
-numeric or character vector indicating the indices or names,
+numeric or character vector indicating the indices or ids,
 respectively, of the individuals in the evaluated core.}
 
 \item{data}{Core Hunter data (\code{chdata}) containing genotypes,
