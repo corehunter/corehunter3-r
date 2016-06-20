@@ -92,7 +92,7 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
   if(!is.numeric(size)){
     stop("Core 'size' should be numeric.")
   }
-  n <- getSize(data)
+  n <- data$size
   if(size > 0 && size < 1){
     size <- size * n
   }

@@ -19,8 +19,10 @@ be \code{numeric}.}
 Distance matrix data of class \code{chdist} with elements
 \describe{
  \item{\code{data}}{Distance matrix (\code{numeric} matrix).}
- \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
-   the unique id is used as the name as well}
+ \item{\code{size}}{Number of individuals in the dataset.}
+ \item{\code{ids}}{Unique item identifiers.}
+ \item{\code{names}}{Item names. Names of individuals to which no explicit name
+   has been assigned are equal to the unique \code{ids}.}
  \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
 }

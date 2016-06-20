@@ -13,8 +13,10 @@ phenotypes(file)
 Phenotype data of class \code{chpheno} with elements
 \describe{
  \item{\code{data}}{Phenotypes (data frame).}
- \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
-   the unique id is used as the name as well}
+ \item{\code{size}}{Number of individuals in the dataset.}
+ \item{\code{ids}}{Unique item identifiers.}
+ \item{\code{names}}{Item names. Names of individuals to which no explicit name
+   has been assigned are equal to the unique \code{ids}.}
  \item{\code{types}}{Variable types and encodings.}
  \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}

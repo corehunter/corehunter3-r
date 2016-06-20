@@ -35,23 +35,40 @@ exampleData <- function(){
 #' Initialize Core Hunter data.
 #'
 #' The data may contain genotypes, phenotypes and/or a precomputed distance matrix.
+#' All provided data should describe the same individuals which is verified through
+#' the item ids and names.
 #'
 #' @param genotypes Genetic marker data (\code{chgeno}).
 #' @param phenotypes Phenotypic trait data (\code{chpheno}).
 #' @param distances Precomputed distance matrix (\code{chdist}).
 #'
-#' @return Core Hunter data (\code{chdata}) with elements \code{dist},
-#'  \code{geno} and/or \code{pheno}, depending on which data is provided,
-#'  as well as an element \code{java} that holds the Java version of the
-#'  data object.
+#' @return Core Hunter data (\code{chdata}) with elements
+#' \describe{
+#'  \item{\code{dist}}{Distance data of class \code{chdist} if included.}
+#'  \item{\code{geno}}{Genotype data of class \code{chgeno} if included.}
+#'  \item{\code{pheno}}{Phenotype data of class \code{chpheno} if included.}
+#'  \item{\code{size}}{Number of individuals in the dataset.}
+#'  \item{\code{ids}}{Unique item identifiers.}
+#'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
+#'    has been assigned are equal to the unique \code{ids}.}
+#'  \item{\code{java}}{Java version of the data object.}
+#' }
+#'
+#' @return Core Hunter data of class \code{chdata}.
 #'
 #' @examples
 #' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
-#' chData <- coreHunterData(distances = distances(file = dist.file))
-#' chData
+#' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
+#' pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
+#' chData <- coreHunterData(
+#'   distances(file = dist.file),
+#'   genotypes(file = geno.file),
+#'   phenotypes(file = pheno.file)
+#' )
 #'
 #' @seealso \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 #'
+#' @import rJava
 #' @export
 coreHunterData <- function(distances, genotypes, phenotypes){
 
@@ -88,15 +105,20 @@ coreHunterData <- function(distances, genotypes, phenotypes){
   data <- list(
     java = j.data
   )
+  size.ids.names <- c("size", "ids", "names")
   if(!missing(distances)){
     data$dist <- distances
+    data[size.ids.names] <- distances[size.ids.names]
   }
   if(!missing(genotypes)){
     data$geno <- genotypes
+    data[size.ids.names] <- genotypes[size.ids.names]
   }
   if(!missing(phenotypes)){
     data$pheno <- phenotypes
+    data[size.ids.names] <- phenotypes[size.ids.names]
   }
+  # set class
   class(data) <- c("chdata", class(data))
 
   return(data)
@@ -119,7 +141,7 @@ print.chdata <- function(x, ...){
   if(length(available) > 1){
     available <- paste(paste(available[1:(length(available)-1)], collapse = ", "), tail(available, n = 1), sep = " & ")
   }
-  cat(sprintf("Core Hunter data containing %s for %d individuals.", available, data$getSize()))
+  cat(sprintf("Core Hunter data containing %s for %d individuals.", available, data$size))
 }
 
 # -------------------- #
@@ -142,8 +164,10 @@ print.chdata <- function(x, ...){
 #' @return Distance matrix data of class \code{chdist} with elements
 #' \describe{
 #'  \item{\code{data}}{Distance matrix (\code{numeric} matrix).}
-#'  \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
-#'    the unique id is used as the name as well}
+#'  \item{\code{size}}{Number of individuals in the dataset.}
+#'  \item{\code{ids}}{Unique item identifiers.}
+#'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
+#'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
 #' }
@@ -253,6 +277,7 @@ distances <- function(data, file){
   # create R object
   dist <- list(
     data = matrix,
+    size = j.data$getSize(),
     names = names,
     java = j.data
   )
@@ -267,7 +292,7 @@ distances <- function(data, file){
 
 #' @export
 print.chdist <- function(x, ...){
-  cat(sprintf("Precomputed distance matrix for %d individuals.", getSize(x)))
+  cat(sprintf("Precomputed distance matrix for %d individuals.", x$size))
 }
 
 # ------------- #
@@ -285,8 +310,10 @@ print.chdist <- function(x, ...){
 #' @return Genotype data of class \code{chdist} with elements
 #' \describe{
 #'  \item{\code{data}}{Genotypes (data frame).}
-#'  \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
-#'    the unique id is used as the name as well}
+#'  \item{\code{size}}{Number of individuals in the dataset.}
+#'  \item{\code{ids}}{Unique item identifiers.}
+#'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
+#'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{alleles}}{List of character vectors with allele names per marker.}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
@@ -329,12 +356,17 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
   j.data <- api$readGenotypeData(file, format)
   # read raw data
   data <- read.autodelim(file)
+  # drop names
+  data$NAME <- NULL
+  # clean frequency format
   if(format == "frequency"){
     # drop allele name row
     data <- data[rownames(data) != "ALLELE",]
+    # convert to numeric
+    for(col in colnames(data)){
+      data[[col]] <- as.numeric(data[[col]])
+    }
   }
-  # drop names
-  data$NAME <- NULL
 
   # obtain names and allele names from Java object
   names <- api$getNames(j.data)
@@ -343,6 +375,7 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
   # create R object
   geno <- list(
     data = data,
+    size = j.data$getSize(),
     names = names,
     alleles  = alleles,
     file = file,
@@ -356,7 +389,7 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
 
 #' @export
 print.chgeno <- function(x, ...){
-  cat(sprintf("Genotypes for %d individuals (%d markers).", getSize(x), x$java$getNumberOfMarkers()))
+  cat(sprintf("Genotypes for %d individuals (%d markers).", x$size, x$java$getNumberOfMarkers()))
 }
 
 # -------------- #
@@ -373,8 +406,10 @@ print.chgeno <- function(x, ...){
 #' @return Phenotype data of class \code{chpheno} with elements
 #' \describe{
 #'  \item{\code{data}}{Phenotypes (data frame).}
-#'  \item{\code{names}}{Item names. If no names are assigned for some or all individuals,
-#'    the unique id is used as the name as well}
+#'  \item{\code{size}}{Number of individuals in the dataset.}
+#'  \item{\code{ids}}{Unique item identifiers.}
+#'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
+#'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{types}}{Variable types and encodings.}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
@@ -430,6 +465,7 @@ phenotypes <- function(file){
   # create R object
   pheno <- list(
     data = data,
+    size = j.data$getSize(),
     names = names,
     types = types,
     file = file,
@@ -474,34 +510,7 @@ convert.column <- function(col, type){
 
 #' @export
 print.chpheno <- function(x, ...){
-  cat(sprintf("Phenotypes for %d individuals (%d traits).", getSize(x) , x$java$getFeatures()$size()))
-}
-
-# ------- #
-# GENERAL #
-# ------- #
-
-#' @export
-getSize.chdata <- function(data){
-  data$java$getSize()
-}
-
-# ---------- #
-# S3 METHODS #
-# ---------- #
-
-#' Retrieve dataset size.
-#'
-#' @param data data object
-#'
-#' @examples
-#' data <- exampleData()
-#' getSize(data)
-#'
-#' @return dataset size
-#' @export
-getSize <- function(data){
-  UseMethod("getSize")
+  cat(sprintf("Phenotypes for %d individuals (%d traits).", x$size , x$java$getFeatures()$size()))
 }
 
 # --- #

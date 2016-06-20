@@ -83,7 +83,7 @@ test_that("create distance data from matrix", {
 })
 
 test_that("size", {
-  expect_equal(getSize(distanceData()), 100)
+  expect_equal(distanceData()$size, 100)
 })
 
 ########################
@@ -115,7 +115,7 @@ test_that("read genotype data from file", {
 })
 
 test_that("size", {
-  expect_equal(getSize(genotypeData()), 100)
+  expect_equal(genotypeData()$size, 100)
 })
 
 #########################
@@ -141,7 +141,7 @@ test_that("read phenotype data from file", {
 })
 
 test_that("size", {
-  expect_equal(getSize(phenotypeData()), 100)
+  expect_equal(phenotypeData()$size, 100)
 })
 
 ###########################
@@ -171,7 +171,7 @@ test_that("distance matrix is correct", {
 })
 
 test_that("size", {
-  expect_equal(getSize(testData()), 100)
+  expect_equal(testData()$size, 100)
 })
 
 

@@ -14,18 +14,34 @@ coreHunterData(distances, genotypes, phenotypes)
 \item{phenotypes}{Phenotypic trait data (\code{chpheno}).}
 }
 \value{
-Core Hunter data (\code{chdata}) with elements \code{dist},
- \code{geno} and/or \code{pheno}, depending on which data is provided,
- as well as an element \code{java} that holds the Java version of the
- data object.
+Core Hunter data (\code{chdata}) with elements
+\describe{
+ \item{\code{dist}}{Distance data of class \code{chdist} if included.}
+ \item{\code{geno}}{Genotype data of class \code{chgeno} if included.}
+ \item{\code{pheno}}{Phenotype data of class \code{chpheno} if included.}
+ \item{\code{size}}{Number of individuals in the dataset.}
+ \item{\code{ids}}{Unique item identifiers.}
+ \item{\code{names}}{Item names. Names of individuals to which no explicit name
+   has been assigned are equal to the unique \code{ids}.}
+ \item{\code{java}}{Java version of the data object.}
+}
+
+Core Hunter data of class \code{chdata}.
 }
 \description{
 The data may contain genotypes, phenotypes and/or a precomputed distance matrix.
+All provided data should describe the same individuals which is verified through
+the item ids and names.
 }
 \examples{
 dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
-chData <- coreHunterData(distances = distances(file = dist.file))
-chData
+geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
+pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
+chData <- coreHunterData(
+  distances(file = dist.file),
+  genotypes(file = geno.file),
+  phenotypes(file = pheno.file)
+)
 
 }
 \seealso{
