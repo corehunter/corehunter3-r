@@ -516,7 +516,7 @@ convert.column <- function(col, type){
     stop(sprintf("Unsupported variable encoding '%s'.", enc))
   }
   # convert to proper type
-  if(type == "N"){
+  if(type == "N" && enc != "B"){
     col <- as.factor(col)
   } else if(type == "O"){
     col <- as.ordered(col)

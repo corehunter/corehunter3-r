@@ -104,6 +104,7 @@ test_that("class is correct", {
 })
 
 test_that("read genotype data from file", {
+  # 1: default dataset
   for(format in c("def", "bi", "freq")){
     geno <- genotypeData(format = format)
     expect_equal(geno$file, genotypeFile(format))
@@ -123,6 +124,17 @@ test_that("read genotype data from file", {
       }
     }
   }
+  # 2: small dataset
+  geno <- genotypeData(format = "default", dataset = "small")
+  expect_equal(geno$size, 5)
+  expect_equal(geno$ids, getIds(dataset = "small"))
+  expect_equal(rownames(geno$data), geno$ids)
+  expect_equal(geno$names, getNames(dataset = "small"))
+  expect_equal(length(geno$alleles), 4)
+  expect_equal(geno$alleles[[1]], c("1", "2", "3"))
+  expect_equal(geno$alleles[[2]], c("A", "B", "C", "D"))
+  expect_equal(geno$alleles[[3]], c("a1", "a2"))
+  expect_equal(geno$alleles[[4]], c("+", "-"))
 })
 
 #########################
@@ -135,6 +147,7 @@ test_that("class is correct", {
 })
 
 test_that("read phenotype data from file", {
+  # 1: default dataset
   pheno <- phenotypeData()
   expect_equal(pheno$file, phenotypeFile())
   expect_equal(pheno$size, 100)
@@ -148,6 +161,17 @@ test_that("read phenotype data from file", {
   gd <- StatMatch::gower.dist(pheno$data[no.missing.data, ], rngs = pheno$ranges)
   gd <- gd[lower.tri(gd)]
   expect_equal(mean(gd), evaluateCore(no.missing.data, pheno, objective("EE", "GD")))
+  # 2: small dataset
+  pheno <- phenotypeData(dataset = "small")
+  expect_equal(pheno$size, 5)
+  expect_equal(pheno$ids, getIds(dataset = "small"))
+  expect_equal(rownames(pheno$data), pheno$ids)
+  expect_equal(pheno$names, getNames(dataset = "small"))
+  expect_equal(pheno$ranges, getRanges(dataset = "small"))
+  # check average Gower distance (no missing data in small dataset)
+  gd <- StatMatch::gower.dist(pheno$data, rngs = pheno$ranges)
+  gd <- gd[lower.tri(gd)]
+  expect_equal(mean(gd), evaluateCore(1:5, pheno, objective("EE", "GD")))
 })
 
 ###########################
