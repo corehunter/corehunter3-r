@@ -141,7 +141,7 @@ print.chdata <- function(x, ...){
   if(length(available) > 1){
     available <- paste(paste(available[1:(length(available)-1)], collapse = ", "), tail(available, n = 1), sep = " & ")
   }
-  cat(sprintf("Core Hunter data containing %s for %d individuals.", available, data$size))
+  cat(sprintf("Core Hunter data containing %s for %d individuals.", available, x$size))
 }
 
 # -------------------- #

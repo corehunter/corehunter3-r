@@ -12,9 +12,12 @@ test_that("arguments are checked", {
   expect_error(distances(data = "whoops"), "a matrix or a data frame")
   expect_error(distances(matrix(letters[1:25], nrow = 5, ncol = 5)), "should be numeric")
   expect_error(distances(matrix(0, nrow = 5, ncol = 5)), "names are required")
+  m <- matrix(1:25, nrow = 5, ncol = 5)
+  rownames(m) <- colnames(m) <- 1:5
+  expect_error(distances(m), "matrix should be symmetric")
 })
 
-test_that("class is correct", {
+test_that("class", {
   expect_is(distanceData(), "chdist")
   expect_is(distanceData()$data, "matrix")
 })
@@ -84,6 +87,13 @@ test_that("create distance data from matrix", {
   expect_equal(dist$data, matrix)
   expect_equal(dist$ids, getIds(dataset = "small"))
   expect_equal(dist$names, getIds(dataset = "small"))
+  # as data frame (no explicit names)
+  dist <- distances(as.data.frame(matrix))
+  expect_true(is.null(dist$file))
+  expect_equal(dist$size, 5)
+  expect_equal(dist$data, matrix)
+  expect_equal(dist$ids, getIds(dataset = "small"))
+  expect_equal(dist$names, getIds(dataset = "small"))
   # as data frame (with names)
   data <- cbind(NAME = c(NA, NA, "Bob", "Bob", NA), as.data.frame(matrix))
   dist <- distances(data)
@@ -92,13 +102,25 @@ test_that("create distance data from matrix", {
   expect_equal(dist$data, matrix)
   expect_equal(dist$ids, getIds(dataset = "small"))
   expect_equal(dist$names, getNames(dataset = "small"))
+
+})
+
+test_that("print", {
+  data <- distanceData()
+  expect_output(print(data), "Precomputed distance matrix for 100 individuals.")
 })
 
 ########################
 context("Genotype data")
 ########################
 
-test_that("class is correct", {
+test_that("arguments are checked", {
+  expect_error(genotypes(), "path is required")
+  expect_error(genotypes(file = 124), "should be a file path")
+  expect_error(genotypes(file = "i/do/not/exist"), "does not exist")
+})
+
+test_that("class", {
   expect_is(genotypeData(), "chgeno")
   expect_is(genotypeData()$data, "data.frame")
 })
@@ -137,11 +159,22 @@ test_that("read genotype data from file", {
   expect_equal(geno$alleles[[4]], c("+", "-"))
 })
 
+test_that("print", {
+  data <- genotypeData()
+  expect_output(print(data), "Genotypes for 100 individuals \\(18 markers\\).")
+})
+
 #########################
 context("Phenotype data")
 #########################
 
-test_that("class is correct", {
+test_that("arguments are checked", {
+  expect_error(phenotypes(), "path is required")
+  expect_error(phenotypes(file = 124), "should be a file path")
+  expect_error(phenotypes(file = "i/do/not/exist"), "does not exist")
+})
+
+test_that("class", {
   expect_is(phenotypeData(), "chpheno")
   expect_is(phenotypeData()$data, "data.frame")
 })
@@ -174,6 +207,11 @@ test_that("read phenotype data from file", {
   expect_equal(mean(gd), evaluateCore(1:5, pheno, objective("EE", "GD")))
 })
 
+test_that("print", {
+  data <- phenotypeData()
+  expect_output(print(data), "Phenotypes for 100 individuals \\(39 traits\\).")
+})
+
 ###########################
 context("Core Hunter data")
 ###########################
@@ -186,14 +224,14 @@ test_that("arguments are checked", {
   expect_error(coreHunterData(phenotypes = "123"), "class 'chpheno'")
 })
 
-test_that("class is correct", {
+test_that("class", {
   expect_is(testData(), "chdata")
   expect_is(testData()$dist, "chdist")
   expect_is(testData()$geno, "chgeno")
   expect_is(testData()$pheno, "chpheno")
 })
 
-test_that("distance matrix is correct", {
+test_that("distance matrix", {
   data <- read.autodelim(distanceFile())
   data$NAME <- NULL
   matrix <- as.matrix(data)
@@ -204,7 +242,23 @@ test_that("size", {
   expect_equal(testData()$size, 100)
 })
 
+test_that("example data", {
+  data <- exampleData()
+  expect_equal(data$dist, distanceData())
+  expect_equal(data$geno, genotypeData())
+  expect_equal(data$pheno, phenotypeData())
+})
 
+test_that("print", {
+  data <- testData()
+  expect_output(print(data), "Core Hunter data containing genotypes, phenotypes & precomputed distances for 100 individuals.")
+  data <- coreHunterData(geno = genotypeData())
+  expect_output(print(data), "Core Hunter data containing genotypes for 100 individuals.")
+  data <- coreHunterData(pheno = phenotypeData())
+  expect_output(print(data), "Core Hunter data containing phenotypes for 100 individuals.")
+  data <- coreHunterData(dist = distanceData())
+  expect_output(print(data), "Core Hunter data containing precomputed distances for 100 individuals.")
+})
 
 
 
