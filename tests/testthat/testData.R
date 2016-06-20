@@ -141,11 +141,11 @@ test_that("read phenotype data from file", {
   expect_equal(pheno$ids, getIds())
   expect_equal(rownames(pheno$data), pheno$ids)
   expect_equal(pheno$names, getNames())
+  expect_equal(pheno$ranges, getRanges())
   # check average Gower distance of all individuals without missing data
   # (Core Hunter treats missing data slightly differently than StatMatch)
   no.missing.data <- which(!apply(is.na(pheno$data), 1, any))
-  ranges <- as.numeric(apply(pheno$data, 2, max, na.rm = T)) - as.numeric(apply(pheno$data, 2, min, na.rm = T))
-  gd <- StatMatch::gower.dist(pheno$data[no.missing.data, ], rngs = ranges)
+  gd <- StatMatch::gower.dist(pheno$data[no.missing.data, ], rngs = pheno$ranges)
   gd <- gd[lower.tri(gd)]
   expect_equal(mean(gd), evaluateCore(no.missing.data, pheno, objective("EE", "GD")))
 })

@@ -105,6 +105,17 @@ getNames <- function(dataset = c("default", "small")){
   }
   return(names)
 }
+
+getRanges <- function(dataset = c("default", "small")){
+  dataset <- match.arg(dataset)
+  if(dataset == "default"){
+    ranges <- c(rep(NA, 28), c(14, 36, 14, 31, 81, 74, 14, 20, 4, 2, 35))
+  } else {
+    ranges <- c(NA, NA, 10, 2.0, NA)
+  }
+  return(ranges)
+}
+
 # ----------------- #
 # UTILITY FUNCTIONS #
 # ----------------- #

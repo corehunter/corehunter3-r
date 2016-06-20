@@ -18,6 +18,8 @@ Phenotype data of class \code{chpheno} with elements
  \item{\code{names}}{Item names. Names of individuals to which no explicit name
    has been assigned are equal to the unique \code{ids}.}
  \item{\code{types}}{Variable types and encodings.}
+ \item{\code{ranges}}{Ranges of numeric variables (interval/ratio).
+   \code{NA} for other variables (nominal/ordinal).}
  \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
 }

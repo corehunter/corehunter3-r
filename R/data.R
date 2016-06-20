@@ -416,6 +416,8 @@ print.chgeno <- function(x, ...){
 #'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
 #'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{types}}{Variable types and encodings.}
+#'  \item{\code{ranges}}{Ranges of numeric variables (interval/ratio).
+#'    \code{NA} for other variables (nominal/ordinal).}
 #'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
 #' }
@@ -458,15 +460,17 @@ phenotypes <- function(file){
   } else {
     types <- rep("NS", ncol(data))
   }
-  data <- data[rownames(data) != "TYPE",]
+  # drop type, min, max
+  data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), ]
   # convert columns accordingly
   for(c in 1:ncol(data)){
     data[[c]] <- convert.column(data[[c]], types[c])
   }
 
-  # obtain ids and names from Java object
+  # obtain ids, names and variable ranges from Java object
   ids <- api$getIds(j.data)
   names <- api$getNames(j.data)
+  ranges <- .jevalArray(api$getRanges(j.data), simplify = TRUE)
 
   # create R object
   pheno <- list(
@@ -475,6 +479,7 @@ phenotypes <- function(file){
     ids = ids,
     names = names,
     types = types,
+    ranges = ranges,
     file = file,
     java = j.data
   )
@@ -487,6 +492,10 @@ phenotypes <- function(file){
 convert.column <- function(col, type){
   enc <- substr(type, 2, 2)
   type <- substr(type, 1, 1)
+  # default encoding if not specified
+  if(enc == ""){
+    enc <- switch(type, "N" = "S", "O" = "I", "I" = "I", "R" = "D")
+  }
   # convert to proper encoding
   if(enc == "B"){
     # cfr. Java: boolean
