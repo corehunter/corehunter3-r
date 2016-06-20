@@ -272,12 +272,15 @@ distances <- function(data, file){
 
   }
 
-  # extract inferred names
+  # obtain ids and names from Java object
+  ids <- api$getIds(j.data)
   names <- api$getNames(j.data)
+
   # create R object
   dist <- list(
     data = matrix,
     size = j.data$getSize(),
+    ids = ids,
     names = names,
     java = j.data
   )
@@ -368,7 +371,8 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
     }
   }
 
-  # obtain names and allele names from Java object
+  # obtain ids, names and allele names from Java object
+  ids <- api$getIds(j.data)
   names <- api$getNames(j.data)
   alleles <- lapply(.jevalArray(api$getAlleles(j.data)), .jevalArray)
 
@@ -376,6 +380,7 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
   geno <- list(
     data = data,
     size = j.data$getSize(),
+    ids = ids,
     names = names,
     alleles  = alleles,
     file = file,
@@ -459,13 +464,15 @@ phenotypes <- function(file){
     data[[c]] <- convert.column(data[[c]], types[c])
   }
 
-  # obtain names from Java object
+  # obtain ids and names from Java object
+  ids <- api$getIds(j.data)
   names <- api$getNames(j.data)
 
   # create R object
   pheno <- list(
     data = data,
     size = j.data$getSize(),
+    ids = ids,
     names = names,
     types = types,
     file = file,

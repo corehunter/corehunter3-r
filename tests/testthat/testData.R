@@ -26,9 +26,11 @@ test_that("read distance data from file", {
   data <- read.autodelim(distanceFile())
   data$NAME <- NULL
   matrix <- as.matrix(data)
+  expect_equal(dist$size, 100)
   expect_equal(dist$data, matrix)
-  expect_equal(rownames(dist$data), colnames(dist$data))
-  expect_equal(rownames(dist$data), getIds())
+  expect_equal(dist$ids, getIds())
+  expect_equal(rownames(dist$data), dist$ids)
+  expect_equal(colnames(dist$data), dist$ids)
   expect_equal(dist$names, getNames())
   # small dataset
   dist <- distanceData(dataset = "small")
@@ -41,6 +43,8 @@ test_that("read distance data from file", {
   ), nrow = 5, ncol = 5)
   rownames(expected) <- colnames(expected) <- getIds(dataset = "small")
   expect_equal(dist$data, expected)
+  expect_equal(dist$size, 5)
+  expect_equal(dist$ids, getIds(dataset = "small"))
   expect_equal(dist$names, getNames(dataset = "small"))
 })
 
@@ -53,12 +57,16 @@ test_that("create distance data from matrix", {
   # as data frame (with names)
   dist <- distances(data)
   expect_true(is.null(dist$file))
+  expect_equal(dist$size, 100)
   expect_equal(dist$data, matrix)
+  expect_equal(dist$ids, getIds())
   expect_equal(dist$names, getNames())
-  # as numeric matrix (no names)
+  # as numeric matrix (no explicit names)
   dist <- distances(matrix)
   expect_true(is.null(dist$file))
+  expect_equal(dist$size, 100)
   expect_equal(dist$data, matrix)
+  expect_equal(dist$ids, getIds())
   expect_equal(dist$names, getIds())
   # 2: small dataset
   matrix <- matrix(c(
@@ -69,21 +77,21 @@ test_that("create distance data from matrix", {
     0.8, 0.6, 0.4, 0.2, 0.0
   ), nrow = 5, ncol = 5)
   rownames(matrix) <- colnames(matrix) <- getIds(dataset = "small")
-  # as numeric matrix (no names)
+  # as numeric matrix (no explicit names)
   dist <- distances(matrix)
   expect_true(is.null(dist$file))
+  expect_equal(dist$size, 5)
   expect_equal(dist$data, matrix)
+  expect_equal(dist$ids, getIds(dataset = "small"))
   expect_equal(dist$names, getIds(dataset = "small"))
   # as data frame (with names)
   data <- cbind(NAME = c(NA, NA, "Bob", "Bob", NA), as.data.frame(matrix))
   dist <- distances(data)
   expect_true(is.null(dist$file))
+  expect_equal(dist$size, 5)
   expect_equal(dist$data, matrix)
+  expect_equal(dist$ids, getIds(dataset = "small"))
   expect_equal(dist$names, getNames(dataset = "small"))
-})
-
-test_that("size", {
-  expect_equal(distanceData()$size, 100)
 })
 
 ########################
@@ -99,6 +107,9 @@ test_that("read genotype data from file", {
   for(format in c("def", "bi", "freq")){
     geno <- genotypeData(format = format)
     expect_equal(geno$file, genotypeFile(format))
+    expect_equal(geno$size, 100)
+    expect_equal(geno$ids, getIds())
+    expect_equal(rownames(geno$data), geno$ids)
     expect_equal(geno$names, getNames())
     expect_equal(length(geno$alleles), geno$java$getNumberOfMarkers())
     for(m in 1:length(geno$alleles)){
@@ -114,10 +125,6 @@ test_that("read genotype data from file", {
   }
 })
 
-test_that("size", {
-  expect_equal(genotypeData()$size, 100)
-})
-
 #########################
 context("Phenotype data")
 #########################
@@ -130,6 +137,9 @@ test_that("class is correct", {
 test_that("read phenotype data from file", {
   pheno <- phenotypeData()
   expect_equal(pheno$file, phenotypeFile())
+  expect_equal(pheno$size, 100)
+  expect_equal(pheno$ids, getIds())
+  expect_equal(rownames(pheno$data), pheno$ids)
   expect_equal(pheno$names, getNames())
   # check average Gower distance of all individuals without missing data
   # (Core Hunter treats missing data slightly differently than StatMatch)
@@ -138,10 +148,6 @@ test_that("read phenotype data from file", {
   gd <- StatMatch::gower.dist(pheno$data[no.missing.data, ], rngs = ranges)
   gd <- gd[lower.tri(gd)]
   expect_equal(mean(gd), evaluateCore(no.missing.data, pheno, objective("EE", "GD")))
-})
-
-test_that("size", {
-  expect_equal(phenotypeData()$size, 100)
 })
 
 ###########################
