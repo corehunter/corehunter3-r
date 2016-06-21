@@ -117,7 +117,6 @@ test_that("class is correct", {
 
 test_that("weight is positive", {
   expect_error(objective("AN", "CE", weight = -1), "positive")
-  expect_error(objective("CV", weight = 0), "positive")
 })
 
 test_that("elements are correct", {
@@ -126,7 +125,7 @@ test_that("elements are correct", {
   expect_equal(o$meas, "PD")
   expect_equal(o$weight, 1)
   o <- objective("SH", weight = 1.5)
-  expect_equasl(o$type, "SH")
+  expect_equal(o$type, "SH")
   expect_null(o$meas)
   expect_equal(o$weight, 1.5)
 })
