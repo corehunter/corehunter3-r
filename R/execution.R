@@ -135,8 +135,7 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
   if(missing(obj)){
     # check: only genotypes, phenotypes or distances provided
     if(sum(j.data$hasGenotypes(), j.data$hasPhenotypes(), j.data$hasDistances()) != 1){
-      stop("Default objective applicable only when data contains only genotypes, phenotypes
-            or precomputed distances. Please specify at least one objective.")
+      stop("Please specify objective. No default for multiple data types.")
     }
     # set default objective
     meas <- "PD"
@@ -283,7 +282,12 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
 #' @param weight Weight assigned to the objective, when maximizing a weighted
 #'   index. Defaults to 1.0.
 #'
-#' @return Core Hunter objective (\code{chobj}).
+#' @return Core Hunter objective of class \code{chobj} with elements
+#' \describe{
+#'  \item{\code{type}}{Objective type.}
+#'  \item{\code{weight}}{Assigned weight.}
+#'  \item{\code{meas}}{Distance measure (if applicable).}
+#' }
 #'
 #' @examples
 #' objective()

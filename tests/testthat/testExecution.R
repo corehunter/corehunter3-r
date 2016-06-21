@@ -8,13 +8,14 @@ test_that("arguments are checked", {
   expect_error(sampleCore(), "no default")
   expect_error(sampleCore(data = "abc"), "class 'chdata'")
   data <- testData()
-  expect_error(sampleCore(data, size = -1), "size")
-  expect_error(sampleCore(data, size = 0), "size")
-  expect_error(sampleCore(data, size = 1/data$size), "size")
-  expect_error(sampleCore(data, size = 1), "size")
-  expect_error(sampleCore(data, size = 1.4), "size")
-  expect_error(sampleCore(data, size = data$size), "size")
-  expect_error(sampleCore(data, size = data$size + sample(1:10, size = 1)), "size")
+  expect_error(sampleCore(data, size = -1), ">= 2")
+  expect_error(sampleCore(data, size = 0), ">= 2")
+  expect_error(sampleCore(data, size = 1/data$size), ">= 2")
+  expect_error(sampleCore(data, size = 1), ">= 2")
+  expect_error(sampleCore(data, size = 1.4), ">= 2")
+  expect_error(sampleCore(data, size = data$size), "< 100")
+  expect_error(sampleCore(data, size = data$size + sample(1:10, size = 1)), "< 100")
+  expect_error(sampleCore(data, size = "abc"), "should be numeric")
   expect_error(sampleCore(data, obj = "abc"), "class 'chobj'")
   expect_error(sampleCore(data, obj = list(123)), "class 'chobj'")
   expect_error(sampleCore(data, obj = list(objective("SH"), objective("SH"))), "Duplicate objectives.")
@@ -28,7 +29,11 @@ test_that("arguments are checked", {
 })
 
 test_that("No default objective when data contains multiple types", {
-  expect_error(sampleCore(testData(), "specify at least one objective"))
+  expect_error(sampleCore(testData(), "specify objective"))
+})
+
+test_that("No time limit", {
+  expect_silent(sampleCore(phenotypeData()))
 })
 
 test_that("result contains indices or names", {
@@ -108,6 +113,22 @@ context("Objectives")
 test_that("class is correct", {
   obj <- objective()
   expect_is(obj, "chobj")
+})
+
+test_that("weight is positive", {
+  expect_error(objective("AN", "CE", weight = -1), "positive")
+  expect_error(objective("CV", weight = 0), "positive")
+})
+
+test_that("elements are correct", {
+  o <- objective("EE", "PD")
+  expect_equal(o$type, "EE")
+  expect_equal(o$meas, "PD")
+  expect_equal(o$weight, 1)
+  o <- objective("SH", weight = 1.5)
+  expect_equasl(o$type, "SH")
+  expect_null(o$meas)
+  expect_equal(o$weight, 1.5)
 })
 
 
