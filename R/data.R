@@ -148,7 +148,7 @@ print.chdata <- function(x, ...){
 # DISTANCE MATRIX DATA #
 # -------------------- #
 
-#' Create distances data from matrix or file.
+#' Create Core Hunter distance data from matrix or file.
 #'
 #' Specify either a symmetric distance matrix or the file from which to read the matrix.
 #' See \url{www.corehunter.org} for documentation and examples of the distance matrix
@@ -252,6 +252,10 @@ distances <- function(data, file){
     # check type
     if(!is.data.frame(data) && !is.matrix(data)){
       stop("Argument 'matrix' should be a matrix or a data frame.")
+    }
+    # check headers
+    if(is.null(rownames(data)) || is.null(colnames(data))){
+      stop("Unique row and column names are required.")
     }
 
     # extract matrix
@@ -401,10 +405,57 @@ print.chgeno <- function(x, ...){
 # PHENOTYPE DATA #
 # -------------- #
 
-#' Read phenotype data from file.
+#' Create Core Hunter phenotype data from data frame or file.
 #'
-#' See \url{www.corehunter.org} for documentation and examples
-#' of the phenotype data format used by Core Hunter.
+#' Specify either a data frame containing the phenotypic trait observations
+#' or a file from which to read the data. See \url{www.corehunter.org} for
+#' documentation and examples of the phenotype data format used by Core Hunter.
+#'
+#' @param data Data frame containing one row per individual and one column per trait.
+#'   Unique row and column names are required and used as item and trait ids, respectively.
+#'   The data frame may optionally include a first column \code{NAME} (\code{character})
+#'   used to assign names to some or all individuals.
+#'
+#' @param types Variable types (optional). Ignored when reading from file.
+#'
+#'   Vector of characters of length one or two.
+#'   The first letter indicates the scale type and should be one of \code{N} (nominal),
+#'   \code{O} (ordinal), \code{I} (interval) or \code{R} (ratio). The second letter
+#'   optionally indicates the variable encoding (in Java) and should be one of
+#'   \code{B} (boolean), \code{T} (short), \code{I} (integer), \code{L} (long),
+#'   \code{R} (big integer), \code{F} (float), \code{D} (double), \code{M} (big decimal),
+#'   \code{A} (date) or \code{S} (string). The default encoding is \code{S} (string)
+#'   for nominal variables, \code{I} (integer) for ordinal and interval variables
+#'   and \code{D} (double) for ratio variables. Interval and ratio variables are
+#'   limited to numeric encodings.
+#'
+#'   If no explicit variable types are specified these are automatically inferred from
+#'   the data frame column types and classes, whenever possible.
+#'   Columns of type \code{character} are treated as nominal string encoded variables
+#'   (\code{N}, \code{NS}).
+#'   Unordered \code{factor} columns are converted to \code{character} and also treated
+#'   as string encoded nominals.
+#'   Ordered factors are converted to \code{integer} respecting the order of values
+#'   in the factor levels and subsequently treated as integer encoded interval variables
+#'   (\code{I}, \code{II}).
+#'   Columns of type \code{logical} are taken to be assymetric binary variables (\code{NB}).
+#'   Finally, \code{integer} and more broadly \code{numeric} columns are treated as integer
+#'   encoded interval variables (\code{I}, \code{II}) and double encoded ratio variables
+#'   (\code{R}, \code{RD}), respectively.
+#'
+#'   If explicit types are given for some variables others can still be automatically inferred
+#'   by setting their type to \code{NA}.
+#'
+#' @param min Minimum values of interval or ratio variables (optional).
+#'   Numeric vector. Ignored when reading from file.
+#'   If undefined for some variables the respective minimum is inferred from the data.
+#'   If the data exceeds the minimum it is also updated accordingly.
+#'   For nominal and ordinal variables just put \code{NA}.
+#' @param max Maximum values of interval or ratio variables (optional).
+#'   Numeric vector. Ignored when reading from file.
+#'   If undefined for some variables the respective maximum is inferred from the data.
+#'   If the data exceeds the maximum it is also updated accordingly.
+#'   For nominal and ordinal variables just put \code{NA}.
 #'
 #' @param file File containing the phenotype data.
 #'
@@ -423,19 +474,124 @@ print.chgeno <- function(x, ...){
 #' }
 #'
 #' @examples
+#' # read from file
 #' pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
-#' pheno <- phenotypes(pheno.file)
+#' pheno <- phenotypes(file = pheno.file)
+#'
+#' # create from data frame
+#' # TODO ...
 #'
 #' @import rJava
 #' @export
-phenotypes <- function(file){
+phenotypes <- function(data, types, min, max, file){
 
   # check input
-  if(missing(file)){
-    stop("File path is required.")
+  if(missing(data) && missing(file)){
+    stop("Data frame or file path is required.")
+  }
+  if(!missing(data) && !missing(file)){
+    stop("Please specify either data frame or file, not both.")
   }
 
   api <- ch.api()
+
+  if(missing(file)){
+
+    # write data to file to be read in Java
+
+    # check data type
+    if(!is.data.frame(data)){
+      stop("Argument 'data' should be a data frame.")
+    }
+
+    # check row and column names
+    if(is.null(rownames(data)) || is.null(colnames(data))){
+      stop("Unique row and column names are required.")
+    }
+
+    # process data
+    pdata <- data
+
+    # temporarily extract item names if specified
+    names <- pdata$NAME
+    if(!is.null(names) && !is.character(names)){
+      stop("Item names should be of type 'character'.")
+    }
+    pdata <- pdata[, colnames(pdata) != "NAME"]
+
+    # check and/or infer types
+    if(missing(types)){
+      types <- rep(NA, ncol(pdata))
+    } else if(length(types) != ncol(pdata)){
+      stop("Number of variable types does not correspond to number of data columns.")
+    }
+    for(t in 1:length(types)){
+      type <- types[t]
+      if(!is.na(type)){
+        if(!is.character(type) || (length(type) != 1 && length(type) != 2)){
+          stop("Types should be characters of length one or two.")
+        }
+        return(type)
+      } else {
+        # infer type
+        col <- pdata[[t]]
+        if(is.character(col)){
+          # character treated as nominal string
+          type <- "N"
+        } else if(is.factor(col)){
+          if(!is.ordered(col)){
+            # unordered factor treated as nominal string
+            type <- "N"
+          } else {
+            # ordered factor: convert to integer and treat as interval variable
+            pdata[[t]] <- as.integer(col)
+            type <- "I"
+          }
+        } else if(is.logical(col)){
+          type <- "NB"
+        } else if(is.integer(col)){
+          type <- "I"
+        } else if(is.numeric(col)){
+          type <- "R"
+        } else {
+          stop("Could not automatically infer variable type.")
+        }
+        types[t] <- type
+      }
+    }
+
+    # convert all columns to characters
+    pdata <- data.frame(lapply(pdata, as.character), stringsAsFactors = FALSE)
+
+    # add type, min and max rows (bottom to top)
+    if(!missing(max)){
+      if(!is.numeric(max)){
+        stop("Maximum values should be numeric.")
+      }
+      if(length(max) != ncol(pdata)){
+        stop("Number of maximum values does not correspond to number of data columns.")
+      }
+      pdata <- rbind(MAX = max, pdata)
+    }
+    if(!missing(min)){
+      if(!is.numeric(min)){
+        stop("Maximum values should be numeric.")
+      }
+      if(length(min) != ncol(pdata)){
+        stop("Number of minimum values does not correspond to number of data columns.")
+      }
+      pdata <- rbind(MIN = min, pdata)
+    }
+    pdata <- rbind(TYPE = types, pdata)
+
+    # reinsert names if set
+    if(!is.null(names)){
+      # ...
+    }
+    # make row headers first column (ID)
+    pdata <- cbind(ID = rownames(pdata), pdata)
+
+  }
 
   # read from file
 
@@ -458,7 +614,7 @@ phenotypes <- function(file){
   if("TYPE" %in% rownames(data)){
     types <- data["TYPE",]
   } else {
-    types <- rep("NS", ncol(data))
+    stop("Variable types are required.")
   }
   # drop type, min, max
   data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), ]

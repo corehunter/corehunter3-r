@@ -2,11 +2,58 @@
 % Please edit documentation in R/data.R
 \name{phenotypes}
 \alias{phenotypes}
-\title{Read phenotype data from file.}
+\title{Create Core Hunter phenotype data from data frame or file.}
 \usage{
-phenotypes(file)
+phenotypes(data, types, min, max, file)
 }
 \arguments{
+\item{data}{Data frame containing one row per individual and one column per trait.
+Unique row and column names are required and used as item and trait ids, respectively.
+The data frame may optionally include a first column \code{NAME} (\code{character})
+used to assign names to some or all individuals.}
+
+\item{types}{Variable types (optional). Ignored when reading from file.
+
+  Vector of characters of length one or two.
+  The first letter indicates the scale type and should be one of \code{N} (nominal),
+  \code{O} (ordinal), \code{I} (interval) or \code{R} (ratio). The second letter
+  optionally indicates the variable encoding (in Java) and should be one of
+  \code{B} (boolean), \code{T} (short), \code{I} (integer), \code{L} (long),
+  \code{R} (big integer), \code{F} (float), \code{D} (double), \code{M} (big decimal),
+  \code{A} (date) or \code{S} (string). The default encoding is \code{S} (string)
+  for nominal variables, \code{I} (integer) for ordinal and interval variables
+  and \code{D} (double) for ratio variables. Interval and ratio variables are
+  limited to numeric encodings.
+
+  If no explicit variable types are specified these are automatically inferred from
+  the data frame column types and classes, whenever possible.
+  Columns of type \code{character} are treated as nominal string encoded variables
+  (\code{N}, \code{NS}).
+  Unordered \code{factor} columns are converted to \code{character} and also treated
+  as string encoded nominals.
+  Ordered factors are converted to \code{integer} respecting the order of values
+  in the factor levels and subsequently treated as integer encoded interval variables
+  (\code{I}, \code{II}).
+  Columns of type \code{logical} are taken to be assymetric binary variables (\code{NB}).
+  Finally, \code{integer} and more broadly \code{numeric} columns are treated as integer
+  encoded interval variables (\code{I}, \code{II}) and double encoded ratio variables
+  (\code{R}, \code{RD}), respectively.
+
+  If explicit types are given for some variables others can still be automatically inferred
+  by setting their type to \code{NA}.}
+
+\item{min}{Minimum values of interval or ratio variables (optional).
+Numeric vector. Ignored when reading from file.
+If undefined for some variables the respective minimum is inferred from the data.
+If the data exceeds the minimum it is also updated accordingly.
+For nominal and ordinal variables just put \code{NA}, 1 or any other value (it is ignored anyway).}
+
+\item{max}{Maximum values of interval or ratio variables (optional).
+Numeric vector. Ignored when reading from file.
+If undefined for some variables the respective maximum is inferred from the data.
+If the data exceeds the maximum it is also updated accordingly.
+For nominal and ordinal variables just put \code{NA}, 1 or any other value (it is ignored anyway).}
+
 \item{file}{File containing the phenotype data.}
 }
 \value{
@@ -25,12 +72,17 @@ Phenotype data of class \code{chpheno} with elements
 }
 }
 \description{
-See \url{www.corehunter.org} for documentation and examples
-of the phenotype data format used by Core Hunter.
+Specify either a data frame containing the phenotypic trait observations
+or a file from which to read the data. See \url{www.corehunter.org} for
+documentation and examples of the phenotype data format used by Core Hunter.
 }
 \examples{
+# read from file
 pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
-pheno <- phenotypes(pheno.file)
+pheno <- phenotypes(file = pheno.file)
+
+# create from data frame
+# TODO ...
 
 }
 

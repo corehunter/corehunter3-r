@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{distances}
 \alias{distances}
-\title{Create distances data from matrix or file.}
+\title{Create Core Hunter distance data from matrix or file.}
 \usage{
 distances(data, file)
 }

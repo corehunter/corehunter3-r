@@ -23,7 +23,12 @@ individuals, one of \code{PD} (default), \code{GD}, \code{MR} or \code{CE}
 index. Defaults to 1.0.}
 }
 \value{
-Core Hunter objective (\code{chobj}).
+Core Hunter objective of class \code{chobj} with elements
+\describe{
+ \item{\code{type}}{Objective type.}
+ \item{\code{weight}}{Assigned weight.}
+ \item{\code{meas}}{Distance measure (if applicable).}
+}
 }
 \description{
 The following optimization objectives are supported by Core Hunter:
