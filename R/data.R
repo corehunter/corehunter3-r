@@ -522,10 +522,10 @@ phenotypes <- function(data, types, min, max, file){
       stop("Number of variable types does not correspond to number of data columns.")
     }
     if(missing(min)){
-      min = as.numeric(rep(NA, length(types))
+      min = as.numeric(rep(NA, length(types)))
     }
     if(missing(max)){
-      max = as.numeric(rep(NA, length(types))
+      max = as.numeric(rep(NA, length(types)))
     }
     for(t in 1:length(types)){
       type <- types[t]
