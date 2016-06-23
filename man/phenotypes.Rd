@@ -46,13 +46,13 @@ used to assign names to some or all individuals.}
 Numeric vector. Ignored when reading from file.
 If undefined for some variables the respective minimum is inferred from the data.
 If the data exceeds the minimum it is also updated accordingly.
-For nominal and ordinal variables just put \code{NA}, 1 or any other value (it is ignored anyway).}
+For nominal and ordinal variables just put \code{NA}.}
 
 \item{max}{Maximum values of interval or ratio variables (optional).
 Numeric vector. Ignored when reading from file.
 If undefined for some variables the respective maximum is inferred from the data.
 If the data exceeds the maximum it is also updated accordingly.
-For nominal and ordinal variables just put \code{NA}, 1 or any other value (it is ignored anyway).}
+For nominal and ordinal variables just put \code{NA}.}
 
 \item{file}{File containing the phenotype data.}
 }

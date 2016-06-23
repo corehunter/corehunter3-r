@@ -253,10 +253,6 @@ distances <- function(data, file){
     if(!is.data.frame(data) && !is.matrix(data)){
       stop("Argument 'matrix' should be a matrix or a data frame.")
     }
-    # check headers
-    if(is.null(rownames(data)) || is.null(colnames(data))){
-      stop("Unique row and column names are required.")
-    }
 
     # extract matrix
     if(is.matrix(data)){
