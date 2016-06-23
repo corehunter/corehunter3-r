@@ -12,13 +12,17 @@ Unique row and column names are required and used as item and trait ids, respect
 The data frame may optionally include a first column \code{NAME} (\code{character})
 used to assign names to some or all individuals.}
 
-\item{types}{Variable types (optional). Ignored when reading from file.
-
+\item{types}{Variable types (optional).
   Vector of characters of length one or two.
+  Ignored when reading from file.
+
   The first letter indicates the scale type and should be one of \code{N} (nominal),
-  \code{O} (ordinal), \code{I} (interval) or \code{R} (ratio). The second letter
-  optionally indicates the variable encoding (in Java) and should be one of
-  \code{B} (boolean), \code{T} (short), \code{I} (integer), \code{L} (long),
+  \code{O} (ordinal), \code{I} (interval) or \code{R} (ratio).
+  Note that in Core Hunter the levels of ordinal variables are ordered naturally and
+  it is assumed that each level occurs at least once in the data.
+
+  The second letter optionally indicates the variable encoding (in Java) and should
+  be one of \code{B} (boolean), \code{T} (short), \code{I} (integer), \code{L} (long),
   \code{R} (big integer), \code{F} (float), \code{D} (double), \code{M} (big decimal),
   \code{A} (date) or \code{S} (string). The default encoding is \code{S} (string)
   for nominal variables, \code{I} (integer) for ordinal and interval variables
@@ -31,9 +35,9 @@ used to assign names to some or all individuals.}
   (\code{N}, \code{NS}).
   Unordered \code{factor} columns are converted to \code{character} and also treated
   as string encoded nominals.
-  Ordered factors are converted to \code{integer} respecting the order of values
-  in the factor levels and subsequently treated as integer encoded interval variables
-  (\code{I}, \code{II}).
+  Ordered factors are converted to \code{integer} respecting the order and bounds of
+  the values in the factor levels and subsequently treated as integer encoded interval
+  variables (\code{I}, \code{II}).
   Columns of type \code{logical} are taken to be assymetric binary variables (\code{NB}).
   Finally, \code{integer} and more broadly \code{numeric} columns are treated as integer
   encoded interval variables (\code{I}, \code{II}) and double encoded ratio variables
@@ -65,8 +69,7 @@ Phenotype data of class \code{chpheno} with elements
  \item{\code{names}}{Item names. Names of individuals to which no explicit name
    has been assigned are equal to the unique \code{ids}.}
  \item{\code{types}}{Variable types and encodings.}
- \item{\code{ranges}}{Ranges of numeric variables (interval/ratio).
-   \code{NA} for other variables (nominal/ordinal).}
+ \item{\code{ranges}}{Variable ranges, when applicable (\code{NA} elsewhere).}
  \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
 }
