@@ -431,9 +431,9 @@ print.chgeno <- function(x, ...){
 #'   (\code{N}, \code{NS}).
 #'   Unordered \code{factor} columns are converted to \code{character} and also treated
 #'   as string encoded nominals.
-#'   Ordered factors are converted to \code{integer} respecting the order of values
-#'   in the factor levels and subsequently treated as integer encoded interval variables
-#'   (\code{I}, \code{II}).
+#'   Ordered factors are converted to \code{integer} respecting the order and bounds of
+#'   values in the factor levels and subsequently treated as integer encoded interval
+#'   variables (\code{I}, \code{II}).
 #'   Columns of type \code{logical} are taken to be assymetric binary variables (\code{NB}).
 #'   Finally, \code{integer} and more broadly \code{numeric} columns are treated as integer
 #'   encoded interval variables (\code{I}, \code{II}) and double encoded ratio variables
@@ -505,21 +505,27 @@ phenotypes <- function(data, types, min, max, file){
       stop("Unique row and column names are required.")
     }
 
-    # process data
-    pdata <- data
-
-    # temporarily extract item names if specified
-    names <- pdata$NAME
+    # extract item names
+    names <- data$NAME
     if(!is.null(names) && !is.character(names)){
       stop("Item names should be of type 'character'.")
     }
-    pdata <- pdata[, colnames(pdata) != "NAME"]
+    data$NAME <- NULL
 
-    # check and/or infer types
+    # copy data for processing
+    pdata <- data
+
+    # check and/or infer types and ignore bounds for non-numeric variables
     if(missing(types)){
       types <- rep(NA, ncol(pdata))
     } else if(length(types) != ncol(pdata)){
       stop("Number of variable types does not correspond to number of data columns.")
+    }
+    if(missing(min)){
+      min = as.numeric(rep(NA, length(types))
+    }
+    if(missing(max)){
+      max = as.numeric(rep(NA, length(types))
     }
     for(t in 1:length(types)){
       type <- types[t]
@@ -534,17 +540,22 @@ phenotypes <- function(data, types, min, max, file){
         if(is.character(col)){
           # character treated as nominal string
           type <- "N"
+          min[t] <- max[t] <- NA
         } else if(is.factor(col)){
           if(!is.ordered(col)){
             # unordered factor treated as nominal string
             type <- "N"
+            min[t] <- max[t] <- NA
           } else {
             # ordered factor: convert to integer and treat as interval variable
             pdata[[t]] <- as.integer(col)
             type <- "I"
+            min[t] <- 1
+            max[t] <- length(levels(col))
           }
         } else if(is.logical(col)){
           type <- "NB"
+          min[t] <- max[t] <- NA
         } else if(is.integer(col)){
           type <- "I"
         } else if(is.numeric(col)){
@@ -559,64 +570,74 @@ phenotypes <- function(data, types, min, max, file){
     # convert all columns to characters
     pdata <- data.frame(lapply(pdata, as.character), stringsAsFactors = FALSE)
 
-    # add type, min and max rows (bottom to top)
-    if(!missing(max)){
-      if(!is.numeric(max)){
-        stop("Maximum values should be numeric.")
-      }
-      if(length(max) != ncol(pdata)){
-        stop("Number of maximum values does not correspond to number of data columns.")
-      }
-      pdata <- rbind(MAX = max, pdata)
+    # add min and max rows (bottom to top)
+    if(!is.numeric(max)){
+      stop("Maximum values should be numeric.")
     }
-    if(!missing(min)){
-      if(!is.numeric(min)){
-        stop("Maximum values should be numeric.")
-      }
-      if(length(min) != ncol(pdata)){
-        stop("Number of minimum values does not correspond to number of data columns.")
-      }
-      pdata <- rbind(MIN = min, pdata)
+    if(length(max) != ncol(pdata)){
+      stop("Number of maximum values does not correspond to number of data columns.")
     }
+    pdata <- rbind(MAX = max, pdata)
+    if(!is.numeric(min)){
+      stop("Maximum values should be numeric.")
+    }
+    if(length(min) != ncol(pdata)){
+      stop("Number of minimum values does not correspond to number of data columns.")
+    }
+    pdata <- rbind(MIN = min, pdata)
+    # add type row
     pdata <- rbind(TYPE = types, pdata)
 
     # reinsert names if set
     if(!is.null(names)){
-      # ...
+      names <- c(rep("", sum(rownames(pdata) %in% c("TYPE", "MIN", "MAX"))), names)
+      pdata <- cbind(NAME = names, pdata)
     }
     # make row headers first column (ID)
     pdata <- cbind(ID = rownames(pdata), pdata)
+    
+    # write temporary file
+    tmp <- normalizePath(tempfile(fileext = ".csv"))
+    write.csv(pdata, file = tmp, quote = F, row.names = F, na = "")
+    
+    # read data into Core Hunter from file
+    j.data <- api$readPhenotypeData(tmp)
+    
+    # remove temporary file
+    file.remove(tmp)
 
-  }
-
-  # read from file
-
-  # check file path
-  if(!is.character(file)){
-    stop("Argument 'file' should be a file path (character).")
-  }
-  if(!file.exists(file)){
-    stop("File 'file' does not exist.")
-  }
-  file <- normalizePath(file)
-
-  # read from file
-  j.data <- api$readPhenotypeData(file)
-  # read raw data
-  data <- read.autodelim(file)
-  # drop names
-  data$NAME <- NULL
-  # extract variable types and encodings
-  if("TYPE" %in% rownames(data)){
-    types <- data["TYPE",]
   } else {
-    stop("Variable types are required.")
-  }
-  # drop type, min, max
-  data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), ]
-  # convert columns accordingly
-  for(c in 1:ncol(data)){
-    data[[c]] <- convert.column(data[[c]], types[c])
+  
+    # read from file
+
+    # check file path
+    if(!is.character(file)){
+      stop("Argument 'file' should be a file path (character).")
+    }
+    if(!file.exists(file)){
+      stop("File 'file' does not exist.")
+    }
+    file <- normalizePath(file)
+  
+    # read from file
+    j.data <- api$readPhenotypeData(file)
+    # read raw data
+    data <- read.autodelim(file)
+    # drop names
+    data$NAME <- NULL
+    # extract variable types and encodings
+    if("TYPE" %in% rownames(data)){
+      types <- data["TYPE",]
+    } else {
+      stop("Variable types are required.")
+    }
+    # drop type, min, max
+    data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), ]
+    # convert columns accordingly
+    for(c in 1:ncol(data)){
+      data[[c]] <- convert.column(data[[c]], types[c])
+    }
+  
   }
 
   # obtain ids, names and variable ranges from Java object
@@ -632,9 +653,11 @@ phenotypes <- function(data, types, min, max, file){
     names = names,
     types = types,
     ranges = ranges,
-    file = file,
     java = j.data
   )
+  if(!missing(file)){
+    pheno$file <- file
+  }
   class(pheno) <- c("chpheno", "chdata", class(pheno))
 
   return(pheno)
