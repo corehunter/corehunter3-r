@@ -207,6 +207,17 @@ test_that("read phenotype data from file", {
   expect_equal(mean(gd), evaluateCore(1:5, pheno, objective("EE", "GD")))
 })
 
+test_that("create phenotype data from data frame", {
+  df <- data.frame(
+    n = sample(letters[1:10], size = 5, replace = TRUE),
+    i = sample(1:10, size = 5, replace = TRUE),
+    o = ordered(sample(letters[1:10], size = 5, replace = TRUE), levels = letters[1:10]),
+    r = rnorm(5),
+    b = sample(c(T,F), size = 5, replace = TRUE)
+  )
+  # TODO ...
+})
+
 test_that("print", {
   data <- phenotypeData()
   expect_output(print(data), "Phenotypes for 100 individuals \\(39 traits\\).")

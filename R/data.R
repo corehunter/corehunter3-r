@@ -364,7 +364,7 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
   # clean frequency format
   if(format == "frequency"){
     # drop allele name row
-    data <- data[rownames(data) != "ALLELE",]
+    data <- subset(data, rownames(data) != "ALLELE")
     # convert to numeric
     for(col in colnames(data)){
       data[[col]] <- as.numeric(data[[col]])
@@ -492,6 +492,29 @@ phenotypes <- function(data, types, min, max, file){
     stop("Please specify either data frame or file, not both.")
   }
 
+  # utility function
+  read.raw.data <- function(file){
+    # read raw data
+    data <- read.autodelim(file)
+    # drop names
+    data$NAME <- NULL
+    # extract variable types and encodings
+    if("TYPE" %in% rownames(data)){
+      types <- as.character(data["TYPE",])
+    } else {
+      stop("Variable types are required.")
+    }
+    # drop type, min, max
+    data <- subset(data, !(rownames(data) %in% c("TYPE", "MIN", "MAX")))
+    # convert columns accordingly
+    for(c in 1:ncol(data)){
+      data[[c]] <- convert.column(data[[c]], types[c])
+    }
+    # prepare and return result
+    result <- list(data = data, types = types)
+    return(result)
+  }
+
   api <- ch.api()
 
   if(missing(file)){
@@ -533,10 +556,12 @@ phenotypes <- function(data, types, min, max, file){
     for(t in 1:length(types)){
       type <- types[t]
       if(!is.na(type)){
-        if(!is.character(type) || (length(type) != 1 && length(type) != 2)){
-          stop("Types should be characters of length one or two.")
+        if(!is.character(type) || (nchar(type) != 1 && nchar(type) != 2)){
+          stop("Types should consist of one or two characters.")
         }
-        return(type)
+        if(!is.numeric(data[[t]])){
+          min[t] <- max[t] <- NA
+        }
       } else {
         # infer type
         col <- pdata[[t]]
@@ -607,6 +632,8 @@ phenotypes <- function(data, types, min, max, file){
 
     # read data into Core Hunter from file
     j.data <- api$readPhenotypeData(tmp)
+    # read raw data
+    raw.data <- read.raw.data(tmp)
 
     # remove temporary file
     file.remove(tmp)
@@ -627,21 +654,7 @@ phenotypes <- function(data, types, min, max, file){
     # read from file
     j.data <- api$readPhenotypeData(file)
     # read raw data
-    data <- read.autodelim(file)
-    # drop names
-    data$NAME <- NULL
-    # extract variable types and encodings
-    if("TYPE" %in% rownames(data)){
-      types <- as.character(data["TYPE",])
-    } else {
-      stop("Variable types are required.")
-    }
-    # drop type, min, max
-    data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), ]
-    # convert columns accordingly
-    for(c in 1:ncol(data)){
-      data[[c]] <- convert.column(data[[c]], types[c])
-    }
+    raw.data <- read.raw.data(file)
 
   }
 
@@ -652,11 +665,11 @@ phenotypes <- function(data, types, min, max, file){
 
   # create R object
   pheno <- list(
-    data = data,
+    data = raw.data$data,
     size = j.data$getSize(),
     ids = ids,
     names = names,
-    types = types,
+    types = raw.data$types,
     ranges = ranges,
     java = j.data
   )
