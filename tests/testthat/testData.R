@@ -208,6 +208,30 @@ test_that("read phenotype data from file", {
 })
 
 test_that("create phenotype data from data frame", {
+
+  # three different ways to compute Gower distance matrix
+  gd <- function(df){
+    pheno <- phenotypes(df)
+    StatMatch::gower.dist(df, rngs = pheno$ranges, KR.corr = FALSE)
+  }
+  gd2 <- function(df){
+    pheno <- phenotypes(df)
+    StatMatch::gower.dist(pheno$data, rngs = pheno$ranges, KR.corr = FALSE)
+  }
+  gd3 <- function(df){
+    pheno <- phenotypes(df)
+    m <- matrix(0.0, pheno$size, pheno$size)
+    for(i in 1:pheno$size){
+      if(i < pheno$size){
+        for(j in (i+1):pheno$size){
+          m[i,j] <- m[j,i] <- evaluateCore(c(i,j), pheno, objective("EE", "GD"))
+        }
+      }
+    }
+    return(m)
+  }
+
+  # create data frame
   df <- data.frame(
     n = sample(letters[1:10], size = 5, replace = TRUE),
     i = sample(1:10, size = 5, replace = TRUE),
@@ -215,7 +239,17 @@ test_that("create phenotype data from data frame", {
     r = rnorm(5),
     b = sample(c(T,F), size = 5, replace = TRUE)
   )
-  # TODO ...
+  # create phenotype data with automatic types and ranges
+  pheno <- phenotypes(df)
+  expect_equal(pheno$size, 5)
+  expect_equal(pheno$ids, as.character(1:5))
+  expect_equal(pheno$names, as.character(1:5))
+  expect_equal(pheno$data$o, as.integer(df$o))
+  expect_equal(pheno$types, c("N", "I", "I", "R", "NB"))
+  expect_equal(pheno$ranges, c(NA, max(df$i) - min(df$i), 9, max(df$r) - min(df$r), NA))
+  expect_equal(gd(df), gd2(df))
+  expect_equal(gd(df), gd3(df))
+
 })
 
 test_that("print", {

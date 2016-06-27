@@ -30,18 +30,22 @@ used to assign names to some or all individuals.}
   limited to numeric encodings.
 
   If no explicit variable types are specified these are automatically inferred from
-  the data frame column types and classes, whenever possible.
-  Columns of type \code{character} are treated as nominal string encoded variables
-  (\code{N}, \code{NS}).
-  Unordered \code{factor} columns are converted to \code{character} and also treated
-  as string encoded nominals.
-  Ordered factors are converted to \code{integer} respecting the order and bounds of
-  the values in the factor levels and subsequently treated as integer encoded interval
-  variables (\code{I}, \code{II}).
+  the data frame column types and classes, whenever possible. Columns of type
+  \code{character} are treated as nominal string encoded variables (\code{N}).
+  Unordered \code{factor} columns are converted to \code{character} and also
+  treated as string encoded nominals. Ordered factors are converted to
+  integer encoded interval variables (\code{I}) as described below.
   Columns of type \code{logical} are taken to be assymetric binary variables (\code{NB}).
   Finally, \code{integer} and more broadly \code{numeric} columns are treated as integer
-  encoded interval variables (\code{I}, \code{II}) and double encoded ratio variables
-  (\code{R}, \code{RD}), respectively.
+  encoded interval variables (\code{I}) and double encoded ratio variables (\code{R}),
+  respectively.
+
+  Ordinal variables of class \code{ordered} are converted to integers respecting
+  the order and range of the factor levels and subsequently treated as integer
+  encoded interval variables (\code{I}). This conversion allows to model the
+  full range of factor levels also when some might not occur in the data. For other
+  ordinal variables it is assumed that each value occurs at least once and that
+  values follow the natural ordering of the chosen data type (in Java).
 
   If explicit types are given for some variables others can still be automatically inferred
   by setting their type to \code{NA}.}

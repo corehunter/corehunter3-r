@@ -430,18 +430,22 @@ print.chgeno <- function(x, ...){
 #'   limited to numeric encodings.
 #'
 #'   If no explicit variable types are specified these are automatically inferred from
-#'   the data frame column types and classes, whenever possible.
-#'   Columns of type \code{character} are treated as nominal string encoded variables
-#'   (\code{N}, \code{NS}).
-#'   Unordered \code{factor} columns are converted to \code{character} and also treated
-#'   as string encoded nominals.
-#'   Ordered factors are converted to \code{integer} respecting the order and bounds of
-#'   the values in the factor levels and subsequently treated as integer encoded interval
-#'   variables (\code{I}, \code{II}).
+#'   the data frame column types and classes, whenever possible. Columns of type
+#'   \code{character} are treated as nominal string encoded variables (\code{N}).
+#'   Unordered \code{factor} columns are converted to \code{character} and also
+#'   treated as string encoded nominals. Ordered factors are converted to
+#'   integer encoded interval variables (\code{I}) as described below.
 #'   Columns of type \code{logical} are taken to be assymetric binary variables (\code{NB}).
 #'   Finally, \code{integer} and more broadly \code{numeric} columns are treated as integer
-#'   encoded interval variables (\code{I}, \code{II}) and double encoded ratio variables
-#'   (\code{R}, \code{RD}), respectively.
+#'   encoded interval variables (\code{I}) and double encoded ratio variables (\code{R}),
+#'   respectively.
+#'
+#'   Ordinal variables of class \code{ordered} are converted to integers respecting
+#'   the order and range of the factor levels and subsequently treated as integer
+#'   encoded interval variables (\code{I}). This conversion allows to model the
+#'   full range of factor levels also when some might not occur in the data. For other
+#'   ordinal variables it is assumed that each value occurs at least once and that
+#'   values follow the natural ordering of the chosen data type (in Java).
 #'
 #'   If explicit types are given for some variables others can still be automatically inferred
 #'   by setting their type to \code{NA}.
@@ -538,13 +542,10 @@ phenotypes <- function(data, types, min, max, file){
     }
     data$NAME <- NULL
 
-    # copy data for processing
-    pdata <- data
-
     # check and/or infer types and ignore bounds for non-numeric variables
     if(missing(types)){
-      types <- rep(NA, ncol(pdata))
-    } else if(length(types) != ncol(pdata)){
+      types <- rep(NA, ncol(data))
+    } else if(length(types) != ncol(data)){
       stop("Number of variable types does not correspond to number of data columns.")
     }
     if(missing(min)){
@@ -554,9 +555,8 @@ phenotypes <- function(data, types, min, max, file){
       max = as.numeric(rep(NA, length(types)))
     }
     for(t in 1:length(types)){
-      type <- types[t]
-      if(!is.na(type)){
-        if(!is.character(type) || (nchar(type) != 1 && nchar(type) != 2)){
+      if(!is.na(types[t])){
+        if(!is.character(types[t]) || (nchar(types[t]) != 1 && nchar(types[t]) != 2)){
           stop("Types should consist of one or two characters.")
         }
         if(!is.numeric(data[[t]])){
@@ -564,71 +564,75 @@ phenotypes <- function(data, types, min, max, file){
         }
       } else {
         # infer type
-        col <- pdata[[t]]
+        col <- data[[t]]
         if(is.character(col)){
           # character treated as nominal string
-          type <- "N"
+          types[t] <- "N"
           min[t] <- max[t] <- NA
         } else if(is.factor(col)){
           if(!is.ordered(col)){
             # unordered factor treated as nominal string
-            type <- "N"
+            types[t] <- "N"
             min[t] <- max[t] <- NA
           } else {
-            # ordered factor: convert to integer and treat as interval variable
-            pdata[[t]] <- as.integer(col)
-            type <- "I"
-            min[t] <- 1
-            max[t] <- length(levels(col))
+            # ordered factor: will be converted to integer (see below)
+            types[t] <- "O"
           }
         } else if(is.logical(col)){
-          type <- "NB"
+          types[t] <- "NB"
           min[t] <- max[t] <- NA
         } else if(is.integer(col)){
-          type <- "I"
+          types[t] <- "I"
         } else if(is.numeric(col)){
-          type <- "R"
+          types[t] <- "R"
         } else {
           stop("Could not automatically infer variable type.")
         }
-        types[t] <- type
+      }
+      # convert ordinal columns of class ordered to integer (interval)
+      if(substr(types[t], 1, 1) == "O" && is.ordered(data[[t]])){
+        orig.col <- data[[t]]
+        data[[t]] <- as.integer(orig.col)
+        types[t] <- "I"
+        min[t] <- 1
+        max[t] <- length(levels(orig.col))
       }
     }
 
     # convert all columns to characters
-    ids <- rownames(pdata)
-    pdata <- data.frame(lapply(pdata, as.character), stringsAsFactors = FALSE, check.names = FALSE)
-    rownames(pdata) <- ids
+    ids <- rownames(data)
+    data <- data.frame(lapply(data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+    rownames(data) <- ids
 
     # add min and max rows (bottom to top)
     if(!is.numeric(max)){
       stop("Maximum values should be numeric.")
     }
-    if(length(max) != ncol(pdata)){
+    if(length(max) != ncol(data)){
       stop("Number of maximum values does not correspond to number of data columns.")
     }
-    pdata <- rbind(MAX = max, pdata)
+    data <- rbind(MAX = max, data)
     if(!is.numeric(min)){
       stop("Maximum values should be numeric.")
     }
-    if(length(min) != ncol(pdata)){
+    if(length(min) != ncol(data)){
       stop("Number of minimum values does not correspond to number of data columns.")
     }
-    pdata <- rbind(MIN = min, pdata)
+    data <- rbind(MIN = min, data)
     # add type row
-    pdata <- rbind(TYPE = types, pdata)
+    data <- rbind(TYPE = types, data)
 
     # reinsert names if set
     if(!is.null(names)){
-      names <- c(rep("", sum(rownames(pdata) %in% c("TYPE", "MIN", "MAX"))), names)
-      pdata <- cbind(NAME = names, pdata)
+      names <- c(rep("", sum(rownames(data) %in% c("TYPE", "MIN", "MAX"))), names)
+      data <- cbind(NAME = names, data)
     }
     # make row headers first column (ID)
-    pdata <- cbind(ID = rownames(pdata), pdata)
+    data <- cbind(ID = rownames(data), data)
 
     # write temporary file
     tmp <- tempfile(fileext = ".csv")
-    write.csv(pdata, file = tmp, quote = F, row.names = F, na = "")
+    write.csv(data, file = tmp, quote = F, row.names = F, na = "")
 
     # read data into Core Hunter from file
     j.data <- api$readPhenotypeData(tmp)
