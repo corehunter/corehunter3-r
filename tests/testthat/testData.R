@@ -172,6 +172,31 @@ test_that("arguments are checked", {
   expect_error(phenotypes(), "path is required")
   expect_error(phenotypes(file = 124), "should be a file path")
   expect_error(phenotypes(file = "i/do/not/exist"), "does not exist")
+  expect_error(phenotypes(data = data.frame(), file = phenotypeFile()), "either data frame or file")
+  expect_error(phenotypes(file = "data/phenotypes-no-types.csv"), "types are required")
+  expect_error(phenotypes(data = 456), "should be a data frame")
+  # no column ids
+  df <- data.frame(1:10, letters[1:10])
+  colnames(df) <- NULL
+  expect_error(phenotypes(data = df), "names are required")
+  df <- data.frame(NAME = 1:10, letters[1:10])
+  # row names not character
+  expect_error(phenotypes(df), "names should be of type 'character'")
+  df <- data.frame(1:10, letters[1:10])
+  # invalid type
+  expect_error(phenotypes(df, types = c("I", "N", "R")), "does not correspond to number of data columns")
+  expect_error(phenotypes(df, types = c("I", "NSS")), "one or two characters")
+  expect_error(phenotypes(df, types = c("X", "Y")), "unknown scale", ignore.case = TRUE)
+  expect_error(phenotypes(file = "data/phenotypes-unknown-type.csv"), "unsupported variable type", ignore.case = TRUE)
+  # no auto type
+  df <- data.frame(rep(as.Date("2016-06-27"), 10), letters[1:10])
+  expect_error(phenotypes(df), "infer variable type")
+  # invalid ranges
+  df <- data.frame(1:10, letters[1:10])
+  expect_error(phenotypes(df, min = c("a", NA)), "should be numeric")
+  expect_error(phenotypes(df, max = c(F, NA)), "should be numeric")
+  expect_error(phenotypes(df, min = c(1, NA, 10)), "number of data columns")
+  expect_error(phenotypes(df, max = c(5, NA, 100)), "number of data columns")
 })
 
 test_that("class", {
@@ -249,6 +274,41 @@ test_that("create phenotype data from data frame", {
   expect_equal(pheno$ranges, c(NA, max(df$i) - min(df$i), 9, max(df$r) - min(df$r), NA))
   expect_equal(gd(df), gd2(df))
   expect_equal(gd(df), gd3(df))
+
+  # same but with first column as character instead of factor
+  df$n <- as.character(df$n)
+  pheno.factor <- pheno
+  pheno.character <- phenotypes(df)
+  expect_equal(pheno.character, pheno.factor)
+
+  # explicit types (all nominal string)
+  pheno <- phenotypes(df, types = rep("NS", 5))
+  for(c in 1:ncol(df)){
+    expect_is(pheno$data[[c]], "factor")
+  }
+  expect_equal(pheno$types, rep("NS", 5))
+  expect_equal(pheno$ranges, as.numeric(rep(NA, 5)))
+  expect_equal(gd(df), gd2(df))
+  expect_equal(gd(df), gd3(df))
+
+  # with dates
+  df.dates <- df
+  df.dates$dates <- format(as.Date(c(
+    "2016-06-01",
+    "2016-06-05",
+    "2016-06-02",
+    "2016-06-03",
+    "2016-06-04"
+  )), format = "%Y%m%d%H%M%S%z")
+  pheno <- phenotypes(df.dates, types = c(rep(NA, 5), "OA"))
+  expect_equal(pheno$types[6], "OA")
+  expect_equal(gd(df), gd2(df))
+  expect_equal(gd(df), gd3(df))
+
+  # with names
+  df <- cbind(NAME = letters[1:5], df, stringsAsFactors = FALSE)
+  pheno <- phenotypes(df)
+  expect_equal(pheno$names, letters[1:5])
 
 })
 

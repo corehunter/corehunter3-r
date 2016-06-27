@@ -18,8 +18,6 @@ used to assign names to some or all individuals.}
 
   The first letter indicates the scale type and should be one of \code{N} (nominal),
   \code{O} (ordinal), \code{I} (interval) or \code{R} (ratio).
-  Note that in Core Hunter the levels of ordinal variables are ordered naturally and
-  it is assumed that each level occurs at least once in the data.
 
   The second letter optionally indicates the variable encoding (in Java) and should
   be one of \code{B} (boolean), \code{T} (short), \code{I} (integer), \code{L} (long),
@@ -39,6 +37,10 @@ used to assign names to some or all individuals.}
   Finally, \code{integer} and more broadly \code{numeric} columns are treated as integer
   encoded interval variables (\code{I}) and double encoded ratio variables (\code{R}),
   respectively.
+
+  Boolean encoded nominals (\code{NB}) are treated as assymetric binary variables.
+  For symmetric binary variables just use the default string encoding (\code{N}
+  or \code{NS}). Other nominal variables are converted to factors.
 
   Ordinal variables of class \code{ordered} are converted to integers respecting
   the order and range of the factor levels and subsequently treated as integer
@@ -84,12 +86,26 @@ or a file from which to read the data. See \url{www.corehunter.org} for
 documentation and examples of the phenotype data format used by Core Hunter.
 }
 \examples{
+# create from data frame
+pheno.data <- data.frame(
+ season = c("winter", "summer", "summer", "winter", "summer"),
+ yield = c(34.5, 32.6, 22.1, 54.12, 43.33),
+ weight = ordered(c("heavy", "light", "light", "medium", "heavy"), levels = c("light", "medium", "heavy")),
+ resistant = c(F, T, T, F, T)
+)
+pheno <- phenotypes(pheno.data)
+
+# explicit types
+pheno <- phenotypes(pheno.data, types = c("N", "R", "O", "NB"))
+# treat last column as symmetric binary, auto infer others
+pheno <- phenotypes(pheno.data, types = c(NA, NA, NA, "NS"))
+
+# explicit ranges
+pheno <- phenotypes(pheno.data, min = c(NA, 20.0, NA, NA), max = c(NA, 60.0, NA, NA))
+
 # read from file
 pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
 pheno <- phenotypes(file = pheno.file)
-
-# create from data frame
-# TODO ...
 
 }
 
