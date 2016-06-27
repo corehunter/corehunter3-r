@@ -483,8 +483,8 @@ print.chgeno <- function(x, ...){
 #' pheno.data <- data.frame(
 #'  season = c("winter", "summer", "summer", "winter", "summer"),
 #'  yield = c(34.5, 32.6, 22.1, 54.12, 43.33),
-#'  weight = ordered(c("heavy", "light", "light", "medium", "heavy"), levels = c("light", "medium", "heavy")),
-#'  resistant = c(F, T, T, F, T)
+#'  size = ordered(c("l", "s", "s", "m", "l"), levels = c("s", "m", "l")),
+#'  resistant = c(FALSE, TRUE, TRUE, FALSE, TRUE)
 #' )
 #' pheno <- phenotypes(pheno.data)
 #'
