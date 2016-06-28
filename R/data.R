@@ -70,6 +70,7 @@ exampleData <- function(){
 #' @seealso \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 #'
 #' @import rJava
+#' @importFrom methods is
 #' @export
 coreHunterData <- function(genotypes, phenotypes, distances){
 
@@ -502,6 +503,7 @@ print.chgeno <- function(x, ...){
 #' pheno <- phenotypes(file = pheno.file)
 #'
 #' @import rJava
+#' @importFrom utils write.csv
 #' @export
 phenotypes <- function(data, types, min, max, file){
 
@@ -761,6 +763,8 @@ print.chpheno <- function(x, ...){
 #' @inheritParams utils::read.table
 #'
 #' @return Data frame.
+#'
+#' @importFrom utils read.delim
 #' @export
 read.autodelim <- function(file, row.names = 1, check.names = FALSE, stringsAsFactors = FALSE, strip.white = TRUE, ...){
   sep <- switch(tolower(tools::file_ext(file)),
@@ -776,9 +780,15 @@ read.autodelim <- function(file, row.names = 1, check.names = FALSE, stringsAsFa
 # PRIVATE UTILITIES #
 # ----------------- #
 
-# Wrap distances, genotypes or phenotypes in Core Hunter data.
-# If the given data does not match any of these three classes
-# it is returned unchanged.
+#' Wrap distances, genotypes or phenotypes in Core Hunter data.
+#'
+#' If the given data does not match any of these three classes
+#' it is returned unchanged.
+#'
+#' @param data of class \code{chgeno}, \code{chpheno} or \code{chdist}
+#' @return Core Hunter data of class \code{chdata}
+#'
+#' @importFrom methods is
 wrapData <- function(data){
   if(is(data, "chdist")){
     data <- coreHunterData(distances = data)

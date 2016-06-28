@@ -78,8 +78,8 @@
 #'
 #' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
 #'
-#' @import rJava
-#' @import naturalsort
+#' @import rJava naturalsort
+#' @importFrom methods is
 #' @export
 sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
                        time = NA, impr.time = NA, indices = FALSE, verbose = FALSE){
