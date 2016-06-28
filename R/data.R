@@ -15,7 +15,7 @@
 #'
 #' @source \url{http://bioinformatics.oxfordjournals.org/content/23/16/2155.long}
 #'
-#' @return data of class \code{chdata}
+#' @return Core Hunter data of class \code{chdata}
 #' @export
 exampleData <- function(){
   getFile <- function(file){
@@ -176,7 +176,6 @@ print.chdata <- function(x, ...){
 #'
 #' @examples
 #' # create from distance matrix
-#'
 #' m <- matrix(runif(100), nrow = 10, ncol = 10)
 #' diag(m) <- 0
 #' # make symmetric
@@ -187,7 +186,6 @@ print.chdata <- function(x, ...){
 #' dist <- distances(m)
 #'
 #' # read from file
-#'
 #' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
 #' dist <- distances(file = dist.file)
 #'
@@ -325,12 +323,28 @@ print.chdist <- function(x, ...){
 #' }
 #'
 #' @examples
+#' # create from data frame or matrix
+#'
+#' # default format
+#' # TODO ...
+#'
+#' # biparental
+#' # TODO ...
+#'
+#' # frequencies
+#' # TODO ...
+#'
+#' # read from file
+#'
+#' # default format
 #' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 #' geno <- genotypes(geno.file)
 #'
+#' # biparental
 #' geno.file.biparental <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
 #' geno.biparental <- genotypes(geno.file.biparental, format = "biparental")
 #'
+#' # frequencies
 #' geno.file.freq <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
 #' geno.freq <- genotypes(geno.file.freq, format = "frequency")
 #'

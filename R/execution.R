@@ -80,6 +80,7 @@
 #'
 #' @import rJava naturalsort
 #' @importFrom methods is
+#' @importFrom utils capture.output
 #' @export
 sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
                        time = NA, impr.time = NA, indices = FALSE, verbose = FALSE){
