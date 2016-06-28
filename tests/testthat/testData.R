@@ -115,9 +115,10 @@ context("Genotype data")
 ########################
 
 test_that("arguments are checked", {
-  expect_error(genotypes(), "path is required")
+  expect_error(genotypes(), "specify data or file")
   expect_error(genotypes(file = 124), "should be a file path")
   expect_error(genotypes(file = "i/do/not/exist"), "does not exist")
+  expect_error(genotypes(data = testData()$geno$data, file = genotypeFile()), "not both")
 })
 
 test_that("class", {
@@ -179,11 +180,8 @@ test_that("arguments are checked", {
   df <- data.frame(1:10, letters[1:10])
   colnames(df) <- NULL
   expect_error(phenotypes(data = df), "names are required")
-  df <- data.frame(NAME = 1:10, letters[1:10])
-  # row names not character
-  expect_error(phenotypes(df), "names should be of type 'character'")
-  df <- data.frame(1:10, letters[1:10])
   # invalid type
+  df <- data.frame(1:10, letters[1:10])
   expect_error(phenotypes(df, types = c("I", "N", "R")), "does not correspond to number of data columns")
   expect_error(phenotypes(df, types = c("I", "NSS")), "one or two characters")
   expect_error(phenotypes(df, types = c("X", "Y")), "unknown scale", ignore.case = TRUE)

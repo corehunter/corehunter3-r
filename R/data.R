@@ -353,15 +353,15 @@ print.chdist <- function(x, ...){
 #'
 #' # default format
 #' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
-#' geno <- genotypes(geno.file)
+#' geno <- genotypes(file = geno.file)
 #'
 #' # biparental
 #' geno.file <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
-#' geno <- genotypes(geno.file.biparental, format = "biparental")
+#' geno <- genotypes(file = geno.file, format = "biparental")
 #'
 #' # frequencies
 #' geno.file <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
-#' geno <- genotypes(geno.file.freq, format = "frequency")
+#' geno <- genotypes(file = geno.file, format = "frequency")
 #'
 #' @import rJava
 #' @export
