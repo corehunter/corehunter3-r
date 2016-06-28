@@ -158,9 +158,8 @@ print.chdata <- function(x, ...){
 #'
 #' @param data Symmetric distance matrix. Unique row and column headers are required,
 #'  should be the same and are used as item ids. Can be a \code{numeric} matrix or a data frame.
-#'  The data frame may optionally include a first column \code{NAME} (\code{character})
-#'  used to assign names to some or all individuals. The remaining columns should
-#'  be \code{numeric}.
+#'  The data frame may optionally include a first column \code{NAME} used to assign names to some
+#'  or all individuals. The remaining columns should be \code{numeric}.
 #' @param file File from which to read the distance matrix.
 #'
 #' @return Distance matrix data of class \code{chdist} with elements
@@ -170,8 +169,8 @@ print.chdata <- function(x, ...){
 #'  \item{\code{ids}}{Unique item identifiers.}
 #'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
 #'    has been assigned are equal to the unique \code{ids}.}
-#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
+#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #' }
 #'
 #' @examples
@@ -202,16 +201,6 @@ distances <- function(data, file){
   }
 
   api <- ch.api()
-
-  extract.matrix <- function(data){
-    # discard names (if set)
-    data$NAME <- NULL
-    # extract matrix
-    matrix <- as.matrix(data)
-    # check matrix
-    check.matrix(matrix)
-    return(matrix)
-  }
 
   check.matrix <- function(matrix){
     if(!is.numeric(matrix)){
@@ -258,12 +247,12 @@ distances <- function(data, file){
     if(is.matrix(data)){
       names <- as.character(rep(NA, nrow(data)))
       matrix <- data
-      check.matrix(matrix)
     } else {
       # extract names and convert to matrix
       names <- extract.names(data)
       matrix <- extract.matrix(data)
     }
+    check.matrix(matrix)
 
     j.matrix <- .jarray(matrix, dispatch = TRUE)
     j.ids <- .jarray(rownames(data))
@@ -302,24 +291,44 @@ print.chdist <- function(x, ...){
 # GENOTYPE DATA #
 # ------------- #
 
-#' Read genotype data from file.
+#' Create Core Hunter genotype data from data frame, matrix or file.
 #'
-#' See \url{www.corehunter.org} for documentation and examples of the different
-#' genotype data formats supported by Core Hunter.
+#' Specify either a data frame or matrix, or a file from which to read the genotypes.
+#' See \url{www.corehunter.org} for documentation and examples of the genotype data
+#' file format used by Core Hunter.
 #'
+#' @param data Data frame or matrix containing the genotypes (individuals x markers)
+#'  depending on the chosen format:
+#'  \describe{
+#'    \item{\code{default}}{
+#'      TODO
+#'    }
+#'    \item{\code{biparental}}{
+#'      Numeric matrix or data frame. In case of a data frame a first column \code{NAME}
+#'      may optionally be included specifying item names. The remaining columns should
+#'      be numeric and follow the same format as the otherwise specified numeric matrix.
+#'      Data consists of 0, 1 and 2 coding for homozygous (AA), heterozygous (AB) and
+#'      homozygous (BB), respectively. Unique row names (item ids) are required and
+#'      optionally column (marker) names may be included as well.
+#'    }
+#'    \item{\code{frequency}}{
+#'      TODO
+#'    }
+#'    See \url{www.corehunter.org} for more details about the supported genotype formats.
+#'  }
 #' @param file File containing the genotype data.
 #' @param format Genotype data format, one of \code{default}, \code{biparental} or \code{frequency}.
 #'
 #' @return Genotype data of class \code{chdist} with elements
 #' \describe{
-#'  \item{\code{data}}{Genotypes (data frame).}
+#'  \item{\code{data}}{Genotypes. Data frame for default format, \code{numeric} matrix for other formats.}
 #'  \item{\code{size}}{Number of individuals in the dataset.}
 #'  \item{\code{ids}}{Unique item identifiers.}
 #'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
 #'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{alleles}}{List of character vectors with allele names per marker.}
-#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
+#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #' }
 #'
 #' @examples
@@ -329,7 +338,13 @@ print.chdist <- function(x, ...){
 #' # TODO ...
 #'
 #' # biparental
-#' # TODO ...
+#' geno.data <- matrix(
+#'  sample(c(0,1,2), replace = TRUE, size = 1000),
+#'  nrow = 10, ncol = 100
+#' )
+#' rownames(geno.data) <- paste("g", 1:10, sep = "-")
+#' colnames(geno.data) <- paste("m", 1:100, sep = "-")
+#' geno <- genotypes(geno.data, format = "biparental")
 #'
 #' # frequencies
 #' # TODO ...
@@ -341,50 +356,119 @@ print.chdist <- function(x, ...){
 #' geno <- genotypes(geno.file)
 #'
 #' # biparental
-#' geno.file.biparental <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
-#' geno.biparental <- genotypes(geno.file.biparental, format = "biparental")
+#' geno.file <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
+#' geno <- genotypes(geno.file.biparental, format = "biparental")
 #'
 #' # frequencies
-#' geno.file.freq <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
-#' geno.freq <- genotypes(geno.file.freq, format = "frequency")
+#' geno.file <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
+#' geno <- genotypes(geno.file.freq, format = "frequency")
 #'
 #' @import rJava
 #' @export
-genotypes <- function(file, format = c("default", "biparental", "frequency")){
+genotypes <- function(data, file, format = c("default", "biparental", "frequency")){
 
   # check input
-  if(missing(file)){
-    stop("File path is required.")
+  if(missing(data) && missing(file)){
+    stop("Please specify data or file.")
+  }
+  if(!missing(data) && !missing(file)){
+    stop("Please specify either data or file, not both.")
   }
   format <- match.arg(format)
 
   api <- ch.api()
 
-  # read from file
+  if(missing(file)){
 
-  # check file path
-  if(!is.character(file)){
-    stop("Argument 'file' should be a file path (character).")
-  }
-  if(!file.exists(file)){
-    stop("File 'file' does not exist.")
-  }
-  file <- normalizePath(file)
+    # create from data
+    if(format == "default"){
 
-  # read from file
-  j.data <- api$readGenotypeData(file, format)
-  # read raw data
-  data <- read.autodelim(file)
-  # drop names
-  data$NAME <- NULL
-  # clean frequency format
-  if(format == "frequency"){
-    # drop allele name row
-    data <- subset(data, rownames(data) != "ALLELE")
-    # convert to numeric
-    for(col in colnames(data)){
-      data[[col]] <- as.numeric(data[[col]])
+      #---------#
+      # default #
+      #---------#
+
+      # TODO ...
+      stop("Not implemented yet.")
+
+    } else if(format == "biparental"){
+
+      #------------#
+      # biparental #
+      #------------#
+
+      # check data
+      if(is.matrix(data)){
+        names <- as.character(rep(NA, nrow(data)))
+      } else if(is.data.frame(data)){
+        # extract names and matrix
+        names <- extract.names(data)
+        data <- extract.matrix(data)
+      } else {
+        stop("Biparental genotype format: data should be either a matrix or data frame.")
+      }
+      # check matrix
+      values <- unique(as.vector(data))
+      values <- values[!is.na(values)]
+      expected <- c(0,1,2)
+      if(!is.numeric(data) || length(setdiff(values, expected)) > 0){
+        stop("Marker matrix should be numeric (0, 1, 2).")
+      }
+      # check row names
+      if(is.null(row.names(data))){
+        stop("Unique row names are required (item ids).")
+      }
+
+      # create data
+      j.matrix <- .jarray(matrix(as.integer(data), nrow = nrow(data)), dispatch = TRUE)
+      j.ids <- .jarray(rownames(data))
+      j.names <- .jarray(names)
+      marker.names <- colnames(data)
+      if(is.null(marker.names)){
+        marker.names <- as.character(rep(NA, ncol(data)))
+      }
+      j.marker.names <- .jarray(marker.names)
+      j.data <- api$createBiparentalGenotypeData(j.matrix, j.ids, j.names, j.marker.names)
+
+    } else {
+
+      #-----------#
+      # frequency #
+      #-----------#
+
+      # TODO ...
+      stop("Not implemented yet.")
+
     }
+
+  } else {
+
+    # read from file
+
+    # check file path
+    if(!is.character(file)){
+      stop("Argument 'file' should be a file path (character).")
+    }
+    if(!file.exists(file)){
+      stop("File 'file' does not exist.")
+    }
+    file <- normalizePath(file)
+
+    # read from file
+    j.data <- api$readGenotypeData(file, format)
+    # read raw data
+    data <- read.autodelim(file)
+    # drop names
+    data$NAME <- NULL
+    # clean frequency format
+    if(format == "frequency"){
+      # drop allele name row
+      data <- subset(data, rownames(data) != "ALLELE")
+      # convert to numeric
+      for(col in colnames(data)){
+        data[[col]] <- as.numeric(data[[col]])
+      }
+    }
+
   }
 
   # obtain ids, names and allele names from Java object
@@ -393,15 +477,18 @@ genotypes <- function(file, format = c("default", "biparental", "frequency")){
   alleles <- lapply(.jevalArray(api$getAlleles(j.data)), .jevalArray)
 
   # create R object
+  # TODO include marker names
   geno <- list(
     data = data,
     size = j.data$getSize(),
     ids = ids,
     names = names,
     alleles  = alleles,
-    file = file,
     java = j.data
   )
+  if(!missing(file)){
+    geno$file <- file
+  }
   class(geno) <- c("chgeno", "chdata", class(geno))
 
   return(geno)
@@ -425,8 +512,8 @@ print.chgeno <- function(x, ...){
 #'
 #' @param data Data frame containing one row per individual and one column per trait.
 #'   Unique row and column names are required and used as item and trait ids, respectively.
-#'   The data frame may optionally include a first column \code{NAME} (\code{character})
-#'   used to assign names to some or all individuals.
+#'   The data frame may optionally include a first column \code{NAME} used to assign names
+#'   to some or all individuals.
 #'
 #' @param types Variable types (optional).
 #'   Vector of characters of length one or two.
@@ -490,8 +577,8 @@ print.chgeno <- function(x, ...){
 #'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{types}}{Variable types and encodings.}
 #'  \item{\code{ranges}}{Variable ranges, when applicable (\code{NA} elsewhere).}
-#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #'  \item{\code{java}}{Java version of the data object.}
+#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
 #' }
 #'
 #' @examples
@@ -569,10 +656,7 @@ phenotypes <- function(data, types, min, max, file){
     }
 
     # extract item names
-    names <- data$NAME
-    if(!is.null(names) && !is.character(names)){
-      stop("Item names should be of type 'character'.")
-    }
+    names <- extract.names(data)
     data$NAME <- NULL
 
     # check and/or infer types and ignore bounds for non-numeric variables
@@ -655,11 +739,9 @@ phenotypes <- function(data, types, min, max, file){
     # add type row
     data <- rbind(TYPE = types, data)
 
-    # reinsert names if set
-    if(!is.null(names)){
-      names <- c(rep("", sum(rownames(data) %in% c("TYPE", "MIN", "MAX"))), names)
-      data <- cbind(NAME = names, data)
-    }
+    # reinsert names
+    names <- c(rep("", sum(rownames(data) %in% c("TYPE", "MIN", "MAX"))), names)
+    data <- cbind(NAME = names, data)
     # make row headers first column (ID)
     data <- cbind(ID = rownames(data), data)
 
@@ -829,7 +911,15 @@ extract.names <- function(data){
   return(names)
 }
 
-
+# extract matrix from data frame with initial NAME column followed by
+# the columns of the matrix
+extract.matrix <- function(data){
+  # discard names (if set)
+  data$NAME <- NULL
+  # extract matrix
+  matrix <- as.matrix(data)
+  return(matrix)
+}
 
 
 

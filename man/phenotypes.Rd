@@ -9,8 +9,8 @@ phenotypes(data, types, min, max, file)
 \arguments{
 \item{data}{Data frame containing one row per individual and one column per trait.
 Unique row and column names are required and used as item and trait ids, respectively.
-The data frame may optionally include a first column \code{NAME} (\code{character})
-used to assign names to some or all individuals.}
+The data frame may optionally include a first column \code{NAME} used to assign names
+to some or all individuals.}
 
 \item{types}{Variable types (optional).
   Vector of characters of length one or two.
@@ -76,8 +76,8 @@ Phenotype data of class \code{chpheno} with elements
    has been assigned are equal to the unique \code{ids}.}
  \item{\code{types}}{Variable types and encodings.}
  \item{\code{ranges}}{Variable ranges, when applicable (\code{NA} elsewhere).}
- \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
+ \item{\code{file}}{Path of file from which data was read (if applicable).}
 }
 }
 \description{

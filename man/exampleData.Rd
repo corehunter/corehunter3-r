@@ -10,7 +10,7 @@
 exampleData()
 }
 \value{
-data of class \code{chdata}
+Core Hunter data of class \code{chdata}
 }
 \description{
 Reads a precomputed distance matrix from \code{"extdata/distances.csv"},

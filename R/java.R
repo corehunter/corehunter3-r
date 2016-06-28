@@ -51,4 +51,23 @@ toRIndices <- function(indices){
   indices + 1
 }
 
+# --------------------------- #
+# COMPLEX ARRAYS AND MATRICES #
+# --------------------------- #
+
+# create Integer matrix
+# .jIntegerMatrix <- function(matrix){
+#   .jarray(
+#     apply(matrix, 1, function(row){
+#       .jarray(lapply(row, function(value){
+#           .jnew("java.lang.Integer", as.integer(value))
+#         }), "java.lang.Integer"
+#       )
+#     }),"[Ljava.lang.Integer;"
+#   )
+# }
+
+
+
+
 

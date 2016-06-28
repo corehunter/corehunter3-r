@@ -9,9 +9,8 @@ distances(data, file)
 \arguments{
 \item{data}{Symmetric distance matrix. Unique row and column headers are required,
 should be the same and are used as item ids. Can be a \code{numeric} matrix or a data frame.
-The data frame may optionally include a first column \code{NAME} (\code{character})
-used to assign names to some or all individuals. The remaining columns should
-be \code{numeric}.}
+The data frame may optionally include a first column \code{NAME} used to assign names to some
+or all individuals. The remaining columns should be \code{numeric}.}
 
 \item{file}{File from which to read the distance matrix.}
 }
@@ -23,8 +22,8 @@ Distance matrix data of class \code{chdist} with elements
  \item{\code{ids}}{Unique item identifiers.}
  \item{\code{names}}{Item names. Names of individuals to which no explicit name
    has been assigned are equal to the unique \code{ids}.}
- \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
+ \item{\code{file}}{Path of file from which data was read (if applicable).}
 }
 }
 \description{
@@ -34,7 +33,6 @@ file format used by Core Hunter.
 }
 \examples{
 # create from distance matrix
-
 m <- matrix(runif(100), nrow = 10, ncol = 10)
 diag(m) <- 0
 # make symmetric
@@ -45,7 +43,6 @@ rownames(m) <- colnames(m) <- paste("i", 1:10, sep = "-")
 dist <- distances(m)
 
 # read from file
-
 dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
 dist <- distances(file = dist.file)
 

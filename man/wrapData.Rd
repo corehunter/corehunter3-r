@@ -9,6 +9,9 @@ wrapData(data)
 \arguments{
 \item{data}{of class \code{chgeno}, \code{chpheno} or \code{chdist}}
 }
+\value{
+Core Hunter data of class \code{chdata}
+}
 \description{
 If the given data does not match any of these three classes
 it is returned unchanged.

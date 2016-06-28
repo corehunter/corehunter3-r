@@ -2,11 +2,31 @@
 % Please edit documentation in R/data.R
 \name{genotypes}
 \alias{genotypes}
-\title{Read genotype data from file.}
+\title{Create Core Hunter genotype data from data frame, matrix or file.}
 \usage{
-genotypes(file, format = c("default", "biparental", "frequency"))
+genotypes(data, file, format = c("default", "biparental", "frequency"))
 }
 \arguments{
+\item{data}{Data frame or matrix containing the genotypes (individuals x markers)
+depending on the chosen format:
+\describe{
+  \item{\code{default}}{
+    TODO
+  }
+  \item{\code{biparental}}{
+    Numeric matrix or data frame. In case of a data frame a first column \code{NAME}
+    may optionally be included specifying item names. The remaining columns should
+    be numeric and follow the same format as the otherwise specified numeric matrix.
+    Data consists of 0, 1 and 2 coding for homozygous (AA), heterozygous (AB) and
+    homozygous (BB), respectively. Unique row names (item ids) are required and
+    optionally column (marker) names may be included as well.
+  }
+  \item{\code{frequency}}{
+    TODO
+  }
+  See \url{www.corehunter.org} for more details about the supported genotype formats.
+}}
+
 \item{file}{File containing the genotype data.}
 
 \item{format}{Genotype data format, one of \code{default}, \code{biparental} or \code{frequency}.}
@@ -14,29 +34,52 @@ genotypes(file, format = c("default", "biparental", "frequency"))
 \value{
 Genotype data of class \code{chdist} with elements
 \describe{
- \item{\code{data}}{Genotypes (data frame).}
+ \item{\code{data}}{Genotypes. Data frame for default format, \code{numeric} matrix for other formats.}
  \item{\code{size}}{Number of individuals in the dataset.}
  \item{\code{ids}}{Unique item identifiers.}
  \item{\code{names}}{Item names. Names of individuals to which no explicit name
    has been assigned are equal to the unique \code{ids}.}
  \item{\code{alleles}}{List of character vectors with allele names per marker.}
- \item{\code{file}}{Path of file from which data was read (if applicable).}
  \item{\code{java}}{Java version of the data object.}
+ \item{\code{file}}{Path of file from which data was read (if applicable).}
 }
 }
 \description{
-See \url{www.corehunter.org} for documentation and examples of the different
-genotype data formats supported by Core Hunter.
+Specify either a data frame or matrix, or a file from which to read the genotypes.
+See \url{www.corehunter.org} for documentation and examples of the genotype data
+file format used by Core Hunter.
 }
 \examples{
+# create from data frame or matrix
+
+# default format
+# TODO ...
+
+# biparental
+geno.data <- matrix(
+ sample(c(0,1,2), replace = TRUE, size = 1000),
+ nrow = 10, ncol = 100
+)
+rownames(geno.data) <- paste("g", 1:10, sep = "-")
+colnames(geno.data) <- paste("m", 1:100, sep = "-")
+geno <- genotypes(geno.data, format = "biparental")
+
+# frequencies
+# TODO ...
+
+# read from file
+
+# default format
 geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 geno <- genotypes(geno.file)
 
-geno.file.biparental <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
-geno.biparental <- genotypes(geno.file.biparental, format = "biparental")
+# biparental
+geno.file <- system.file("extdata", "genotypes-biparental.csv", package = "corehunter")
+geno <- genotypes(geno.file.biparental, format = "biparental")
 
-geno.file.freq <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
-geno.freq <- genotypes(geno.file.freq, format = "frequency")
+# frequencies
+geno.file <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
+geno <- genotypes(geno.file.freq, format = "frequency")
 
 }
 
