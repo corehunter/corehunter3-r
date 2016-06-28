@@ -324,9 +324,9 @@ context("Core Hunter data")
 test_that("arguments are checked", {
   expect_error(coreHunterData(), "specify at least one")
   expect_error(coreHunterData(distances = list(1, "a")), "class 'chdist'")
-  expect_error(coreHunterData("x"), "class 'chdist'")
-  expect_error(coreHunterData(genotypes = 123), "class 'chgeno'")
-  expect_error(coreHunterData(phenotypes = "123"), "class 'chpheno'")
+  expect_error(coreHunterData("x"), "class 'chgeno'")
+  expect_error(coreHunterData(phenotypes = 123), "class 'chpheno'")
+  expect_error(coreHunterData(distances = "123"), "class 'chdist'")
 })
 
 test_that("class", {

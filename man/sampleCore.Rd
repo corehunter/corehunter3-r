@@ -14,11 +14,13 @@ object of class \code{chdist}, \code{chgeno} or \code{chpheno}
 if only one type of data is provided.}
 
 \item{obj}{Objective or list of objectives (\code{chobj}).
-If no objectives are specified and the data contains
-only genotypes, phenotypes or precomputed distances, the average
-entry-to-nearest entry distance (\code{EN}) is maximized, using
-Modified Rogers distance (\code{MR}) for genotypes and Gower
-distance (\code{GD}) for phenotypes, respectively.}
+If no objectives are specified Core Hunter maximizes
+the entry-to-nearest-entry distance (\code{EN}) in the core, using
+Modified Roger's distance (\code{MR}) if genotypes are available,
+Gower's distance (\code{GD}) if phenotypes are available, or else
+the precomputed distances (\code{PD}), in this order of preference.
+A message is printed when the default objective uses only part of the
+available data.}
 
 \item{size}{Desired core subset size (numeric). If larger than one the value
 is used as the absolute core size after rounding. Else it is used as the
@@ -60,7 +62,7 @@ Sample a core collection from the given data.
 data <- exampleData()
 
 # default size, fast mode, maximize entry-to-nearest-entry Modified Rogers distance
-obj <- objective("EE", "MR")
+obj <- objective("EN", "MR")
 sampleCore(data, mode = "f", obj)
 
 \dontrun{
@@ -74,12 +76,12 @@ sampleCore(data, obj = objective(type = "AN", meas = "PD"))
 # multiple objectives (equal weight)
 sampleCore(data, obj = list(
  objective("EN", "PD"),
- objective("AN", "PD")
+ objective("AN", "GD")
 ))
 # multiple objectives (custom weight)
 sampleCore(data, obj = list(
  objective("EN", "PD", weight = 0.3),
- objective("AN", "PD", weight = 0.7)
+ objective("AN", "GD", weight = 0.7)
 ))
 
 # custom stop conditions

@@ -28,12 +28,44 @@ test_that("arguments are checked", {
   expect_error(sampleCore(data, mode = "foo"), "one of")
 })
 
-test_that("No default objective when data contains multiple types", {
-  expect_error(sampleCore(testData(), "specify objective"))
-})
-
-test_that("No time limit", {
-  expect_silent(sampleCore(phenotypeData()))
+test_that("default objectives", {
+  # genotypes only
+  expect_silent(core <- testSampleCore(genotypeData()))
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$MR))
+  # phenotypes only
+  expect_silent(core <- testSampleCore(phenotypeData()))
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$GD))
+  # distances only
+  expect_silent(core <- testSampleCore(distanceData()))
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$PD))
+  # full dataset
+  expect_message(core <- testSampleCore(testData()), "using genotypes only", ignore.case = TRUE)
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$MR))
+  # phenotypes and distances only
+  expect_message(
+    core <- testSampleCore(coreHunterData(pheno = phenotypeData(), dist = distanceData())),
+    "using phenotypes only", ignore.case = TRUE
+  )
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$GD))
+  # genotypes and distances only
+  expect_message(
+    core <- testSampleCore(coreHunterData(geno = genotypeData(), dist = distanceData())),
+    "using genotypes only", ignore.case = TRUE
+  )
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$MR))
+  # genotypes and phenotypes only
+  expect_message(
+    core <- testSampleCore(coreHunterData(geno = genotypeData(), pheno = phenotypeData())),
+    "using genotypes only", ignore.case = TRUE
+  )
+  expect_false(is.null(core$EN))
+  expect_false(is.null(core$EN$MR))
 })
 
 test_that("result contains indices or names", {
@@ -46,22 +78,10 @@ test_that("result contains indices or names", {
   expect_equal(core.ids$sel, rownames(data$dist$data)[core.ind$sel])
 })
 
-test_that("default objective for distance data only", {
-  expect_silent(testSampleCore(testData()$dist))
-})
-
-test_that("default objective for genotypes only", {
-  expect_silent(testSampleCore(testData()$geno))
-})
-
-test_that("default objective for phenotypes only", {
-  expect_silent(testSampleCore(testData()$pheno))
-})
-
 test_that("multiple objectives", {
   expect_silent(testSampleCore(testData(), obj = list(
     objective("AN", "PD"),
-    objective("EE", "PD"),
+    objective("EE", "CE"),
     objective("EN", "GD")
   )))
 })
@@ -128,6 +148,11 @@ test_that("elements are correct", {
   expect_equal(o$type, "SH")
   expect_null(o$meas)
   expect_equal(o$weight, 1.5)
+})
+
+test_that("print", {
+  o <- objective()
+  expect_output(print(o), "Core Hunter objective: EN \\(measure = MR, weight = 1.00\\)")
 })
 
 

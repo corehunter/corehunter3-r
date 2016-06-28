@@ -35,7 +35,7 @@ exampleData <- function(){
 #' Initialize Core Hunter data.
 #'
 #' The data may contain genotypes, phenotypes and/or a precomputed distance matrix.
-#' All provided data should describe the same individuals which is verified through
+#' All provided data should describe the same individuals which is verified by comparing
 #' the item ids and names.
 #'
 #' @param genotypes Genetic marker data (\code{chgeno}).
@@ -44,9 +44,9 @@ exampleData <- function(){
 #'
 #' @return Core Hunter data (\code{chdata}) with elements
 #' \describe{
-#'  \item{\code{dist}}{Distance data of class \code{chdist} if included.}
 #'  \item{\code{geno}}{Genotype data of class \code{chgeno} if included.}
 #'  \item{\code{pheno}}{Phenotype data of class \code{chpheno} if included.}
+#'  \item{\code{dist}}{Distance data of class \code{chdist} if included.}
 #'  \item{\code{size}}{Number of individuals in the dataset.}
 #'  \item{\code{ids}}{Unique item identifiers.}
 #'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
@@ -57,67 +57,68 @@ exampleData <- function(){
 #' @return Core Hunter data of class \code{chdata}.
 #'
 #' @examples
-#' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
 #' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 #' pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
+#' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
+#'
 #' chData <- coreHunterData(
-#'   distances(file = dist.file),
 #'   genotypes(file = geno.file),
-#'   phenotypes(file = pheno.file)
+#'   phenotypes(file = pheno.file),
+#'   distances(file = dist.file)
 #' )
 #'
 #' @seealso \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 #'
 #' @import rJava
 #' @export
-coreHunterData <- function(distances, genotypes, phenotypes){
+coreHunterData <- function(genotypes, phenotypes, distances){
 
   # check arguments
-  if(!missing(distances) && !is(distances, "chdist")){
-    stop("Argument 'distances' should contain Core Hunter distance matrix data of class 'chdist'.")
-  }
   if(!missing(genotypes) && !is(genotypes, "chgeno")){
     stop("Argument 'genotypes' should contain Core Hunter genotype data of class 'chgeno'.")
   }
   if(!missing(phenotypes) && !is(phenotypes, "chpheno")){
     stop("Argument 'phenotypes' should contain Core Hunter phenotype data of class 'chpheno'.")
   }
+  if(!missing(distances) && !is(distances, "chdist")){
+    stop("Argument 'distances' should contain Core Hunter distance matrix data of class 'chdist'.")
+  }
   if(missing(genotypes) && missing(phenotypes) && missing(distances)){
     stop("Please specify at least one type of data (genotypes, phenotypes and/or distances).")
   }
 
   # create data
-  j.dist <- .jnull(ch.distances())
   j.geno <- .jnull(ch.genotypes())
   j.pheno <- .jnull(ch.phenotypes())
-  if(!missing(distances)){
-    j.dist <- distances$java
-  }
+  j.dist <- .jnull(ch.distances())
   if(!missing(genotypes)){
     j.geno <- genotypes$java
   }
   if(!missing(phenotypes)){
     j.pheno <- phenotypes$java
   }
+  if(!missing(distances)){
+    j.dist <- distances$java
+  }
   j.data <- new(ch.data(), j.geno, j.pheno, j.dist)
 
   # create R object
-  data <- list(
-    java = j.data
-  )
+  data <- list()
   size.ids.names <- c("size", "ids", "names")
-  if(!missing(distances)){
-    data$dist <- distances
-    data[size.ids.names] <- distances[size.ids.names]
-  }
   if(!missing(genotypes)){
     data$geno <- genotypes
-    data[size.ids.names] <- genotypes[size.ids.names]
+    tmp <- genotypes
   }
   if(!missing(phenotypes)){
     data$pheno <- phenotypes
-    data[size.ids.names] <- phenotypes[size.ids.names]
+    tmp <- phenotypes
   }
+  if(!missing(distances)){
+    data$dist <- distances
+    tmp <- distances
+  }
+  data[size.ids.names] <- tmp[size.ids.names]
+  data$java <- j.data
   # set class
   class(data) <- c("chdata", class(data))
 

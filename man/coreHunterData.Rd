@@ -4,21 +4,21 @@
 \alias{coreHunterData}
 \title{Initialize Core Hunter data.}
 \usage{
-coreHunterData(distances, genotypes, phenotypes)
+coreHunterData(genotypes, phenotypes, distances)
 }
 \arguments{
-\item{distances}{Precomputed distance matrix (\code{chdist}).}
-
 \item{genotypes}{Genetic marker data (\code{chgeno}).}
 
 \item{phenotypes}{Phenotypic trait data (\code{chpheno}).}
+
+\item{distances}{Precomputed distance matrix (\code{chdist}).}
 }
 \value{
 Core Hunter data (\code{chdata}) with elements
 \describe{
- \item{\code{dist}}{Distance data of class \code{chdist} if included.}
  \item{\code{geno}}{Genotype data of class \code{chgeno} if included.}
  \item{\code{pheno}}{Phenotype data of class \code{chpheno} if included.}
+ \item{\code{dist}}{Distance data of class \code{chdist} if included.}
  \item{\code{size}}{Number of individuals in the dataset.}
  \item{\code{ids}}{Unique item identifiers.}
  \item{\code{names}}{Item names. Names of individuals to which no explicit name
@@ -30,17 +30,18 @@ Core Hunter data of class \code{chdata}.
 }
 \description{
 The data may contain genotypes, phenotypes and/or a precomputed distance matrix.
-All provided data should describe the same individuals which is verified through
+All provided data should describe the same individuals which is verified by comparing
 the item ids and names.
 }
 \examples{
-dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
 geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
+dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
+
 chData <- coreHunterData(
-  distances(file = dist.file),
   genotypes(file = geno.file),
-  phenotypes(file = pheno.file)
+  phenotypes(file = pheno.file),
+  distances(file = dist.file)
 )
 
 }

@@ -4,18 +4,18 @@
 \alias{objective}
 \title{Create Core Hunter objective.}
 \usage{
-objective(type = c("EN", "AN", "EE", "SH", "HE", "CV"), measure = c("PD",
-  "GD", "MR", "CE"), weight = 1)
+objective(type = c("EN", "AN", "EE", "SH", "HE", "CV"), measure = c("MR",
+  "CE", "GD", "PD"), weight = 1)
 }
 \arguments{
 \item{type}{Objective type, one of \code{EN} (default), \code{AN}, \code{EE},
 \code{SH}, \code{HE} or \code{CV} (see description). The former three
 objectives are distance based and require to choose a distance
-\code{measure}. By default, the precomputed distance matrix is used (if
-available).}
+\code{measure}. By default, Modified Roger's distance is used,
+computed from the genotypes.}
 
 \item{measure}{Distance measure used to compute the distance between two
-individuals, one of \code{PD} (default), \code{GD}, \code{MR} or \code{CE}
+individuals, one of \code{MR} (default), \code{CE}, \code{GD} or \code{PD}
 (see description). Ignored when \code{type} is \code{SH}, \code{HE} or
 \code{CV}.}
 
@@ -74,23 +74,23 @@ The following optimization objectives are supported by Core Hunter:
 The first three objective types (\code{EN}, \code{AN} and \code{EE}) aggregate pairwise distances
 between individuals. These distances can be computed using various measures:
 \describe{
- \item{\code{PD}}{
-   Precomputed distances (default). Uses the precomputed distance matrix of the dataset.
+\item{\code{MR}}{
+   Modified Rogers distance (default). Requires genotypes.
+ }
+ \item{\code{CE}}{
+   Cavalli-Sforza and Edwards distance. Requires genotypes.
  }
  \item{\code{GD}}{
    Gower distance. Requires phenotypes.
  }
- \item{\code{MR}}{
-   Modified Rogers distance. Requires genotypes.
- }
- \item{\code{CE}}{
-   Cavalli-Sforza and Edwards distance. Requires genotypes.
+ \item{\code{PD}}{
+   Precomputed distances. Uses the precomputed distance matrix of the dataset.
  }
 }
 }
 \examples{
 objective()
-objective(meas = "MR")
+objective(meas = "PD")
 objective("EE", "GD")
 objective("HE")
 

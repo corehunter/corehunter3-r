@@ -9,11 +9,13 @@
 #'   object of class \code{chdist}, \code{chgeno} or \code{chpheno}
 #'   if only one type of data is provided.
 #' @param obj Objective or list of objectives (\code{chobj}).
-#'   If no objectives are specified and the data contains
-#'   only genotypes, phenotypes or precomputed distances, the average
-#'   entry-to-nearest entry distance (\code{EN}) is maximized, using
-#'   Modified Rogers distance (\code{MR}) for genotypes and Gower
-#'   distance (\code{GD}) for phenotypes, respectively.
+#'   If no objectives are specified Core Hunter maximizes
+#'   the entry-to-nearest-entry distance (\code{EN}) in the core, using
+#'   Modified Roger's distance (\code{MR}) if genotypes are available,
+#'   Gower's distance (\code{GD}) if phenotypes are available, or else
+#'   the precomputed distances (\code{PD}), in this order of preference.
+#'   A message is printed when the default objective uses only part of the
+#'   available data.
 #' @param size Desired core subset size (numeric). If larger than one the value
 #'   is used as the absolute core size after rounding. Else it is used as the
 #'   sampling rate and multiplied with the dataset size to determine the size of
@@ -45,7 +47,7 @@
 #' data <- exampleData()
 #'
 #' # default size, fast mode, maximize entry-to-nearest-entry Modified Rogers distance
-#' obj <- objective("EE", "MR")
+#' obj <- objective("EN", "MR")
 #' sampleCore(data, mode = "f", obj)
 #'
 #' \dontrun{
@@ -59,12 +61,12 @@
 #' # multiple objectives (equal weight)
 #' sampleCore(data, obj = list(
 #'  objective("EN", "PD"),
-#'  objective("AN", "PD")
+#'  objective("AN", "GD")
 #' ))
 #' # multiple objectives (custom weight)
 #' sampleCore(data, obj = list(
 #'  objective("EN", "PD", weight = 0.3),
-#'  objective("AN", "PD", weight = 0.7)
+#'  objective("AN", "GD", weight = 0.7)
 #' ))
 #'
 #' # custom stop conditions
@@ -133,19 +135,22 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
   # set default objectives or check given objectives
   j.data <- data$java
   if(missing(obj)){
-    # check: only genotypes, phenotypes or distances provided
-    if(sum(j.data$hasGenotypes(), j.data$hasPhenotypes(), j.data$hasDistances()) != 1){
-      stop("Please specify objective. No default for multiple data types.")
-    }
-    # set default objective
-    meas <- "PD"
+    # set default objective (TODO: obtain from Java API to ensure consistency with GUI)
     if(j.data$hasGenotypes()){
       meas <- "MR"
-    }
-    if(j.data$hasPhenotypes()){
+      used <- "genotypes"
+    } else if(j.data$hasPhenotypes()){
       meas <- "GD"
+      used <- "phenotypes"
+    } else {
+      meas <- "PD"
+      used <- "precomputed distances"
     }
     obj <- objective(type = "EN", measure = meas)
+    # warn if more than one type of data is provided
+    if(sum(j.data$hasGenotypes(), j.data$hasPhenotypes(), j.data$hasDistances()) > 1){
+      message(sprintf("Default %s. Using %s only.", capture.output(obj), used))
+    }
   }
   # wrap single objective in list
   if(is(obj, 'chobj')){
@@ -256,27 +261,27 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
 #' The first three objective types (\code{EN}, \code{AN} and \code{EE}) aggregate pairwise distances
 #' between individuals. These distances can be computed using various measures:
 #' \describe{
-#'  \item{\code{PD}}{
-#'    Precomputed distances (default). Uses the precomputed distance matrix of the dataset.
+#' \item{\code{MR}}{
+#'    Modified Rogers distance (default). Requires genotypes.
+#'  }
+#'  \item{\code{CE}}{
+#'    Cavalli-Sforza and Edwards distance. Requires genotypes.
 #'  }
 #'  \item{\code{GD}}{
 #'    Gower distance. Requires phenotypes.
 #'  }
-#'  \item{\code{MR}}{
-#'    Modified Rogers distance. Requires genotypes.
-#'  }
-#'  \item{\code{CE}}{
-#'    Cavalli-Sforza and Edwards distance. Requires genotypes.
+#'  \item{\code{PD}}{
+#'    Precomputed distances. Uses the precomputed distance matrix of the dataset.
 #'  }
 #' }
 #'
 #' @param type Objective type, one of \code{EN} (default), \code{AN}, \code{EE},
 #'   \code{SH}, \code{HE} or \code{CV} (see description). The former three
 #'   objectives are distance based and require to choose a distance
-#'   \code{measure}. By default, the precomputed distance matrix is used (if
-#'   available).
+#'   \code{measure}. By default, Modified Roger's distance is used,
+#'   computed from the genotypes.
 #' @param measure Distance measure used to compute the distance between two
-#'   individuals, one of \code{PD} (default), \code{GD}, \code{MR} or \code{CE}
+#'   individuals, one of \code{MR} (default), \code{CE}, \code{GD} or \code{PD}
 #'   (see description). Ignored when \code{type} is \code{SH}, \code{HE} or
 #'   \code{CV}.
 #' @param weight Weight assigned to the objective, when maximizing a weighted
@@ -291,13 +296,13 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"),
 #'
 #' @examples
 #' objective()
-#' objective(meas = "MR")
+#' objective(meas = "PD")
 #' objective("EE", "GD")
 #' objective("HE")
 #'
 #' @export
 objective <- function(type = c("EN", "AN", "EE", "SH", "HE", "CV"),
-                      measure = c("PD", "GD", "MR", "CE"), weight = 1.0){
+                      measure = c("MR", "CE", "GD", "PD"), weight = 1.0){
   # check arguments
   type <- match.arg(type)
   measure <- match.arg(measure)
@@ -314,6 +319,16 @@ objective <- function(type = c("EN", "AN", "EE", "SH", "HE", "CV"),
   }
   class(obj) <- c("chobj", class(obj))
   return(obj)
+}
+
+#' @export
+print.chobj <- function(x, ...){
+  prefix <- "Core Hunter objective"
+  if(!is.null(x$meas)){
+    cat(sprintf("%s: %s (measure = %s, weight = %.2f)", prefix, x$type, x$meas, x$weight))
+  } else {
+    cat(sprintf("%s: %s (weight = %.2f)", prefix, x$type, x$weight))
+  }
 }
 
 
