@@ -81,7 +81,7 @@ geno.data <- matrix(
  c(0.0, 0.3, 0.7, 0.5, 0.5, 0.0, 1.0,
    0.4, 0.0, 0.6, 0.1, 0.9, 0.0, 1.0,
    0.3, 0.3, 0.4, 1.0, 0.0, 0.6, 0.4),
- nrow = 3, ncol = 7
+ byrow = TRUE, nrow = 3, ncol = 7
 )
 rownames(geno.data) <- paste("g", 1:3, sep = "-")
 colnames(geno.data) <- c("M1", "M1", "M1", "M2", "M2", "M3", "M3")
