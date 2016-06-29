@@ -467,8 +467,8 @@ genotypes <- function(data, file, format = c("default", "biparental", "frequency
       # drop allele name row
       data <- data[rownames(data) != "ALLELE", ]
       # convert to numeric
-      for(col in colnames(data)){
-        data[[col]] <- as.numeric(data[[col]])
+      for(c in 1:ncol(data)){
+        data[[c]] <- as.numeric(data[[c]])
       }
     }
 
@@ -481,7 +481,6 @@ genotypes <- function(data, file, format = c("default", "biparental", "frequency
   alleles <- lapply(.jevalArray(api$getAlleles(j.data)), .jevalArray)
 
   # create R object
-  # TODO include marker names
   geno <- list(
     data = data,
     size = j.data$getSize(),

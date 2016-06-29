@@ -137,7 +137,7 @@ test_that("class", {
 
 test_that("read genotype data from file", {
   # 1: default dataset
-  for(format in c("def", "bi", "freq")){
+  for(format in c("default", "biparental", "frequency")){
     geno <- genotypeData(format = format)
     expect_equal(geno$file, genotypeFile(format))
     expect_equal(geno$size, 100)
@@ -151,10 +151,15 @@ test_that("read genotype data from file", {
       expect_equal(length(geno$alleles[[m]]), geno$java$getNumberOfAlleles(toJavaIndices(m)))
       if(format == "default"){ # homozygous test data
         expected <- unique(geno$data[[m]])
-        expected <- expected[!is.na(expected)]
+        expected <- as.character(expected[!is.na(expected)])
         expect_equal(sort(geno$alleles[[m]]), sort(expected))
-      } else if(format == "bi"){
+      } else if(format == "biparental"){
         expect_equal(geno$alleles[[m]], c("0", "1"))
+      }
+    }
+    if(format == "frequency" || format == "biparental"){
+      for(col in colnames(geno$data)){
+        expect_true(is.numeric(geno$data[[col]]))
       }
     }
   }
