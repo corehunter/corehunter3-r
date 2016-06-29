@@ -119,6 +119,15 @@ test_that("arguments are checked", {
   expect_error(genotypes(file = 124), "should be a file path")
   expect_error(genotypes(file = "i/do/not/exist"), "does not exist")
   expect_error(genotypes(data = testData()$geno$data, file = genotypeFile()), "not both")
+  expect_error(genotypes(data = "123", format = "biparental"), "matrix or data frame")
+  m <- matrix(1:100, 10, 10)
+  expect_error(genotypes(data = m, format = "biparental"), "0, 1, 2")
+  m <- matrix(sample(c("0","1","2"), replace = TRUE, size = 100), 10, 10)
+  expect_error(genotypes(data = m, format = "biparental"), "matrix should be numeric")
+  m <- matrix(sample(c(0,1,2), replace = TRUE, size = 100), 10, 10)
+  expect_error(genotypes(data = m, format = "biparental"), "row names are required")
+  rownames(m) <- letters[1:10]
+  expect_silent(genotypes(data = m, format = "biparental"))
 })
 
 test_that("class", {
@@ -164,8 +173,8 @@ test_that("read genotype data from file", {
   expect_equal(geno$alleles[[4]], c("+", "-"))
 })
 
-test_that("create biparental genotype data from matrix", {
-  # with ids and marker names
+test_that("create biparental genotype data from matrix or data frame", {
+  # from matrix with ids and marker names
   m <- matrix(
     sample(c(0,1,2), replace = TRUE, size = 1000),
     nrow = 10, ncol = 100
@@ -185,11 +194,46 @@ test_that("create biparental genotype data from matrix", {
     expect_equal(all, c("0", "1"))
   })
   # with ids, no marker names
-  # TODO ...
-})
-
-test_that("create biparental genotype data from data frame", {
-  # TODO ...
+  m2 <- m
+  colnames(m2) <- NULL
+  geno <- genotypes(m2, format = "biparental")
+  expect_equal(geno$data, m2)
+  expect_null(geno$markers)
+  expect_null(names(geno$alleles))
+  # from data frame with ids, names and marker names
+  names <- letters[1:10]
+  df <- data.frame(NAME = names, m, check.names = F)
+  geno <- genotypes(df, format = "biparental")
+  expect_equal(geno$size, 10)
+  expect_equal(geno$ids, ids)
+  expect_equal(geno$names, names)
+  expect_equal(geno$data, m)
+  expect_equal(geno$markers, markers)
+  expect_equal(names(geno$alleles), geno$markers)
+  lapply(geno$alleles, function(all){
+    expect_equal(all, c("0", "1"))
+  })
+  # from data frame without names
+  df <- data.frame(m, check.names = F)
+  geno <- genotypes(df, format = "biparental")
+  expect_equal(geno$names, ids)
+  expect_equal(geno$data, m)
+  # from data frame without names or marker names
+  df <- data.frame(m, check.names = F)
+  colnames(df) <- NULL
+  geno <- genotypes(df, format = "biparental")
+  expect_equal(geno$data, m2)
+  expect_equal(geno$names, ids)
+  expect_null(geno$markers)
+  expect_null(names(geno$alleles))
+  # from data frame with names, no marker names
+  df <- data.frame(NAME = names, m, check.names = F)
+  colnames(df)[2:ncol(df)] <- NA
+  geno <- genotypes(df, format = "biparental")
+  expect_equal(geno$data, m2)
+  expect_equal(geno$names, names)
+  expect_null(geno$markers)
+  expect_null(names(geno$alleles))
 })
 
 

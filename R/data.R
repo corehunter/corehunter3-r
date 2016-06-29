@@ -926,6 +926,9 @@ extract.matrix <- function(data){
   data$NAME <- NULL
   # extract matrix
   matrix <- as.matrix(data)
+  if(!is.null(colnames(matrix)) && all(is.na(colnames(matrix)))){
+    colnames(matrix) <- NULL
+  }
   return(matrix)
 }
 
