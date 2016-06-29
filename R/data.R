@@ -323,9 +323,12 @@ print.chdist <- function(x, ...){
 #' \describe{
 #'  \item{\code{data}}{Genotypes. Data frame for default format, \code{numeric} matrix for other formats.}
 #'  \item{\code{size}}{Number of individuals in the dataset.}
-#'  \item{\code{ids}}{Unique item identifiers.}
-#'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
+#'  \item{\code{ids}}{Unique item identifiers (\code{character}).}
+#'  \item{\code{names}}{Item names (\code{character}). Names of individuals to which no explicit name
 #'    has been assigned are equal to the unique \code{ids}.}
+#'  \item{\code{markers}}{Marker names (\code{character}, if specified).
+#'    Marker names are required for the \code{default} and \code{frequency} format
+#'    but optional for the \code{biparental} format.}
 #'  \item{\code{alleles}}{List of character vectors with allele names per marker.}
 #'  \item{\code{java}}{Java version of the data object.}
 #'  \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
@@ -462,7 +465,7 @@ genotypes <- function(data, file, format = c("default", "biparental", "frequency
     # clean frequency format
     if(format == "frequency"){
       # drop allele name row
-      data <- subset(data, rownames(data) != "ALLELE")
+      data <- data[rownames(data) != "ALLELE", ]
       # convert to numeric
       for(col in colnames(data)){
         data[[col]] <- as.numeric(data[[col]])
@@ -471,9 +474,10 @@ genotypes <- function(data, file, format = c("default", "biparental", "frequency
 
   }
 
-  # obtain ids, names and allele names from Java object
+  # obtain ids, names, marker names and allele names from Java object
   ids <- api$getIds(j.data)
   names <- api$getNames(j.data)
+  markers <- api$getMarkerNames(j.data)
   alleles <- lapply(.jevalArray(api$getAlleles(j.data)), .jevalArray)
 
   # create R object
@@ -482,10 +486,14 @@ genotypes <- function(data, file, format = c("default", "biparental", "frequency
     data = data,
     size = j.data$getSize(),
     ids = ids,
-    names = names,
-    alleles  = alleles,
-    java = j.data
+    names = names
   )
+  if(!all(is.na(markers))){
+    geno$markers <- markers
+    names(alleles) <- markers
+  }
+  geno$alleles <- alleles
+  geno$java <- j.data
   if(!missing(file)){
     geno$file <- file
   }
@@ -629,7 +637,7 @@ phenotypes <- function(data, types, min, max, file){
       stop("Variable types are required.")
     }
     # drop type, min, max
-    data <- subset(data, !(rownames(data) %in% c("TYPE", "MIN", "MAX")))
+    data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), ]
     # convert columns accordingly
     for(c in 1:ncol(data)){
       data[[c]] <- convert.column(data[[c]], types[c])

@@ -135,10 +135,12 @@ test_that("read genotype data from file", {
     expect_equal(geno$ids, getIds())
     expect_equal(rownames(geno$data), geno$ids)
     expect_equal(geno$names, getNames())
+    expect_equal(geno$markers, getMarkerNames(format = format))
+    expect_equal(names(geno$alleles), geno$markers)
     expect_equal(length(geno$alleles), geno$java$getNumberOfMarkers())
     for(m in 1:length(geno$alleles)){
       expect_equal(length(geno$alleles[[m]]), geno$java$getNumberOfAlleles(toJavaIndices(m)))
-      if(format == "default"){
+      if(format == "default"){ # homozygous test data
         expected <- unique(geno$data[[m]])
         expected <- expected[!is.na(expected)]
         expect_equal(sort(geno$alleles[[m]]), sort(expected))
@@ -153,12 +155,43 @@ test_that("read genotype data from file", {
   expect_equal(geno$ids, getIds(dataset = "small"))
   expect_equal(rownames(geno$data), geno$ids)
   expect_equal(geno$names, getNames(dataset = "small"))
+  expect_equal(geno$markers, getMarkerNames(dataset = "small"))
+  expect_equal(names(geno$alleles), geno$markers)
   expect_equal(length(geno$alleles), 4)
   expect_equal(geno$alleles[[1]], c("1", "2", "3"))
   expect_equal(geno$alleles[[2]], c("A", "B", "C", "D"))
   expect_equal(geno$alleles[[3]], c("a1", "a2"))
   expect_equal(geno$alleles[[4]], c("+", "-"))
 })
+
+test_that("create biparental genotype data from matrix", {
+  # with ids and marker names
+  m <- matrix(
+    sample(c(0,1,2), replace = TRUE, size = 1000),
+    nrow = 10, ncol = 100
+  )
+  ids <- paste("g", 1:10, sep = "-")
+  markers <- paste("m", 1:100, sep = "-")
+  rownames(m) <- ids
+  colnames(m) <- markers
+  geno <- genotypes(m, format = "biparental")
+  expect_equal(geno$size, 10)
+  expect_equal(geno$ids, ids)
+  expect_equal(geno$names, ids)
+  expect_equal(geno$data, m)
+  expect_equal(geno$markers, markers)
+  expect_equal(names(geno$alleles), geno$markers)
+  lapply(geno$alleles, function(all){
+    expect_equal(all, c("0", "1"))
+  })
+  # with ids, no marker names
+  # TODO ...
+})
+
+test_that("create biparental genotype data from data frame", {
+  # TODO ...
+})
+
 
 test_that("print", {
   data <- genotypeData()

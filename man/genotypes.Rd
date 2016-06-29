@@ -36,12 +36,15 @@ Genotype data of class \code{chdist} with elements
 \describe{
  \item{\code{data}}{Genotypes. Data frame for default format, \code{numeric} matrix for other formats.}
  \item{\code{size}}{Number of individuals in the dataset.}
- \item{\code{ids}}{Unique item identifiers.}
- \item{\code{names}}{Item names. Names of individuals to which no explicit name
+ \item{\code{ids}}{Unique item identifiers (\code{character}).}
+ \item{\code{names}}{Item names (\code{character}). Names of individuals to which no explicit name
    has been assigned are equal to the unique \code{ids}.}
+ \item{\code{markers}}{Marker names (\code{character}, if specified).
+   Marker names are required for the \code{default} and \code{frequency} format
+   but optional for the \code{biparental} format.}
  \item{\code{alleles}}{List of character vectors with allele names per marker.}
  \item{\code{java}}{Java version of the data object.}
- \item{\code{file}}{Path of file from which data was read (if applicable).}
+ \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 }
 }
 \description{

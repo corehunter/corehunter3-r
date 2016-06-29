@@ -106,6 +106,29 @@ getNames <- function(dataset = c("default", "small")){
   return(names)
 }
 
+getMarkerNames <- function(dataset = c("default", "small"), format = c("default", "biparental", "frequency")){
+  dataset <- match.arg(dataset)
+  format <- match.arg(format)
+  if(dataset == "default"){
+    if(format == "frequency"){
+      # frequency format test example data has less markers
+      names <- c("iRM21", "iRM44", "iRM48", "iRM214", "iRM228", "iRM231", "iRM232",
+                 "iRM241", "iRM246", "iRM249", "iRM253", "iRM257", "iSBE", "iSSS",
+                 "iGBSS")
+    } else {
+      names <- c("iRM21", "iRM44", "iRM48", "iRM206", "iRM214", "iRM228", "iRM231",
+                 "iRM232", "iRM235", "iRM241", "iRM246", "iRM247", "iRM249", "iRM253",
+                 "iRM257", "iSBE", "iSSS", "iGBSS")
+    }
+  } else {
+    if(format != "default"){
+      stop(sprintf("No small dataset with format %s.", format))
+    }
+    names <- c("mk1", "mk2", "mk3", "mk4")
+  }
+  return(names)
+}
+
 getRanges <- function(dataset = c("default", "small")){
   dataset <- match.arg(dataset)
   if(dataset == "default"){

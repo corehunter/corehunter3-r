@@ -23,7 +23,7 @@ Distance matrix data of class \code{chdist} with elements
  \item{\code{names}}{Item names. Names of individuals to which no explicit name
    has been assigned are equal to the unique \code{ids}.}
  \item{\code{java}}{Java version of the data object.}
- \item{\code{file}}{Path of file from which data was read (if applicable).}
+ \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 }
 }
 \description{

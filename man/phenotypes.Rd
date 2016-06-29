@@ -77,7 +77,7 @@ Phenotype data of class \code{chpheno} with elements
  \item{\code{types}}{Variable types and encodings.}
  \item{\code{ranges}}{Variable ranges, when applicable (\code{NA} elsewhere).}
  \item{\code{java}}{Java version of the data object.}
- \item{\code{file}}{Path of file from which data was read (if applicable).}
+ \item{\code{file}}{Normalized path of file from which the data was read (if applicable).}
 }
 }
 \description{
