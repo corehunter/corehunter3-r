@@ -5,7 +5,7 @@
 # --------- #
 
 getFile <- function(file){
-  system.file("extdata", file, package = "corehunter")
+  normalizePath(system.file("extdata", file, package = "corehunter"))
 }
 
 testData <- function(){

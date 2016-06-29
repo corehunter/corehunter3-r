@@ -170,7 +170,7 @@ print.chdata <- function(x, ...){
 #'  \item{\code{names}}{Item names. Names of individuals to which no explicit name
 #'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{java}}{Java version of the data object.}
-#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
+#'  \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 #' }
 #'
 #' @examples
@@ -328,7 +328,7 @@ print.chdist <- function(x, ...){
 #'    has been assigned are equal to the unique \code{ids}.}
 #'  \item{\code{alleles}}{List of character vectors with allele names per marker.}
 #'  \item{\code{java}}{Java version of the data object.}
-#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
+#'  \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 #' }
 #'
 #' @examples
@@ -578,7 +578,7 @@ print.chgeno <- function(x, ...){
 #'  \item{\code{types}}{Variable types and encodings.}
 #'  \item{\code{ranges}}{Variable ranges, when applicable (\code{NA} elsewhere).}
 #'  \item{\code{java}}{Java version of the data object.}
-#'  \item{\code{file}}{Path of file from which data was read (if applicable).}
+#'  \item{\code{file}}{Normalized path of file from which the data was read (if applicable).}
 #' }
 #'
 #' @examples
