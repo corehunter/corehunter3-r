@@ -4,7 +4,8 @@
 \alias{genotypes}
 \title{Create Core Hunter genotype data from data frame, matrix or file.}
 \usage{
-genotypes(data, file, format = c("default", "biparental", "frequency"))
+genotypes(data, alleles, file, format = c("default", "biparental",
+  "frequency"))
 }
 \arguments{
 \item{data}{Data frame or matrix containing the genotypes (individuals x markers)
@@ -14,18 +15,26 @@ depending on the chosen format:
     TODO
   }
   \item{\code{biparental}}{
-    Numeric matrix or data frame. In case of a data frame a first column \code{NAME}
-    may optionally be included specifying item names. The remaining columns should
-    be numeric and follow the same format as the otherwise specified numeric matrix.
+    Numeric matrix or data frame. One row per individual and one column per marker.
     Data consists of 0, 1 and 2 coding for homozygous (AA), heterozygous (AB) and
     homozygous (BB), respectively. Unique row names (item ids) are required and
     optionally column (marker) names may be included as well.
   }
   \item{\code{frequency}}{
-    TODO
+    Numeric matrix or data frame. One row per individual (or bulk sample) and multiple
+    columns per marker. Data consists of allele frequencies, grouped per marker in
+    consecutive columns with the same name (marker name). The allele frequencies of
+    each marker should sum to one in each sample.
   }
+  In case a data frame is provided, an optional first column \code{NAME}
+  may be included to specify item names. The remaining columns should follow
+  the format of the matrix or data frame described above.
   See \url{www.corehunter.org} for more details about the supported genotype formats.
 }}
+
+\item{alleles}{Allele names per marker (\code{character} vector).
+Ignored for all formats except \code{frequency}. Allele names should
+be ordered in correspondence with the data columns.}
 
 \item{file}{File containing the genotype data.}
 
@@ -68,7 +77,16 @@ colnames(geno.data) <- paste("m", 1:100, sep = "-")
 geno <- genotypes(geno.data, format = "biparental")
 
 # frequencies
-# TODO ...
+geno.data <- matrix(
+ c(0.0, 0.3, 0.7, 0.5, 0.5, 0.0, 1.0,
+   0.4, 0.0, 0.6, 0.1, 0.9, 0.0, 1.0,
+   0.3, 0.3, 0.4, 1.0, 0.0, 0.6, 0.4),
+ nrow = 3, ncol = 7
+)
+rownames(geno.data) <- paste("g", 1:3, sep = "-")
+colnames(geno.data) <- c("M1", "M1", "M1", "M2", "M2", "M3", "M3")
+alleles <- c("M1-a", "M1-b", "M1-c", "M2-a", "M2-b", "M3-a", "M3-b")
+geno <- genotypes(geno.data, alleles, format = "frequency")
 
 # read from file
 

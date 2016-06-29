@@ -304,18 +304,25 @@ print.chdist <- function(x, ...){
 #'      TODO
 #'    }
 #'    \item{\code{biparental}}{
-#'      Numeric matrix or data frame. In case of a data frame a first column \code{NAME}
-#'      may optionally be included specifying item names. The remaining columns should
-#'      be numeric and follow the same format as the otherwise specified numeric matrix.
+#'      Numeric matrix or data frame. One row per individual and one column per marker.
 #'      Data consists of 0, 1 and 2 coding for homozygous (AA), heterozygous (AB) and
 #'      homozygous (BB), respectively. Unique row names (item ids) are required and
 #'      optionally column (marker) names may be included as well.
 #'    }
 #'    \item{\code{frequency}}{
-#'      TODO
+#'      Numeric matrix or data frame. One row per individual (or bulk sample) and multiple
+#'      columns per marker. Data consists of allele frequencies, grouped per marker in
+#'      consecutive columns with the same name (marker name). The allele frequencies of
+#'      each marker should sum to one in each sample.
 #'    }
+#'    In case a data frame is provided, an optional first column \code{NAME}
+#'    may be included to specify item names. The remaining columns should follow
+#'    the format of the matrix or data frame described above.
 #'    See \url{www.corehunter.org} for more details about the supported genotype formats.
 #'  }
+#' @param alleles Allele names per marker (\code{character} vector).
+#'  Ignored for all formats except \code{frequency}. Allele names should
+#'  be ordered in correspondence with the data columns.
 #' @param file File containing the genotype data.
 #' @param format Genotype data format, one of \code{default}, \code{biparental} or \code{frequency}.
 #'
@@ -350,7 +357,16 @@ print.chdist <- function(x, ...){
 #' geno <- genotypes(geno.data, format = "biparental")
 #'
 #' # frequencies
-#' # TODO ...
+#' geno.data <- matrix(
+#'  c(0.0, 0.3, 0.7, 0.5, 0.5, 0.0, 1.0,
+#'    0.4, 0.0, 0.6, 0.1, 0.9, 0.0, 1.0,
+#'    0.3, 0.3, 0.4, 1.0, 0.0, 0.6, 0.4),
+#'  byrow = TRUE, nrow = 3, ncol = 7
+#' )
+#' rownames(geno.data) <- paste("g", 1:3, sep = "-")
+#' colnames(geno.data) <- c("M1", "M1", "M1", "M2", "M2", "M3", "M3")
+#' alleles <- c("M1-a", "M1-b", "M1-c", "M2-a", "M2-b", "M3-a", "M3-b")
+#' geno <- genotypes(geno.data, alleles, format = "frequency")
 #'
 #' # read from file
 #'
@@ -368,7 +384,7 @@ print.chdist <- function(x, ...){
 #'
 #' @import rJava
 #' @export
-genotypes <- function(data, file, format = c("default", "biparental", "frequency")){
+genotypes <- function(data, alleles, file, format = c("default", "biparental", "frequency")){
 
   # check input
   if(missing(data) && missing(file)){
@@ -438,8 +454,39 @@ genotypes <- function(data, file, format = c("default", "biparental", "frequency
       # frequency #
       #-----------#
 
-      # TODO ...
-      stop("Not implemented yet.")
+      # check data
+      if(is.matrix(data)){
+        names <- as.character(rep(NA, nrow(data)))
+      } else if(is.data.frame(data)){
+        # extract names and matrix
+        names <- extract.names(data)
+        data <- extract.matrix(data)
+      } else {
+        stop("Frequency genotype format: data should be either a matrix or data frame.")
+      }
+      # check matrix
+      if(!is.numeric(data) || min(data < 0.0) || any(data > 1.0)){
+        stop("Frequencies should be numeric values between 0.0 and 1.0.")
+      }
+      # check row and column names
+      if(is.null(rownames(data)) || is.null(colnames(data))){
+        stop("Unique row names (item ids) and column names (marker names) are required.")
+      }
+      # check allele names
+      if(!is.vector(alleles) || length(alleles) != ncol(data)){
+        stop("Alleles should be a vector of length equal to the number of data columns.")
+      }
+
+      # create data
+      j.freqs <- .jarray(data, dispatch = TRUE)
+      j.ids <- .jarray(rownames(data))
+      j.names <- .jarray(names)
+      j.column.names <- .jarray(colnames(data))
+      if(missing(alleles)){
+        alleles <- rep(NA, ncol(data))
+      }
+      j.alleles <- .jarray(as.character(alleles))
+      j.data <- api$createFrequencyGenotypeData(j.freqs, j.ids, j.names, j.column.names, j.alleles)
 
     }
 
