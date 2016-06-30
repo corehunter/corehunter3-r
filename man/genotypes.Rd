@@ -33,8 +33,8 @@ depending on the chosen format:
 }}
 
 \item{alleles}{Allele names per marker (\code{character} vector).
-Ignored for all formats except \code{frequency}. Allele names should
-be ordered in correspondence with the data columns.}
+Optional and ignored for all formats except \code{frequency}.
+Allele names should be ordered in correspondence with the data columns.}
 
 \item{file}{File containing the genotype data.}
 
@@ -51,7 +51,9 @@ Genotype data of class \code{chdist} with elements
  \item{\code{markers}}{Marker names (\code{character}, if specified).
    Marker names are required for the \code{default} and \code{frequency} format
    but optional for the \code{biparental} format.}
- \item{\code{alleles}}{List of character vectors with allele names per marker.}
+ \item{\code{alleles}}{List of character vectors with allele names per marker
+   (inferred from the data, or manually specified for the \code{frequency}
+   format through the optional \code{alleles} argument).}
  \item{\code{java}}{Java version of the data object.}
  \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 }

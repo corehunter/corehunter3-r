@@ -321,8 +321,8 @@ print.chdist <- function(x, ...){
 #'    See \url{www.corehunter.org} for more details about the supported genotype formats.
 #'  }
 #' @param alleles Allele names per marker (\code{character} vector).
-#'  Ignored for all formats except \code{frequency}. Allele names should
-#'  be ordered in correspondence with the data columns.
+#'  Optional and ignored for all formats except \code{frequency}.
+#'  Allele names should be ordered in correspondence with the data columns.
 #' @param file File containing the genotype data.
 #' @param format Genotype data format, one of \code{default}, \code{biparental} or \code{frequency}.
 #'
@@ -336,7 +336,9 @@ print.chdist <- function(x, ...){
 #'  \item{\code{markers}}{Marker names (\code{character}, if specified).
 #'    Marker names are required for the \code{default} and \code{frequency} format
 #'    but optional for the \code{biparental} format.}
-#'  \item{\code{alleles}}{List of character vectors with allele names per marker.}
+#'  \item{\code{alleles}}{List of character vectors with allele names per marker
+#'    (inferred from the data, or manually specified for the \code{frequency}
+#'    format through the optional \code{alleles} argument).}
 #'  \item{\code{java}}{Java version of the data object.}
 #'  \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 #' }
@@ -465,7 +467,7 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
         stop("Frequency genotype format: data should be either a matrix or data frame.")
       }
       # check matrix
-      if(!is.numeric(data) || min(data < 0.0) || any(data > 1.0)){
+      if(!is.numeric(data) || any(data < 0.0, na.rm = TRUE) || any(data > 1.0, na.rm = TRUE)){
         stop("Frequencies should be numeric values between 0.0 and 1.0.")
       }
       # check row and column names
@@ -473,6 +475,9 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
         stop("Unique row names (item ids) and column names (marker names) are required.")
       }
       # check allele names
+      if(missing(alleles)){
+        alleles <- rep(NA, ncol(data))
+      }
       if(!is.vector(alleles) || length(alleles) != ncol(data)){
         stop("Alleles should be a vector of length equal to the number of data columns.")
       }
@@ -482,9 +487,6 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
       j.ids <- .jarray(rownames(data))
       j.names <- .jarray(names)
       j.column.names <- .jarray(colnames(data))
-      if(missing(alleles)){
-        alleles <- rep(NA, ncol(data))
-      }
       j.alleles <- .jarray(as.character(alleles))
       j.data <- api$createFrequencyGenotypeData(j.freqs, j.ids, j.names, j.column.names, j.alleles)
 
@@ -518,6 +520,10 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
         data[[c]] <- as.numeric(data[[c]])
       }
     }
+    # convert to matrix for frequency and biparental format
+    if(format == "frequency" || format == "biparental"){
+      data <- as.matrix(data)
+    }
 
   }
 
@@ -538,7 +544,9 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
     geno$markers <- markers
     names(alleles) <- markers
   }
-  geno$alleles <- alleles
+  if(!all(is.na(unlist(alleles)))){
+    geno$alleles <- alleles
+  }
   geno$java <- j.data
   if(!missing(file)){
     geno$file <- file

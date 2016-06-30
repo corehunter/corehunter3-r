@@ -120,6 +120,7 @@ test_that("arguments are checked", {
   expect_error(genotypes(file = "i/do/not/exist"), "does not exist")
   expect_error(genotypes(data = testData()$geno$data, file = genotypeFile()), "not both")
   expect_error(genotypes(data = "123", format = "biparental"), "matrix or data frame")
+  expect_error(genotypes(data = "123", format = "frequency"), "matrix or data frame")
   m <- matrix(1:100, 10, 10)
   expect_error(genotypes(data = m, format = "biparental"), "0, 1, 2")
   m <- matrix(sample(c("0","1","2"), replace = TRUE, size = 100), 10, 10)
@@ -128,6 +129,14 @@ test_that("arguments are checked", {
   expect_error(genotypes(data = m, format = "biparental"), "row names are required")
   rownames(m) <- letters[1:10]
   expect_silent(genotypes(data = m, format = "biparental"))
+  expect_error(genotypes(data = m, format = "freq"), "values between 0.0 and 1.0")
+  m <- matrix(runif(100), 10, 10)
+  expect_error(genotypes(data = m, format = "freq"), "row names")
+  rownames(m) <- letters[1:10]
+  expect_error(genotypes(data = m, format = "freq"), "column names")
+  colnames(m) <- letters[1:10]
+  alleles <- c("x", "y", "z")
+  expect_error(genotypes(data = m, alleles, format = "freq"), "number of data columns")
 })
 
 test_that("class", {
@@ -150,7 +159,7 @@ test_that("read genotype data from file", {
     for(m in 1:length(geno$alleles)){
       expect_equal(length(geno$alleles[[m]]), geno$java$getNumberOfAlleles(toJavaIndices(m)))
       if(format == "default"){ # homozygous test data
-        expected <- unique(geno$data[[m]])
+        expected <- unique(geno$data[,m])
         expected <- as.character(expected[!is.na(expected)])
         expect_equal(sort(geno$alleles[[m]]), sort(expected))
       } else if(format == "biparental"){
@@ -158,9 +167,10 @@ test_that("read genotype data from file", {
       }
     }
     if(format == "frequency" || format == "biparental"){
-      for(col in colnames(geno$data)){
-        expect_true(is.numeric(geno$data[[col]]))
-      }
+      expect_is(geno$data, "matrix")
+      expect_true(is.numeric(geno$data))
+    } else {
+      expect_is(geno$data, "data.frame")
     }
   }
   # 2: small dataset
@@ -195,8 +205,8 @@ test_that("create biparental genotype data from matrix or data frame", {
   expect_equal(geno$data, m)
   expect_equal(geno$markers, markers)
   expect_equal(names(geno$alleles), geno$markers)
-  lapply(geno$alleles, function(all){
-    expect_equal(all, c("0", "1"))
+  lapply(geno$alleles, function(markerAlleles){
+    expect_equal(markerAlleles, c("0", "1"))
   })
   # with ids, no marker names
   m2 <- m
@@ -215,8 +225,8 @@ test_that("create biparental genotype data from matrix or data frame", {
   expect_equal(geno$data, m)
   expect_equal(geno$markers, markers)
   expect_equal(names(geno$alleles), geno$markers)
-  lapply(geno$alleles, function(all){
-    expect_equal(all, c("0", "1"))
+  lapply(geno$alleles, function(markerAlleles){
+    expect_equal(markerAlleles, c("0", "1"))
   })
   # from data frame without names
   df <- data.frame(m, check.names = F)
@@ -239,6 +249,60 @@ test_that("create biparental genotype data from matrix or data frame", {
   expect_equal(geno$names, names)
   expect_null(geno$markers)
   expect_null(names(geno$alleles))
+  # from data read from file
+  m <- genotypeData(format = "bi")$data
+  geno <- genotypes(m, format = "bi")
+  expect_equal(geno$data, m)
+  expect_equal(geno$ids, getIds())
+  expect_equal(geno$names, getIds())
+  expect_equal(geno$markers, getMarkerNames(format = "bi"))
+})
+
+test_that("create frequency data from matrix or data frame", {
+  # from matrix
+  m <- matrix(
+   c(0.0, 0.3, 0.7, 0.5, 0.5, 0.0, 1.0,
+     0.4, 0.0, 0.6, 0.1, 0.9, 0.0, 1.0,
+     0.3, 0.3, 0.4, 1.0, 0.0, 0.6, 0.4),
+   byrow = TRUE, nrow = 3, ncol = 7
+  )
+  ids <- paste("g", 1:3, sep = "-")
+  columns <- c("M1.1", "M1.2", "M1.3", "M2-a", "M2-b", "M3_1", "M3_2")
+  alleles <- c("M1-a", "M1-b", "M1-c", "M2-a", "M2-b", "M3-a", "M3-b")
+  rownames(m) <- ids
+  colnames(m) <- columns
+  geno <- genotypes(m, alleles, format = "frequency")
+  expect_equal(geno$size, 3)
+  expect_equal(geno$ids, ids)
+  expect_equal(geno$names, ids)
+  expect_equal(geno$data, m)
+  expect_equal(geno$markers, c("M1", "M2", "M3"))
+  expect_equal(names(geno$alleles), geno$markers)
+  expect_equal(geno$alleles$M1, alleles[1:3])
+  expect_equal(geno$alleles$M2, alleles[4:5])
+  expect_equal(geno$alleles$M3, alleles[6:7])
+  # from data frame without names
+  df <- data.frame(m, check.names = FALSE)
+  geno <- genotypes(df, alleles, format = "freq")
+  expect_equal(geno$data, m)
+  # from data frame with names
+  names <- letters[1:3]
+  df <- data.frame(NAME = names, m, check.names = FALSE)
+  geno <- genotypes(df, alleles, format = "freq")
+  expect_equal(geno$data, m)
+  expect_equal(geno$ids, ids)
+  expect_equal(geno$names, names)
+  # from matrix without allele names
+  geno <- genotypes(m, format = "freq")
+  expect_null(geno$alleles)
+  expect_equal(geno$data, m)
+  # from data read from file
+  m <- genotypeData(format = "freq")$data
+  geno <- genotypes(m, format = "freq")
+  expect_equal(geno$data, m)
+  expect_equal(geno$ids, getIds())
+  expect_equal(geno$names, getIds())
+  expect_equal(geno$markers, getMarkerNames(format = "freq"))
 })
 
 
