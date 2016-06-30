@@ -347,7 +347,19 @@ print.chdist <- function(x, ...){
 #' # create from data frame or matrix
 #'
 #' # default format
-#' # TODO ...
+#' geno.data <- data.frame(
+#'  NAME = c("Alice", "Bob", "Carol", "Dave", "Eve"),
+#'  M1.1 = c(1,2,1,2,1),
+#'  M1.2 = c(3,2,2,3,1),
+#'  M2.1 = c("B","C","D","B",NA),
+#'  M2.2 = c("B","A","D","B",NA),
+#'  M3.1 = c("a1","a1","a2","a2","a1"),
+#'  M3.2 = c("a1","a2","a2","a1","a1"),
+#'  M4.1 = c(NA,"+","+","+","-"),
+#'  M4.2 = c(NA,"-","+","-","-"),
+#'  row.names = paste("g", 1:5, sep = "-")
+#' )
+#' geno <- genotypes(geno.data)
 #'
 #' # biparental
 #' geno.data <- matrix(
@@ -408,8 +420,31 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
       # default #
       #---------#
 
-      # TODO ...
-      stop("Not implemented yet.")
+      # check data
+      if(!is.data.frame(data)){
+        stop("Default genotype format: data should be a data frame.")
+      } else {
+        names <- extract.names(data)
+        # erase names
+        data$NAME <- NULL
+        # convert to character matrix
+        matrix <- data
+        for(c in 1:ncol(matrix)){
+          matrix[[c]] <- as.character(matrix[[c]])
+        }
+        matrix <- extract.matrix(matrix)
+      }
+      # check matrix
+      if(is.null(rownames(matrix)) || is.null(colnames(matrix))){
+        stop("Unique row names (item ids) and column names (marker names) are required.")
+      }
+
+      # create data
+      j.matrix <- .jarray(matrix, dispatch = TRUE)
+      j.ids <- .jarray(rownames(matrix))
+      j.names <- .jarray(names)
+      j.column.names <- .jarray(colnames(matrix))
+      j.data <- api$createDefaultGenotypeData(j.matrix, j.ids, j.names, j.column.names)
 
     } else if(format == "biparental"){
 
@@ -435,7 +470,7 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
         stop("Marker matrix should be numeric (0, 1, 2).")
       }
       # check row names
-      if(is.null(row.names(data))){
+      if(is.null(rownames(data))){
         stop("Unique row names are required (item ids).")
       }
 

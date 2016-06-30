@@ -67,7 +67,19 @@ file format used by Core Hunter.
 # create from data frame or matrix
 
 # default format
-# TODO ...
+geno.data <- data.frame(
+ NAME = c("Alice", "Bob", "Carol", "Dave", "Eve"),
+ M1.1 = c(1,2,1,2,1),
+ M1.2 = c(3,2,2,3,1),
+ M2.1 = c("B","C","D","B",NA),
+ M2.2 = c("B","A","D","B",NA),
+ M3.1 = c("a1","a1","a2","a2","a1"),
+ M3.2 = c("a1","a2","a2","a1","a1"),
+ M4.1 = c(NA,"+","+","+","-"),
+ M4.2 = c(NA,"-","+","-","-"),
+ row.names = paste("g", 1:5, sep = "-")
+)
+geno <- genotypes(geno.data)
 
 # biparental
 geno.data <- matrix(

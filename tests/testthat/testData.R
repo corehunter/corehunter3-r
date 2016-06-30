@@ -119,8 +119,9 @@ test_that("arguments are checked", {
   expect_error(genotypes(file = 124), "should be a file path")
   expect_error(genotypes(file = "i/do/not/exist"), "does not exist")
   expect_error(genotypes(data = testData()$geno$data, file = genotypeFile()), "not both")
-  expect_error(genotypes(data = "123", format = "biparental"), "matrix or data frame")
-  expect_error(genotypes(data = "123", format = "frequency"), "matrix or data frame")
+  expect_error(genotypes(data = "123"), "data frame")
+  expect_error(genotypes(data = "abc", format = "biparental"), "matrix or data frame")
+  expect_error(genotypes(data = 1:3, format = "frequency"), "matrix or data frame")
   m <- matrix(1:100, 10, 10)
   expect_error(genotypes(data = m, format = "biparental"), "0, 1, 2")
   m <- matrix(sample(c("0","1","2"), replace = TRUE, size = 100), 10, 10)
@@ -137,6 +138,11 @@ test_that("arguments are checked", {
   colnames(m) <- letters[1:10]
   alleles <- c("x", "y", "z")
   expect_error(genotypes(data = m, alleles, format = "freq"), "number of data columns")
+  df <- data.frame(1:10)
+  expect_error(genotypes(df), "row names")
+  rownames(df) <- letters[1:10]
+  colnames(df) <- NULL
+  expect_error(genotypes(df), "column names")
 })
 
 test_that("class", {
@@ -186,6 +192,48 @@ test_that("read genotype data from file", {
   expect_equal(geno$alleles[[2]], c("A", "B", "C", "D"))
   expect_equal(geno$alleles[[3]], c("a1", "a2"))
   expect_equal(geno$alleles[[4]], c("+", "-"))
+})
+
+test_that("create default genotype data from data frame", {
+  ids <- paste("g", 1:5, sep = "-")
+  names <- c("Alice", "Bob", "Carol", "Dave", "Eve")
+  df <- data.frame(
+    NAME = names,
+    M1.1 = c(1,2,1,2,1),
+    M1.2 = c(3,2,2,3,1),
+    M2.1 = c("B","C","D","B",NA),
+    M2.2 = c("B","A","D","B",NA),
+    M3.1 = c("a1","a1","a2","a2","a1"),
+    M3.2 = c("a1","a2","a2","a1","a1"),
+    M4.1 = c(NA,"+","+","+","-"),
+    M4.2 = c(NA,"-","+","-","-"),
+    row.names = ids
+  )
+  df.no.names <- df
+  df.no.names$NAME <- NULL
+  markers <- c("M1", "M2", "M3", "M4")
+  alleles <- list(
+    M1 = as.character(1:3),
+    M2 = c("A", "B", "C", "D"),
+    M3 = c("a1", "a2"),
+    M4 = c("+", "-")
+  )
+  # without names
+  geno <- genotypes(df.no.names)
+  expect_equal(geno$size,5)
+  expect_equal(geno$ids, ids)
+  expect_equal(geno$names, ids)
+  expect_equal(geno$data, df.no.names)
+  expect_equal(geno$markers, markers)
+  expect_equal(geno$alleles, alleles)
+  # with names
+  geno <- genotypes(df)
+  expect_equal(geno$size,5)
+  expect_equal(geno$ids, ids)
+  expect_equal(geno$names, names)
+  expect_equal(geno$data, df.no.names)
+  expect_equal(geno$markers, markers)
+  expect_equal(geno$alleles, alleles)
 })
 
 test_that("create biparental genotype data from matrix or data frame", {
@@ -304,7 +352,6 @@ test_that("create frequency data from matrix or data frame", {
   expect_equal(geno$names, getIds())
   expect_equal(geno$markers, getMarkerNames(format = "freq"))
 })
-
 
 test_that("print", {
   data <- genotypeData()
