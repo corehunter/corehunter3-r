@@ -42,30 +42,11 @@ test_that("default objectives", {
   expect_false(is.null(core$EN))
   expect_false(is.null(core$EN$PD))
   # full dataset
-  expect_message(core <- testSampleCore(testData()), "using genotypes only", ignore.case = TRUE)
+  expect_silent(core <- testSampleCore(testData()))
   expect_false(is.null(core$EN))
   expect_false(is.null(core$EN$MR))
-  # phenotypes and distances only
-  expect_message(
-    core <- testSampleCore(coreHunterData(pheno = phenotypeData(), dist = distanceData())),
-    "using phenotypes only", ignore.case = TRUE
-  )
-  expect_false(is.null(core$EN))
   expect_false(is.null(core$EN$GD))
-  # genotypes and distances only
-  expect_message(
-    core <- testSampleCore(coreHunterData(geno = genotypeData(), dist = distanceData())),
-    "using genotypes only", ignore.case = TRUE
-  )
-  expect_false(is.null(core$EN))
-  expect_false(is.null(core$EN$MR))
-  # genotypes and phenotypes only
-  expect_message(
-    core <- testSampleCore(coreHunterData(geno = genotypeData(), pheno = phenotypeData())),
-    "using genotypes only", ignore.case = TRUE
-  )
-  expect_false(is.null(core$EN))
-  expect_false(is.null(core$EN$MR))
+  expect_false(is.null(core$EN$PD))
 })
 
 test_that("result contains indices or names", {
