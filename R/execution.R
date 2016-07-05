@@ -9,13 +9,11 @@
 #'   object of class \code{chdist}, \code{chgeno} or \code{chpheno}
 #'   if only one type of data is provided.
 #' @param obj Objective or list of objectives (\code{chobj}).
-#'   If no objectives are specified Core Hunter maximizes
-#'   the entry-to-nearest-entry distance (\code{EN}) in the core, using
-#'   Modified Roger's distance (\code{MR}) if genotypes are available,
-#'   Gower's distance (\code{GD}) if phenotypes are available, or else
-#'   the precomputed distances (\code{PD}), in this order of preference.
-#'   A message is printed when the default objective uses only part of the
-#'   available data.
+#'   If no objectives are specified Core Hunter maximizes a weighted
+#'   index including the default entry-to-nearest-entry distance
+#'   (\code{EN}) for each available data type, with equal weight.
+#'   For genotyes, the Modified Roger's distance (\code{MR}) is
+#'   used. For phenotypes, Gower's distance (\code{GD}) is applied.
 #' @param size Desired core subset size (numeric). If larger than one the value
 #'   is used as the absolute core size after rounding. Else it is used as the
 #'   sampling rate and multiplied with the dataset size to determine the size of
@@ -139,25 +137,20 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), norma
     stop("Argument 'verbose' should be a logical.")
   }
 
+  api <- ch.api()
+
   # set default objectives or check given objectives
   j.data <- data$java
   if(missing(obj)){
-    # set default objective (TODO: obtain from Java API to ensure consistency with GUI)
-    if(j.data$hasGenotypes()){
-      meas <- "MR"
-      used <- "genotypes"
-    } else if(j.data$hasPhenotypes()){
-      meas <- "GD"
-      used <- "phenotypes"
-    } else {
-      meas <- "PD"
-      used <- "precomputed distances"
-    }
-    obj <- objective(type = "EN", measure = meas)
-    # warn if more than one type of data is provided
-    if(sum(j.data$hasGenotypes(), j.data$hasPhenotypes(), j.data$hasDistances()) > 1){
-      message(sprintf("Default %s. Using %s only.", capture.output(obj), used))
-    }
+    # set default objectives
+    obj <- api$createDefaultObjectives(j.data)
+    obj <- lapply(obj, function(o){
+      objective(
+        type = o$getObjectiveType()$getAbbreviation(),
+        meas = o$getMeasure()$getAbbreviation(),
+        weight = o$getWeight()
+      )
+    })
   }
   # wrap single objective in list
   if(is(obj, 'chobj')){
@@ -175,7 +168,6 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), norma
   j.obj <- ch.objectives(obj)
 
   # create Core Hunter arguments
-  api <- ch.api()
   j.size <- as.integer(size)
   j.obj.array <- .jarray(j.obj, contents.class = ch.obj()@name)
   j.args <- api$createArguments(j.data, j.size, j.obj.array, normalize)

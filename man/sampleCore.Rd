@@ -15,13 +15,11 @@ object of class \code{chdist}, \code{chgeno} or \code{chpheno}
 if only one type of data is provided.}
 
 \item{obj}{Objective or list of objectives (\code{chobj}).
-If no objectives are specified Core Hunter maximizes
-the entry-to-nearest-entry distance (\code{EN}) in the core, using
-Modified Roger's distance (\code{MR}) if genotypes are available,
-Gower's distance (\code{GD}) if phenotypes are available, or else
-the precomputed distances (\code{PD}), in this order of preference.
-A message is printed when the default objective uses only part of the
-available data.}
+If no objectives are specified Core Hunter maximizes a weighted
+index including the default entry-to-nearest-entry distance
+(\code{EN}) for each available data type, with equal weight.
+For genotyes, the Modified Roger's distance (\code{MR}) is
+used. For phenotypes, Gower's distance (\code{GD}) is applied.}
 
 \item{size}{Desired core subset size (numeric). If larger than one the value
 is used as the absolute core size after rounding. Else it is used as the
