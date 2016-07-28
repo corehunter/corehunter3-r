@@ -13,8 +13,8 @@ test_that("arguments are checked", {
   expect_error(sampleCore(data, size = 1/data$size), ">= 2")
   expect_error(sampleCore(data, size = 1), ">= 2")
   expect_error(sampleCore(data, size = 1.4), ">= 2")
-  expect_error(sampleCore(data, size = data$size), "< 100")
-  expect_error(sampleCore(data, size = data$size + sample(1:10, size = 1)), "< 100")
+  expect_error(sampleCore(data, size = data$size), "< 218")
+  expect_error(sampleCore(data, size = data$size + sample(1:10, size = 1)), "< 218")
   expect_error(sampleCore(data, size = "abc"), "should be numeric")
   expect_error(sampleCore(data, obj = "abc"), "class 'chobj'")
   expect_error(sampleCore(data, obj = list(123)), "class 'chobj'")
@@ -50,13 +50,13 @@ test_that("default objectives", {
 })
 
 test_that("result contains indices or names", {
-  data <- testData()
-  obj <- objective("EE", "PD")
-  core.ids <- testSampleCore(data, obj, size = 5)
-  core.ind <- testSampleCore(data, obj, size = 5, indices = TRUE)
+  geno <- genotypeData(dataset = "small")
+  obj <- objective("EE", "MR")
+  core.ids <- testSampleCore(geno, obj, size = 3)
+  core.ind <- testSampleCore(geno, obj, size = 3, indices = TRUE)
   expect_true(is.character(core.ids$sel))
   expect_true(is.numeric(core.ind$sel))
-  expect_equal(core.ids$sel, rownames(data$dist$data)[core.ind$sel])
+  expect_equal(sort(core.ids$sel), sort(rownames(geno$data)[core.ind$sel]))
 })
 
 test_that("multiple objectives", {

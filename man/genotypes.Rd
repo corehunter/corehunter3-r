@@ -12,7 +12,12 @@ genotypes(data, alleles, file, format = c("default", "biparental",
 depending on the chosen format:
 \describe{
   \item{\code{default}}{
-    TODO
+    Data frame. One row per individual and one or more columns per marker.
+    Columns contain the names, numbers, references, ... of observed alleles.
+    Unique row names (item ids) are required and columns should be named
+    after the marker to which they belong, optionally extended with an
+    arbitrary suffix starting with a dot (\code{.}), dash (\code{-}) or
+    underscore (\code{_}) character.
   }
   \item{\code{biparental}}{
     Numeric matrix or data frame. One row per individual and one column per marker.

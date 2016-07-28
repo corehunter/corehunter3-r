@@ -78,7 +78,7 @@ sampleCore(data, obj, size = 25)
 sampleCore(data, obj, size = 0.1)
 
 # other objective: minimize accession-to-nearest-entry precomputed distance
-sampleCore(data, obj = objective(type = "AN", meas = "PD"))
+sampleCore(data, obj = objective(type = "AN", measure = "PD"))
 # multiple objectives (equal weight)
 sampleCore(data, obj = list(
  objective("EN", "PD"),

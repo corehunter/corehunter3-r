@@ -2,18 +2,21 @@
 # EXAMPLE DATA #
 # ------------ #
 
-#' Example dataset with 100 individuals.
+#' Example dataset with 218 individuals.
 #'
-#' Reads a precomputed distance matrix from \code{"extdata/distances.csv"},
-#' genotypes from \code{"extdata/genotypes.csv"} and phenotypes from
+#' Includes a precomputed distance matrix read from \code{"extdata/distances.csv"},
+#' genotypes read from \code{"extdata/genotypes.csv"} and phenotypes read from
 #' \code{"extdata/phenotypes.csv"}.
 #'
-#' Genotypes and phenotypes are taken from the PowerCore project and, although
-#' this is not really the case, it is assumed here that they both describe
-#' the same population. Only the first 100 individuals are included.
-#' The distance matrix is computed from the phenotypic traits (Gower distance).
+#' The distance matrix is computed from the genotypes (Modified Rogers' distance).
+#' Data was taken from the CIMMYT Research Data Repository (Study Global ID
+#' hdl:11529/10199; real data set 5, cycle 0).
 #'
-#' @source \url{http://bioinformatics.oxfordjournals.org/content/23/16/2155.long}
+#' @encoding UTF-8
+#' @source Cerón-Rojas, J. Jesús ; Crossa, José; Arief, Vivi N.; Kaye Basford;
+#'         Rutkoski, Jessica; Jarquín, Diego ; Alvarado, Gregorio; Beyene, Yoseph;
+#'         Semagn, Kassa ; DeLacy, Ian, 2015-06-04, "Application of a Genomics
+#'         Selection Index to Real and Simulated Data", \url{http://hdl.handle.net/11529/10199} V10
 #'
 #' @return Core Hunter data of class \code{chdata}
 #' @export
@@ -301,7 +304,12 @@ print.chdist <- function(x, ...){
 #'  depending on the chosen format:
 #'  \describe{
 #'    \item{\code{default}}{
-#'      TODO
+#'      Data frame. One row per individual and one or more columns per marker.
+#'      Columns contain the names, numbers, references, ... of observed alleles.
+#'      Unique row names (item ids) are required and columns should be named
+#'      after the marker to which they belong, optionally extended with an
+#'      arbitrary suffix starting with a dot (\code{.}), dash (\code{-}) or
+#'      underscore (\code{_}) character.
 #'    }
 #'    \item{\code{biparental}}{
 #'      Numeric matrix or data frame. One row per individual and one column per marker.
@@ -1011,6 +1019,8 @@ extract.names <- function(data){
 # extract matrix from data frame with initial NAME column followed by
 # the columns of the matrix
 extract.matrix <- function(data){
+  # store IDs
+  ids <- rownames(data)
   # discard names (if set)
   data$NAME <- NULL
   # extract matrix
@@ -1018,6 +1028,7 @@ extract.matrix <- function(data){
   if(!is.null(colnames(matrix)) && all(is.na(colnames(matrix)))){
     colnames(matrix) <- NULL
   }
+  rownames(matrix) <- ids
   return(matrix)
 }
 

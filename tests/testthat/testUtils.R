@@ -25,6 +25,7 @@ distanceData <- function(dataset = c("default", "small")){
 }
 genotypeData <- function(dataset = c("default", "small"), format = c("default", "biparental", "frequency")){
   dataset <- match.arg(dataset)
+  format <- match.arg(format)
   if(dataset == "small"){
     genotypes(file = "data/genotypes-small.csv")
   } else {
@@ -61,16 +62,7 @@ phenotypeFile <- function(){
 getIds <- function(dataset = c("default", "small")){
   dataset <- match.arg(dataset)
   if(dataset == "default"){
-    ids <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-             "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-             "48", "49", "50", "51", "56", "57", "58", "59", "65", "66", "67",
-             "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78",
-             "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89",
-             "119", "120", "121", "122", "123", "124", "125", "126", "127",
-             "128", "133", "134", "166", "167", "168", "182", "183", "184",
-             "185", "186", "187", "188", "189", "190", "191", "192", "193",
-             "194", "195", "198", "201", "299", "300", "301", "302", "303",
-             "304", "305", "306", "316", "317", "318", "351", "353")
+    ids <- as.character(1:218)
   } else {
     ids <- c("Alice", "Dave", "Bob-1", "Bob-2", "Carol")
   }
@@ -80,50 +72,61 @@ getIds <- function(dataset = c("default", "small")){
 getNames <- function(dataset = c("default", "small")){
   dataset <- match.arg(dataset)
   if(dataset == "default"){
-    names <- c("Bred_0002", "Bred_0004", "Bred_0005", "Bred_0006", "Bred_0007",
-               "Bred_0009", "Bred_0010", "Bred_0011", "Bred_0012", "Bred_0013",
-               "Bred_0015", "Bred_0017", "Bred_0020", "Bred_0023", "Bred_0027",
-               "Bred_0028", "Bred_0030", "Bred_0031", "Bred_0033", "Bred_0035",
-               "Bred_0039", "Bred_0040", "Bred_0041", "Bred_0042", "Bred_0043",
-               "Bred_0044", "Bred_0045", "Bred_0047", "Bred_0048", "Bred_0051",
-               "Bred_0053", "Bred_0054", "Bred_0055", "Bred_0057", "Bred_0058",
-               "Bred_0061", "Bred_0062", "Bred_0063", "Bred_0064", "Bred_0065",
-               "Bred_0066", "Bred_0067", "Bred_0068", "Bred_0070", "Bred_0072",
-               "Bred_0074", "Bred_0075", "Bred_0076", "Bred_0077", "Bred_0078",
-               "Bred_0079", "Bred_0080", "Bred_0083", "Bred_0084", "Bred_0085",
-               "Bred_0087", "Bred_0088", "Bred_0091", "Bred_0096", "Bred_0099",
-               "Bred_0100", "Bred_0101", "Bred_0102", "Bred_0103", "Bred_0105",
-               "Bred_0106", "Bred_0107", "Bred_0108", "Bred_0111", "Bred_0112",
-               "Bred_0113", "Bred_0114", "Bred_0115", "Bred_0116", "Bred_0117",
-               "Bred_0118", "Bred_0119", "Bred_0121", "Bred_0123", "Bred_0125",
-               "Bred_0129", "Bred_0132", "Bred_0133", "Bred_0134", "Bred_0135",
-               "Bred_0137", "Bred_0140", "Bred_0141", "Bred_0142", "Bred_0143",
-               "Bred_0145", "Bred_0146", "Bred_0147", "Bred_0149", "Bred_0152",
-               "Bred_0154", "Bred_0156", "Bred_0157", "Bred_0158", "Bred_0159")
+    names <- c("Bred_0003", "Bred_0004", "Bred_0005", "Bred_0006", "Bred_0013",
+               "Bred_0014", "Bred_0016", "Bred_0017", "Bred_0021", "Bred_0022",
+               "Bred_0023", "Bred_0024", "Bred_0026", "Bred_0027", "Bred_0028",
+               "Bred_0030", "Bred_0031", "Bred_0033", "Bred_0036", "Bred_0038",
+               "Bred_0039", "Bred_0046", "Bred_0047", "Bred_0048", "Bred_0049",
+               "Bred_0052", "Bred_0053", "Bred_0055", "Bred_0057", "Bred_0058",
+               "Bred_0059", "Bred_0063", "Bred_0064", "Bred_0066", "Bred_0068",
+               "Bred_0069", "Bred_0071", "Bred_0072", "Bred_0074", "Bred_0082",
+               "Bred_0083", "Bred_0085", "Bred_0086", "Bred_0089", "Bred_0094",
+               "Bred_0095", "Bred_0099", "Bred_0101", "Bred_0103", "Bred_0106",
+               "Bred_0107", "Bred_0108", "Bred_0109", "Bred_0110", "Bred_0112",
+               "Bred_0114", "Bred_0115", "Bred_0116", "Bred_0117", "Bred_0118",
+               "Bred_0119", "Bred_0120", "Bred_0121", "Bred_0123", "Bred_0125",
+               "Bred_0126", "Bred_0129", "Bred_0130", "Bred_0131", "Bred_0132",
+               "Bred_0133", "Bred_0137", "Bred_0138", "Bred_0141", "Bred_0144",
+               "Bred_0146", "Bred_0148", "Bred_0149", "Bred_0152", "Bred_0159",
+               "Bred_0162", "Bred_0165", "Bred_0169", "Bred_0170", "Bred_0171",
+               "Bred_0173", "Bred_0175", "Bred_0177", "Bred_0178", "Bred_0179",
+               "Bred_0180", "Bred_0185", "Bred_0187", "Bred_0188", "Bred_0191",
+               "Bred_0193", "Bred_0196", "Bred_0197", "Bred_0198", "Bred_0199",
+               "Bred_0200", "Bred_0212", "Bred_0213", "Bred_0215", "Bred_0219",
+               "Bred_0220", "Bred_0222", "Bred_0224", "Bred_0225", "Bred_0227",
+               "Bred_0228", "Bred_0240", "Bred_0242", "Bred_0245", "Bred_0249",
+               "Bred_0250", "Bred_0252", "Bred_0254", "Bred_0255", "Bred_0256",
+               "Bred_0259", "Bred_0261", "Bred_0262", "Bred_0266", "Bred_0267",
+               "Bred_0268", "Bred_0269", "Bred_0270", "Bred_0271", "Bred_0273",
+               "Bred_0280", "Bred_0281", "Bred_0283", "Bred_0284", "Bred_0285",
+               "Bred_0286", "Bred_0287", "Bred_0292", "Bred_0295", "Bred_0296",
+               "Bred_0297", "Bred_0298", "Bred_0299", "Bred_0300", "Bred_0301",
+               "Bred_0302", "Bred_0303", "Bred_0304", "Bred_0305", "Bred_0306",
+               "Bred_0307", "Bred_0309", "Bred_0310", "Bred_0311", "Bred_0312",
+               "Bred_0313", "Bred_0315", "Bred_0316", "Bred_0318", "Bred_0319",
+               "Bred_0326", "Bred_0327", "Bred_0329", "Bred_0330", "Bred_0331",
+               "Bred_0335", "Bred_0336", "Bred_0339", "Bred_0342", "Bred_0343",
+               "Bred_0344", "Bred_0347", "Bred_0349", "Bred_0354", "Bred_0355",
+               "Bred_0357", "Bred_0359", "Bred_0360", "Bred_0362", "Bred_0365",
+               "Bred_0367", "Bred_0368", "Bred_0369", "Bred_0370", "Bred_0371",
+               "Bred_0372", "Bred_0373", "Bred_0374", "Bred_0378", "Bred_0379",
+               "Bred_0381", "Bred_0382", "Bred_0387", "Bred_0389", "Bred_0390",
+               "Bred_0392", "Bred_0393", "Bred_0394", "Bred_0396", "Bred_0398",
+               "Bred_0399", "Bred_0400", "Bred_0405", "Bred_0406", "Bred_0408",
+               "Bred_0409", "Bred_0412", "Bred_0417", "Bred_0418", "Bred_0419",
+               "Bred_0420", "Bred_0421", "Bred_0422", "Bred_0425", "Bred_0426",
+               "Bred_0429", "Bred_0433", "Bred_0434")
   } else {
     names <- c("Alice", "Dave", "Bob", "Bob", "Carol")
   }
   return(names)
 }
 
-getMarkerNames <- function(dataset = c("default", "small"), format = c("default", "biparental", "frequency")){
+getMarkerNames <- function(dataset = c("default", "small")){
   dataset <- match.arg(dataset)
-  format <- match.arg(format)
   if(dataset == "default"){
-    if(format == "frequency"){
-      # frequency format test example data has less markers
-      names <- c("iRM21", "iRM44", "iRM48", "iRM214", "iRM228", "iRM231", "iRM232",
-                 "iRM241", "iRM246", "iRM249", "iRM253", "iRM257", "iSBE", "iSSS",
-                 "iGBSS")
-    } else {
-      names <- c("iRM21", "iRM44", "iRM48", "iRM206", "iRM214", "iRM228", "iRM231",
-                 "iRM232", "iRM235", "iRM241", "iRM246", "iRM247", "iRM249", "iRM253",
-                 "iRM257", "iSBE", "iSSS", "iGBSS")
-    }
+    names <- paste("M", 1:190, sep = "")
   } else {
-    if(format != "default"){
-      stop(sprintf("No small dataset with format %s.", format))
-    }
     names <- c("mk1", "mk2", "mk3", "mk4")
   }
   return(names)
@@ -132,7 +135,7 @@ getMarkerNames <- function(dataset = c("default", "small"), format = c("default"
 getRanges <- function(dataset = c("default", "small")){
   dataset <- match.arg(dataset)
   if(dataset == "default"){
-    ranges <- c(rep(NA, 28), c(14, 36, 14, 31, 81, 74, 14, 20, 4, 2, 35))
+    ranges <- c(9.6254, 86.1488316, 49.7700584, 8.2565)
   } else {
     ranges <- c(NA, NA, 10, 2.0, NA)
   }
