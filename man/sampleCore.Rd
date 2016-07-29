@@ -28,17 +28,19 @@ the core. The default sampling rate is 0.2.}
 
 \item{mode}{Execution mode (\code{default} or \code{fast}). In default mode,
 Core Hunter uses an advanced parallel tempering search algorithm and terminates
-when no improvement is found for 5 seconds. In fast mode, a simple stochastic
+when no improvement is found for ten seconds. In fast mode, a simple stochastic
 hill-climbing algorithm is applied and Core Hunter terminates as soon as no
-improvement is made for 1 second. Stop conditions can be overriden with
+improvement is made for two seconds. Stop conditions can be overriden with
 arguments \code{time} and \code{impr.time}.}
 
 \item{normalize}{If \code{TRUE} (default) the applied objectives in a multi-objective
 configuration (two or more objectives) are automatically normalized prior to execution.
 Normalization requires a short preliminary search per objective. If a \code{time}
-limit is set, at most 20% of the time is spent on normalization. Similarly, when limiting the
-time without finding an improvement (\code{impr.time}) during execution, a five times
-lower limit is imposed on each preliminary search for the purpose of normalization.}
+limit is set, at most 20% of the total time is spent on normalization, and the remaining
+80% of the available time is reserved for the main optimization. Similarly, when
+limiting the time without finding an improvement (\code{impr.time}) during execution,
+one fifth of that limit, divided by the number of objectives, is imposed on each
+preliminary optimizaiton run for the purpose of normalization.}
 
 \item{time}{Absolute runtime limit in seconds. Not used by default. If used
 it should be a strictly positive value and is rounded to the nearest integer.}
