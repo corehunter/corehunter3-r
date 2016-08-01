@@ -40,7 +40,7 @@ limit is set, at most 20% of the total time is spent on normalization, and the r
 80% of the available time is reserved for the main optimization. Similarly, when
 limiting the time without finding an improvement (\code{impr.time}) during execution,
 one fifth of that limit, divided by the number of objectives, is imposed on each
-preliminary optimizaiton run for the purpose of normalization.}
+preliminary optimization run for the purpose of normalization.}
 
 \item{time}{Absolute runtime limit in seconds. Not used by default. If used
 it should be a strictly positive value and is rounded to the nearest integer.}

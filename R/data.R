@@ -600,6 +600,30 @@ genotypes <- function(data, alleles, file, format = c("default", "biparental", "
 
 }
 
+#' Get Allele frequency matrix.
+#'
+#' @param data Core Hunter data containing genotypes
+#'
+#' @return allele frequency matrix
+#'
+#' @import rJava
+#' @export
+getAlleleFrequencies <- function(data){
+  if(!is(data, "chdata") && !is(data, "chgeno")){
+    stop("Data should be of class 'chdata' or 'chgeno'.")
+  }
+  if(is(data, "chdata") && !is(data, "chgeno")){
+    data <- data$geno
+  }
+  if(is.null(data)){
+    stop("No genotypes available in given data.")
+  }
+  api <- ch.api()
+  freqs <- .jevalArray(api$getAlleleFrequencies(data$java), simplify = TRUE)
+  rownames(freqs) <- data$ids
+  return(freqs)
+}
+
 #' @export
 print.chgeno <- function(x, ...){
   cat(sprintf("Genotypes for %d individuals (%d markers).", x$size, x$java$getNumberOfMarkers()))
