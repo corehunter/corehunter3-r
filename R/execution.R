@@ -2,6 +2,91 @@
 # CORE SAMPLING #
 # ------------- #
 
+#' Determine normalization ranges of all objectives in a multi-objective configuration.
+#'
+#' Executes an independent random descent search per objective (in parallel) to approximate
+#' the optimal solution for each objective from which a suitable normalization range is
+#' inferred based on the Pareto minima/maxima. For an objective that is being maximized,
+#' the upper bound is set to the value of the best solution for that objective, while
+#' the lower bound is set to the Pareto minimum, i.e. the minimum value obtained when
+#' evaluating all optimal solutions with the considered objective. For an objective that
+#' is being minimized, the roles of upper and lower bound are interchanged, and the
+#' Pareto maximum is used instead.
+#'
+#' @param data Core Hunter data (\code{chdata}) containing genotypes,
+#'   phenotypes and/or a precomputed distance matrix. Can also be an
+#'   object of class \code{chdist}, \code{chgeno} or \code{chpheno}
+#'   if only one type of data is provided.
+#' @param obj List of objectives (\code{chobj}).
+#'   If no objectives are specified Core Hunter maximizes a weighted
+#'   index including the default entry-to-nearest-entry distance
+#'   (\code{EN}) for each available data type.
+#'   For genotyes, the Modified Roger's distance (\code{MR}) is
+#'   used. For phenotypes, Gower's distance (\code{GD}) is applied.
+#' @param size Desired core subset size (numeric). If larger than one the value
+#'   is used as the absolute core size after rounding. Else it is used as the
+#'   sampling rate and multiplied with the dataset size to determine the size of
+#'   the core. The default sampling rate is 0.2.
+#' @param mode Execution mode (\code{default} or \code{fast}). In default mode,
+#'   the normalization searches terminate when no improvement is found for ten
+#'   seconds. In fast mode, searches terminated as soon as no improvement is
+#'   made for two seconds. Stop conditions can be overriden with arguments
+#'   \code{time} and \code{impr.time}.
+#' @param time Absolute runtime limit in seconds. Not used by default. If used
+#'   it should be a strictly positive value and is rounded to the nearest integer.
+#' @param impr.time Maximum time without improvement in seconds. When set to
+#'   \code{NA} a default value is set depending on the execution \code{mode}.
+#'   If set to another value it should be strictly positive and is rounded
+#'   to the nearest integer.
+#'
+#' @return Data frame with one row per objective and two columns:
+#' \describe{
+#'  \item{\code{lower}}{Lower bound of normalization range.}
+#'  \item{\code{upper}}{Upper bound of normalization range.}
+#' }
+#'
+#' @examples
+#' data <- exampleData()
+#'
+#' # TODO
+#' # ...
+#'
+#' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
+#'
+#' @import rJava
+#' @importFrom methods is
+#' @export
+getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "fast"),
+                                   time = NA, impr.time = NA){
+
+  # check mode
+  mode <- match.arg(mode)
+  # check and process stop conditions
+  time <- checkTime(time, "Time limit")
+  impr.time <- checkTime(impr.time, "Maximum time without improvement")
+
+  # check objectives or set default
+  obj <- defaultObjectives(data, obj)
+  # create arguments
+  j.args <- createArguments(data, obj, size, normalize = TRUE)
+
+  # run Core Hunter normalization
+  api <- ch.api()
+  ranges <- .jevalArray(api$getNormalizationRanges(j.args, mode, time, impr.time), simplify = TRUE)
+  obj.ids <- sapply(obj, function(o){
+    id <- o$type
+    if(!is.null(o$meas)){
+      id <- paste(id, o$meas, sep = "-")
+    }
+    return(id)
+  })
+  ranges <- data.frame(row.names = obj.ids, lower = ranges[,1], upper = ranges[,2])
+
+  # return result
+  return(ranges)
+
+}
+
 #' Sample a core collection from the given data.
 #'
 #' @param data Core Hunter data (\code{chdata}) containing genotypes,
@@ -85,52 +170,20 @@
 #'
 #' @import rJava naturalsort
 #' @importFrom methods is
-#' @importFrom utils capture.output
 #' @export
 sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), normalize = TRUE,
                        time = NA, impr.time = NA, indices = FALSE, verbose = FALSE){
 
-  # wrap and check data class
-  data <- wrapData(data)
-  if(!is(data, "chdata")){
-    stop("Argument 'data' should be of class 'chdata' (see function 'coreHunterData').")
-  }
-
-  # set and check size
-  if(!is.numeric(size)){
-    stop("Core 'size' should be numeric.")
-  }
-  n <- data$size
-  if(size > 0 && size < 1){
-    size <- size * n
-  }
-  size <- round(size)
-  if(size < 2 || size >= n){
-    stop(sprintf("Core 'size' should be >= 2 and < %d (dataset size). Got: %d.", n, size))
-  }
-
-  # chek mode and stop conditions
+  # check mode
   mode <- match.arg(mode)
-  if(!is.na(time)){
-    if(!is.numeric(time)){
-      stop("Time limit should be numeric.")
-    }
-    time <- as.integer(round(time))
-    if(time <= 0){
-      stop("Time limit should positive a number (seconds).")
-    }
-  }
-  if(!is.na(impr.time)){
-    if(!is.numeric(impr.time)){
-      stop("Maximum time without improvement should be numeric.")
-    }
-    impr.time <- as.integer(round(impr.time))
-    if(impr.time <= 0){
-      stop("Maximum time without improvement should positive a number (seconds).")
-    }
-  }
+  # check and process stop conditions
+  time <- checkTime(time, "Time limit")
+  impr.time <- checkTime(impr.time, "Maximum time without improvement")
 
   # check logicals
+  if(!is.logical(normalize)){
+    stop("Argument 'normalize' should be a logical.")
+  }
   if(!is.logical(indices)){
     stop("Argument 'indices' should be a logical.")
   }
@@ -138,54 +191,19 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), norma
     stop("Argument 'verbose' should be a logical.")
   }
 
-  api <- ch.api()
-
-  # set default objectives or check given objectives
-  j.data <- data$java
-  if(missing(obj)){
-    # set default objectives
-    obj <- api$createDefaultObjectives(j.data)
-    obj <- lapply(obj, function(o){
-      objective(
-        type = o$getObjectiveType()$getAbbreviation(),
-        measure = o$getMeasure()$getAbbreviation(),
-        weight = o$getWeight()
-      )
-    })
-  }
-  # wrap single objective in list
-  if(is(obj, 'chobj')){
-    obj <- list(obj)
-  }
-  # check objectives
-  if(!all(sapply(obj, is, 'chobj'))){
-    stop("Objectives should be of class 'chobj'.")
-  }
-  if(length(unique(obj)) != length(obj)){
-    stop("Duplicate objectives.")
-  }
-
-  # convert objectives to Java objects
-  j.obj <- ch.objectives(obj)
-
-  # create Core Hunter arguments
-  j.size <- as.integer(size)
-  j.obj.array <- .jarray(j.obj, contents.class = ch.obj()@name)
-  j.args <- api$createArguments(j.data, j.size, j.obj.array, normalize)
+  # check objectives or set default
+  obj <- defaultObjectives(data, obj)
+  # create arguments
+  j.args <- createArguments(data, obj, size, normalize)
 
   # run Core Hunter
-  if(is.na(time)){
-    time <- as.integer(-1)
-  }
-  if(is.na(impr.time)){
-    impr.time <- as.integer(-1)
-  }
+  api <- ch.api()
   sel <- api$sampleCore(j.args, mode, time, impr.time, !verbose)
   if(indices){
     sel <- toRIndices(sel)
   } else {
     # convert indices to ids
-    sel <- api$getIdsFromIndices(j.data, .jarray(sel))
+    sel <- api$getIdsFromIndices(j.args$getData(), .jarray(sel))
   }
   # sort selection
   sel <- naturalsort(sel)
@@ -209,6 +227,86 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), norma
   # set class and return
   class(core) <- c("chcore", class(core))
   return(core)
+
+}
+
+checkTime <- function(time, description){
+  if(!is.na(time)){
+    if(!is.numeric(time)){
+      stop(sprintf("%s should be numeric."), description)
+    }
+    time <- as.integer(round(time))
+    if(time <= 0){
+      stop(sprintf("%s should positive a number (seconds).", description))
+    }
+  } else {
+    time <- as.integer(-1)
+  }
+  return(time)
+}
+
+defaultObjectives <- function(data, obj){
+  # set default objectives or check given objectives
+  j.data <- data$java
+  # create CH API
+  api <- ch.api()
+  # set default objectives
+  if(missing(obj)){
+    obj <- api$createDefaultObjectives(j.data)
+    obj <- lapply(obj, function(o){
+      objective(
+        type = o$getObjectiveType()$getAbbreviation(),
+        measure = o$getMeasure()$getAbbreviation(),
+        weight = o$getWeight()
+      )
+    })
+  }
+  # wrap single objective in list
+  if(is(obj, 'chobj')){
+    obj <- list(obj)
+  }
+  # check objectives
+  if(!all(sapply(obj, is, 'chobj'))){
+    stop("Objectives should be of class 'chobj'.")
+  }
+  if(length(unique(obj)) != length(obj)){
+    stop("Duplicate objectives.")
+  }
+  return(obj)
+}
+
+createArguments <- function(data, obj, size, normalize){
+
+  # wrap and check data class
+  data <- wrapData(data)
+  if(!is(data, "chdata")){
+    stop("Argument 'data' should be of class 'chdata' (see function 'coreHunterData').")
+  }
+
+  # set and check size
+  if(!is.numeric(size)){
+    stop("Core 'size' should be numeric.")
+  }
+  n <- data$size
+  if(size > 0 && size < 1){
+    size <- size * n
+  }
+  size <- round(size)
+  if(size < 2 || size >= n){
+    stop(sprintf("Core 'size' should be >= 2 and < %d (dataset size). Got: %d.", n, size))
+  }
+
+  # convert objectives to Java objects
+  j.obj <- ch.objectives(obj)
+
+  # create Core Hunter arguments
+  api <- ch.api()
+  j.data <- data$java
+  j.size <- as.integer(size)
+  j.obj.array <- .jarray(j.obj, contents.class = ch.obj()@name)
+  j.args <- api$createArguments(j.data, j.size, j.obj.array, normalize)
+
+  return(j.args)
 
 }
 
