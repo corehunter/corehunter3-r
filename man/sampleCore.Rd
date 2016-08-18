@@ -35,12 +35,10 @@ arguments \code{time} and \code{impr.time}.}
 
 \item{normalize}{If \code{TRUE} (default) the applied objectives in a multi-objective
 configuration (two or more objectives) are automatically normalized prior to execution.
-Normalization requires a short preliminary search per objective. If a \code{time}
-limit is set, at most 20% of the total time is spent on normalization, and the remaining
-80% of the available time is reserved for the main optimization. Similarly, when
-limiting the time without finding an improvement (\code{impr.time}) during execution,
-one fifth of that limit, divided by the number of objectives, is imposed on each
-preliminary optimization run for the purpose of normalization.}
+Normalization requires an independent preliminary search per objective (executed in parallel).
+If a \code{time} limit is set, at most 50% of the total time is spent on normalization. and
+When limiting the time without finding an improvement (\code{impr.time}) during execution,
+the same limit is imposed on each preliminary normalization search.}
 
 \item{time}{Absolute runtime limit in seconds. Not used by default. If used
 it should be a strictly positive value and is rounded to the nearest integer.}
