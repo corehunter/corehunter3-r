@@ -62,7 +62,7 @@ data <- exampleData()
 # maximize entry-to-nearest-entry distance between genotypes and phenotypes (equal weight)
 objectives <- list(objective("EN", "MR"), objective("EN", "GD"))
 # get normalization ranges for default size (20\%)
-ranges <- getNormalizationRanges(data, obj = objectives)
+ranges <- getNormalizationRanges(data, obj = objectives, impr.time = 1)
 
 \dontrun{
 # set normalization ranges and sample core
