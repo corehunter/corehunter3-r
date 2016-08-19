@@ -34,7 +34,13 @@ ch.obj <- function(){
 ch.objectives <- function(objectives){
   api <- ch.api()
   j.objectives <- lapply(objectives, function(obj){
-    api$createObjective(obj$type, obj$meas, obj$weight)
+    if(is.null(obj$range)){
+      # without normalization range
+      api$createObjective(obj$type, obj$meas, obj$weight)
+    } else {
+      # with normalization range
+      api$createObjective(obj$type, obj$meas, obj$weight, obj$range[1], obj$range[2])
+    }
   })
   return(j.objectives)
 }

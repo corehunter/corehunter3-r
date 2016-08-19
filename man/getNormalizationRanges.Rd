@@ -40,7 +40,7 @@ If set to another value it should be strictly positive and is rounded
 to the nearest integer.}
 }
 \value{
-Data frame with one row per objective and two columns:
+Numeric matrix with one row per objective and two columns:
 \describe{
  \item{\code{lower}}{Lower bound of normalization range.}
  \item{\code{upper}}{Upper bound of normalization range.}
@@ -59,8 +59,16 @@ Pareto maximum is used instead.
 \examples{
 data <- exampleData()
 
-# TODO
-# ...
+# maximize entry-to-nearest-entry distance between genotypes and phenotypes (equal weight)
+objectives <- list(objective("EN", "MR"), objective("EN", "GD"))
+# get normalization ranges for default size (20\%)
+ranges <- getNormalizationRanges(data, obj = objectives)
+
+\dontrun{
+# set normalization ranges and sample core
+objectives <- lapply(1:2, function(o){setRange(objectives[[o]], ranges[o,])})
+sampleCore(data, obj = objectives)
+}
 
 }
 \seealso{

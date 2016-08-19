@@ -39,7 +39,7 @@
 #'   If set to another value it should be strictly positive and is rounded
 #'   to the nearest integer.
 #'
-#' @return Data frame with one row per objective and two columns:
+#' @return Numeric matrix with one row per objective and two columns:
 #' \describe{
 #'  \item{\code{lower}}{Lower bound of normalization range.}
 #'  \item{\code{upper}}{Upper bound of normalization range.}
@@ -48,8 +48,16 @@
 #' @examples
 #' data <- exampleData()
 #'
-#' # TODO
-#' # ...
+#' # maximize entry-to-nearest-entry distance between genotypes and phenotypes (equal weight)
+#' objectives <- list(objective("EN", "MR"), objective("EN", "GD"))
+#' # get normalization ranges for default size (20%)
+#' ranges <- getNormalizationRanges(data, obj = objectives)
+#'
+#' \dontrun{
+#' # set normalization ranges and sample core
+#' objectives <- lapply(1:2, function(o){setRange(objectives[[o]], ranges[o,])})
+#' sampleCore(data, obj = objectives)
+#' }
 #'
 #' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
 #'
@@ -80,7 +88,8 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
     }
     return(id)
   })
-  ranges <- data.frame(row.names = obj.ids, lower = ranges[,1], upper = ranges[,2])
+  rownames(ranges) <- obj.ids
+  colnames(ranges) <- c("lower", "upper")
 
   # return result
   return(ranges)
@@ -382,14 +391,28 @@ createArguments <- function(data, obj, size, normalize){
 #'   individuals, one of \code{MR} (default), \code{CE}, \code{GD} or \code{PD}
 #'   (see description). Ignored when \code{type} is \code{SH}, \code{HE} or
 #'   \code{CV}.
-#' @param weight Weight assigned to the objective, when maximizing a weighted
+#' @param weight Weight assigned to the objective when maximizing a weighted
 #'   index. Defaults to 1.0.
+#' @param range Normalization range [l,u] of the objective when maximizing a weighted
+#'   index. By default the range is not set (\code{NULL}) and will be determined
+#'   automatically prior to execution, if normalization is enabled (default).
+#'   Values are rescaled to [0,1] with the linear formula
+#'   \eqn{
+#'    v' = (v - l)/(u - l)
+#'   }.
+#'   When an explicit normalization range is set, it overrides the automatically inferred
+#'   range. Also, setting the range for all included objectives reduces the computation time
+#'   when sampling a multi-objective core collection. In case of repeated sampling from the
+#'   same dataset with the same objectives and size, it is therefore advised to determine the
+#'   normalization ranges only once using \code{\link{getNormalizationRanges}} so that
+#'   they can be reused for all executions.
 #'
 #' @return Core Hunter objective of class \code{chobj} with elements
 #' \describe{
 #'  \item{\code{type}}{Objective type.}
-#'  \item{\code{weight}}{Assigned weight.}
 #'  \item{\code{meas}}{Distance measure (if applicable).}
+#'  \item{\code{weight}}{Assigned weight.}
+#'  \item{\code{range}}{Normalization range (if specified).}
 #' }
 #'
 #' @examples
@@ -397,10 +420,15 @@ createArguments <- function(data, obj, size, normalize){
 #' objective(meas = "PD")
 #' objective("EE", "GD")
 #' objective("HE")
+#' objective("EN", "MR", range = c(0.150, 0.300))
+#' objective("AN", "MR", weight = 0.5, range = c(0.150, 0.300))
+#'
+#' @seealso \code{\link{getNormalizationRanges}}, \code{\link{setRange}}
 #'
 #' @export
 objective <- function(type = c("EN", "AN", "EE", "SH", "HE", "CV"),
-                      measure = c("MR", "CE", "GD", "PD"), weight = 1.0){
+                      measure = c("MR", "CE", "GD", "PD"),
+                      weight = 1.0, range = NULL){
   # check arguments
   type <- match.arg(type)
   measure <- match.arg(measure)
@@ -409,23 +437,62 @@ objective <- function(type = c("EN", "AN", "EE", "SH", "HE", "CV"),
   }
   # create objective
   obj <- list(
-    type = type,
-    weight = weight
+    type = type
   )
   if(type %in% c("EE", "EN", "AN")){
     obj$meas <- measure
   }
+  obj$weight <- weight
   class(obj) <- c("chobj", class(obj))
+  # set range if specified
+  if(!is.null(range)){
+    obj <- setRange(obj, range)
+  }
+
+  return(obj)
+}
+
+#' Set the normalization range of the given objective.
+#'
+#' See argument \code{range} of \code{\link{objective}} for details.
+#'
+#' @param obj Core Hunter objective of class \code{chobj}.
+#' @param range Normalization range [l,u].
+#'              See argument \code{range} of \code{\link{objective}} for details.
+#'
+#' @return Objective including normalization range.
+#'
+#' @importFrom methods is
+#' @seealso \code{\link{objective}}
+#' @export
+setRange <- function(obj, range){
+  if(!is(obj, "chobj")){
+    stop("Objective 'obj' should be of class 'chobj'.")
+  }
+  if(!is.numeric(range) || length(range) != 2){
+    stop("Normalization range should be a numeric vector of length two.")
+  }
+  if(any(is.na(range))){
+    stop("Normalization range not fully defined (contains NA). Set to NULL to omit range.")
+  }
+  if(range[1] > range[2]){
+    stop("Lower bound of normalization range exceeds upper bound.")
+  }
+  obj$range <- range
   return(obj)
 }
 
 #' @export
 print.chobj <- function(x, ...){
   prefix <- "Core Hunter objective"
+  range <- "N/A"
+  if(!is.null(x$range)){
+    range <- sprintf("[%f, %f]", x$range[1], x$range[2])
+  }
   if(!is.null(x$meas)){
-    cat(sprintf("%s: %s (measure = %s, weight = %.2f)", prefix, x$type, x$meas, x$weight))
-  } else {
-    cat(sprintf("%s: %s (weight = %.2f)", prefix, x$type, x$weight))
+    cat(sprintf("%s: %s (measure = %s, weight = %.2f, range = %s)", prefix, x$type, x$meas, x$weight, range))
+  } else {range()
+    cat(sprintf("%s: %s (weight = %.2f, range = %s)", prefix, x$type, x$weight, range))
   }
 }
 

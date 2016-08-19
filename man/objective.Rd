@@ -5,7 +5,7 @@
 \title{Create Core Hunter objective.}
 \usage{
 objective(type = c("EN", "AN", "EE", "SH", "HE", "CV"), measure = c("MR",
-  "CE", "GD", "PD"), weight = 1)
+  "CE", "GD", "PD"), weight = 1, range = NULL)
 }
 \arguments{
 \item{type}{Objective type, one of \code{EN} (default), \code{AN}, \code{EE},
@@ -19,15 +19,30 @@ individuals, one of \code{MR} (default), \code{CE}, \code{GD} or \code{PD}
 (see description). Ignored when \code{type} is \code{SH}, \code{HE} or
 \code{CV}.}
 
-\item{weight}{Weight assigned to the objective, when maximizing a weighted
+\item{weight}{Weight assigned to the objective when maximizing a weighted
 index. Defaults to 1.0.}
+
+\item{range}{Normalization range [l,u] of the objective when maximizing a weighted
+index. By default the range is not set (\code{NULL}) and will be determined
+automatically prior to execution, if normalization is enabled (default).
+Values are rescaled to [0,1] with the linear formula
+\eqn{
+ v' = (v - l)/(u - l)
+}.
+When an explicit normalization range is set, it overrides the automatically inferred
+range. Also, setting the range for all included objectives reduces the computation time
+when sampling a multi-objective core collection. In case of repeated sampling from the
+same dataset with the same objectives and size, it is therefore advised to determine the
+normalization ranges only once using \code{\link{getNormalizationRanges}} so that
+they can be reused for all executions.}
 }
 \value{
 Core Hunter objective of class \code{chobj} with elements
 \describe{
  \item{\code{type}}{Objective type.}
- \item{\code{weight}}{Assigned weight.}
  \item{\code{meas}}{Distance measure (if applicable).}
+ \item{\code{weight}}{Assigned weight.}
+ \item{\code{range}}{Normalization range (if specified).}
 }
 }
 \description{
@@ -93,6 +108,11 @@ objective()
 objective(meas = "PD")
 objective("EE", "GD")
 objective("HE")
+objective("EN", "MR", range = c(0.150, 0.300))
+objective("AN", "MR", weight = 0.5, range = c(0.150, 0.300))
 
+}
+\seealso{
+\code{\link{getNormalizationRanges}}, \code{\link{setRange}}
 }
 
