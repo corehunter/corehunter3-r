@@ -241,7 +241,7 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), norma
 checkTime <- function(time, description){
   if(!is.na(time)){
     if(!is.numeric(time)){
-      stop(sprintf("%s should be numeric."), description)
+      stop(sprintf("%s should be numeric.", description))
     }
     time <- as.integer(round(time))
     if(time <= 0){
