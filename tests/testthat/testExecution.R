@@ -133,9 +133,13 @@ test_that("elements are correct", {
 
 test_that("print", {
   o <- objective()
-  expect_output(print(o), "Core Hunter objective: EN \\(measure = MR, weight = 1.00\\)")
+  expect_output(print(o), "Core Hunter objective: EN \\(measure = MR, weight = 1.00, range = N/A\\)")
   o <- objective("SH")
-  expect_output(print(o), "Core Hunter objective: SH \\(weight = 1.00\\)")
+  expect_output(print(o), "Core Hunter objective: SH \\(weight = 1.00, range = N/A\\)")
+  o <- objective(range = c(0.150, 0.320))
+  expect_output(
+    print(o), "Core Hunter objective: EN \\(measure = MR, weight = 1.00, range = \\[0.150000, 0.320000\\]\\)"
+  )
 })
 
 

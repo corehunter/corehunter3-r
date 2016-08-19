@@ -182,7 +182,6 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #' @export
 sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), normalize = TRUE,
                        time = NA, impr.time = NA, indices = FALSE, verbose = FALSE){
-
   # check mode
   mode <- match.arg(mode)
   # check and process stop conditions
@@ -255,6 +254,8 @@ checkTime <- function(time, description){
 }
 
 defaultObjectives <- function(data, obj){
+  # wrap and check data class
+  data <- wrapData(data)
   # set default objectives or check given objectives
   j.data <- data$java
   # create CH API
@@ -288,10 +289,6 @@ createArguments <- function(data, obj, size, normalize){
 
   # wrap and check data class
   data <- wrapData(data)
-  if(!is(data, "chdata")){
-    stop("Argument 'data' should be of class 'chdata' (see function 'coreHunterData').")
-  }
-
   # set and check size
   if(!is.numeric(size)){
     stop("Core 'size' should be numeric.")

@@ -1024,6 +1024,9 @@ wrapData <- function(data){
   if(is(data, "chpheno")){
     data <- coreHunterData(phenotypes = data)
   }
+  if(!is(data, "chdata")){
+    stop("Argument 'data' should be of class 'chdata' (see function 'coreHunterData').")
+  }
   return(data)
 }
 
