@@ -4,9 +4,9 @@
 
 #' Determine normalization ranges of all objectives in a multi-objective configuration.
 #'
-#' Executes an independent random descent search per objective (in parallel) to approximate
-#' the optimal solution for each objective from which a suitable normalization range is
-#' inferred based on the Pareto minima/maxima. For an objective that is being maximized,
+#' Executes an independent stochastic hill-climbing search per objective (in parallel) to
+#' approximate the optimal solution for each objective from which a suitable normalization
+#' range is inferred based on the Pareto minima/maxima. For an objective that is being maximized,
 #' the upper bound is set to the value of the best solution for that objective, while
 #' the lower bound is set to the Pareto minimum, i.e. the minimum value obtained when
 #' evaluating all optimal solutions with the considered objective. For an objective that
@@ -120,11 +120,15 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #'   arguments \code{time} and \code{impr.time}.
 #' @param normalize If \code{TRUE} (default) the applied objectives in a multi-objective
 #'   configuration (two or more objectives) are automatically normalized prior to execution.
-#'   Normalization requires an independent preliminary search per objective (executed in parallel).
-#'   If a \code{time} limit or maximum time without finding an improvement (\code{impr.time}) have
-#'   been set, the same limits are applied to each normalization search as well as the main
-#'   multi-objective search. In case of a limited number of objectives the total execution
-#'   time should usually not exceed twice the imposed search time limit, if any.
+#'   Normalization requires an independent preliminary search per objective (simple stochastic
+#'   hill-climber, executed in parallel). If a \code{time} limit or maximum time without
+#'   finding an improvement (\code{impr.time}) have been set, the same limits are applied
+#'   to each normalization search as well as the main multi-objective search. In case of a
+#'   limited number of objectives the total execution time should usually not exceed twice
+#'   the imposed search time limit, if any. Normalization ranges can also be precomputed
+#'   (see \code{\link{getNormalizationRanges}}) or manually specified in the objectives
+#'   to save computation time when sampling core collections. This is especially useful
+#'   when multiple cores are sampled for the same objectives, with possibly varying weights.
 #' @param time Absolute runtime limit in seconds. Not used by default. If used
 #'   it should be a strictly positive value and is rounded to the nearest integer.
 #' @param impr.time Maximum time without improvement in seconds. When set to
@@ -175,7 +179,7 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #' sampleCore(data, obj, verbose = TRUE)
 #' }
 #'
-#' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
+#' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}, \code{\link{getNormalizationRanges}}
 #'
 #' @import rJava naturalsort
 #' @importFrom methods is

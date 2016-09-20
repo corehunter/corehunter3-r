@@ -35,11 +35,12 @@ arguments \code{time} and \code{impr.time}.}
 
 \item{normalize}{If \code{TRUE} (default) the applied objectives in a multi-objective
 configuration (two or more objectives) are automatically normalized prior to execution.
-Normalization requires an independent preliminary search per objective (executed in parallel).
-If a \code{time} limit or maximum time without finding an improvement (\code{impr.time}) have
-been set, the same limits are applied to each normalization search as well as the main
-multi-objective search. In case of a limited number of objectives the total execution
-time should usually not exceed twice the imposed search time limit, if any.}
+Normalization requires an independent preliminary search per objective (simple stochastic
+hill-climber, executed in parallel). If a \code{time} limit or maximum time without
+finding an improvement (\code{impr.time}) have been set, the same limits are applied
+to each normalization search as well as the main multi-objective search. In case of a
+limited number of objectives the total execution time should usually not exceed twice
+the imposed search time limit, if any.}
 
 \item{time}{Absolute runtime limit in seconds. Not used by default. If used
 it should be a strictly positive value and is rounded to the nearest integer.}
@@ -100,6 +101,6 @@ sampleCore(data, obj, verbose = TRUE)
 
 }
 \seealso{
-\code{\link{coreHunterData}}, \code{\link{objective}}
+\code{\link{coreHunterData}}, \code{\link{objective}}, \code{\link{getNormalizationRanges}}
 }
 

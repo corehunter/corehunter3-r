@@ -47,9 +47,9 @@ Numeric matrix with one row per objective and two columns:
 }
 }
 \description{
-Executes an independent random descent search per objective (in parallel) to approximate
-the optimal solution for each objective from which a suitable normalization range is
-inferred based on the Pareto minima/maxima. For an objective that is being maximized,
+Executes an independent stochastic hill-climbing search per objective (in parallel) to
+approximate the optimal solution for each objective from which a suitable normalization
+range is inferred based on the Pareto minima/maxima. For an objective that is being maximized,
 the upper bound is set to the value of the best solution for that objective, while
 the lower bound is set to the Pareto minimum, i.e. the minimum value obtained when
 evaluating all optimal solutions with the considered objective. For an objective that
