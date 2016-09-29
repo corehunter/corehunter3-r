@@ -12,7 +12,6 @@
 #' Data was taken from the CIMMYT Research Data Repository (Study Global ID
 #' hdl:11529/10199; real data set 5, cycle 0).
 #'
-#' @encoding UTF-8
 #' @source Cerón-Rojas, J. Jesús ; Crossa, José; Arief, Vivi N.; Kaye Basford;
 #'         Rutkoski, Jessica; Jarquín, Diego ; Alvarado, Gregorio; Beyene, Yoseph;
 #'         Semagn, Kassa ; DeLacy, Ian, 2015-06-04, "Application of a Genomics
@@ -64,7 +63,7 @@ exampleData <- function(){
 #' pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
 #' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
 #'
-#' chData <- coreHunterData(
+#' my.data <- coreHunterData(
 #'   genotypes(file = geno.file),
 #'   phenotypes(file = pheno.file),
 #'   distances(file = dist.file)

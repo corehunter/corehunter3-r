@@ -99,8 +99,9 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #' Sample a core collection from the given data.
 #'
 #' @param data Core Hunter data (\code{chdata}) containing genotypes,
-#'   phenotypes and/or a precomputed distance matrix. Can also be an
-#'   object of class \code{chdist}, \code{chgeno} or \code{chpheno}
+#'   phenotypes and/or a precomputed distance matrix. Typically the
+#'   data is obtained with \code{\link{coreHunterData}}. Can also be
+#'   an object of class \code{chdist}, \code{chgeno} or \code{chpheno}
 #'   if only one type of data is provided.
 #' @param obj Objective or list of objectives (\code{chobj}).
 #'   If no objectives are specified Core Hunter maximizes a weighted

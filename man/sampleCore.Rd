@@ -10,8 +10,9 @@ sampleCore(data, obj, size = 0.2, mode = c("default", "fast"),
 }
 \arguments{
 \item{data}{Core Hunter data (\code{chdata}) containing genotypes,
-phenotypes and/or a precomputed distance matrix. Can also be an
-object of class \code{chdist}, \code{chgeno} or \code{chpheno}
+phenotypes and/or a precomputed distance matrix. Typically the
+data is obtained with \code{\link{coreHunterData}}. Can also be
+an object of class \code{chdist}, \code{chgeno} or \code{chpheno}
 if only one type of data is provided.}
 
 \item{obj}{Objective or list of objectives (\code{chobj}).
@@ -40,7 +41,10 @@ hill-climber, executed in parallel). If a \code{time} limit or maximum time with
 finding an improvement (\code{impr.time}) have been set, the same limits are applied
 to each normalization search as well as the main multi-objective search. In case of a
 limited number of objectives the total execution time should usually not exceed twice
-the imposed search time limit, if any.}
+the imposed search time limit, if any. Normalization ranges can also be precomputed
+(see \code{\link{getNormalizationRanges}}) or manually specified in the objectives
+to save computation time when sampling core collections. This is especially useful
+when multiple cores are sampled for the same objectives, with possibly varying weights.}
 
 \item{time}{Absolute runtime limit in seconds. Not used by default. If used
 it should be a strictly positive value and is rounded to the nearest integer.}

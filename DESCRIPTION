@@ -1,21 +1,22 @@
 Package: corehunter
 Title: Fast and Flexible Core Subset Selection
-Version: 0.0.0.9000
-Date: 2016-06-06
+Version: 3.0.0
+Date: 2016-09-29
 Authors@R: c(person("Herman", "De Beukelaer", email = "herman.debeukelaer@gmail.com", role = c("aut", "cre")),
              person("Guy", "Davenport", email = "daveneti@gmail.com", role = "aut"),
              person("Veerle", "Fack", email = "veerle.fack@ugent.be", role = "ths"))
 Description: Interface to the Core Hunter software for core subset selection.
     Cores can be constructed based on genetic marker data, phenotypic traits,
-    a precomputed distance matrix or any combination of these. Various measures
+    a precomputed distance matrix, or any combination of these. Various measures
     are included such as Modified Rogers' distance and Shannon's diversity index
     (for genotypes) and Gower's distance (for phenotypes). Core Hunter can also
-    optimize a weighted combination of several measures, to meet both the breeder's
-    and geneticist's expectations.
-Depends: R (>= 3.2.3), rJava (>= 0.9-8)
-Imports: naturalsort (>= 0.1.2), methods
-SystemRequirements: Java JDK 1.8 or higher
+    optimize a weighted combination of multiple measures, to bring the different
+    perspectives closer together.
+Depends: R (>= 3.2.4), rJava (>= 0.9-8)
+Imports: naturalsort (>= 0.1.3), methods
+SystemRequirements: Java JRE 8 or higher
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
 Suggests: testthat, StatMatch
+Encoding: UTF-8
