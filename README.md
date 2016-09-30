@@ -44,7 +44,7 @@ Sampling a core collection is then as easy as
 > sampleCore(my.genotypes)
 ```
 
-There are numerous options when sampling a core. For example, you can change the size of the core (defaults to 20%), optimize a specific measure (defaults to average entry-to-nearest-entry distance) or maximize a weighted index including multiple measures, change stop conditions of the algorithm (by default, the algorithm stops when it was unable to further improve the core during the last 10 seconds), etc. All functions have detailed documentation, for example try
+There are numerous options when sampling a core. For example, you can change the size of the core (defaults to 20%), optimize a specific measure (defaults to average entry-to-nearest-entry distance), maximize a weighted index including multiple measures, change stop conditions of the algorithm (by default, the algorithm stops when it was unable to further improve the core during the last 10 seconds), etc. All functions have detailed documentation, for example try
 
 ```R
 > ?sampleCore
