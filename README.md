@@ -1,4 +1,4 @@
-# Core Hunter 3 R package
+# R Package for Core Hunter 3
 
 ### Latest release
 
@@ -32,19 +32,19 @@ Afterwards, load the package
 > library(corehunter)
 ```
 
-and your data, e.g.
+and add your data, e.g.
 
 ```R
 > my.genotypes <- genotypes(file = "path/to/file")
 ```
 
-and sample a core collection with
+Sampling a core collection is then as easy as
 
 ```R
 > sampleCore(my.genotypes)
 ```
 
-There are numerous options when sampling a core. For example, you can change the size of the core (20% by default), optimize a specific measure (average entry-to-nearest-entry distance by default) or maximize a weighted index including multiple measures, change stop conditions of the algorithm, etc. All functions have detailed documentation, for example try
+There are numerous options when sampling a core. For example, you can change the size of the core (defaults to 20%), optimize a specific measure (defaults to average entry-to-nearest-entry distance) or maximize a weighted index including multiple measures, change stop conditions of the algorithm (by default, the algorithm stops when it was unable to further improve the core during the last 10 seconds), etc. All functions have detailed documentation, for example try
 
 ```R
 > ?sampleCore
@@ -59,7 +59,7 @@ There are numerous options when sampling a core. For example, you can change the
 Supported data types
 --------------------
 
-Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. See http://www.corehunter.org for more details.
+Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. See http://www.corehunter.org for more details. Data can be loaded from files, data frames and matrices.
 
 Evaluation measures
 -------------------
