@@ -20,6 +20,18 @@ There was 1 NOTE because this is the first submission of the package:
 	File 'LICENSE':
 	  YEAR: 2016
 	  COPYRIGHT: Herman De Beukelaer, Guy Davenport
+	  
+Only on win-builder the same note also says
+
+ * Possibly mis-spelled words in DESCRIPTION:
+	  Gower's (12:25)
+	  Shannon's (11:56)
+	  genotypes (12:10)
+	  phenotypes (12:47)
+	  phenotypic (9:60)
+	  precomputed (10:7)
+
+Each of these words is however correctly spelled.
 
 ## Downstream dependencies
 
