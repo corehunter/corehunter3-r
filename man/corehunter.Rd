@@ -9,6 +9,7 @@
 A fast and flexible core subset selection tool.
 }
 \examples{
+\dontrun{
 # sample core based on genetic marker data
 geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 geno <- genotypes(file = geno.file)
@@ -27,9 +28,16 @@ sampleCore(dist)
 # sample core from genotypes with custom objective (allelic richness)
 sampleCore(geno, obj = objective("HE"))
 
+# sample core from genotypes with custom size and objective (representativeness)
+sampleCore(geno, obj = objective("AN", "MR"), size = 0.1)
+
+# sample core from genotypes with custom size and stop condition
+sampleCore(geno, size = 0.1, impr.time = 2)
+
 # sample core based on both genotypes and phenotypes
 geno.pheno <- coreHunterData(geno, pheno)
 sampleCore(geno.pheno)
+}
 
 }
 \seealso{
