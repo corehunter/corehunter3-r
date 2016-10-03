@@ -57,14 +57,14 @@ is being minimized, the roles of upper and lower bound are interchanged, and the
 Pareto maximum is used instead.
 }
 \examples{
+\donttest{
 data <- exampleData()
 
 # maximize entry-to-nearest-entry distance between genotypes and phenotypes (equal weight)
 objectives <- list(objective("EN", "MR"), objective("EN", "GD"))
 # get normalization ranges for default size (20\%)
-ranges <- getNormalizationRanges(data, obj = objectives, impr.time = 1)
+ranges <- getNormalizationRanges(data, obj = objectives, mode = "fast")
 
-\dontrun{
 # set normalization ranges and sample core
 objectives <- lapply(1:2, function(o){setRange(objectives[[o]], ranges[o,])})
 sampleCore(data, obj = objectives)

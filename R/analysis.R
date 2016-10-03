@@ -16,13 +16,15 @@
 #' @return Value of the core when evaluated with the chosen objective (numeric).
 #'
 #' @examples
+#' \donttest{
 #' data <- exampleData()
-#' core <- sampleCore(data, mode = "f", objective("EN", "PD"))
+#' core <- sampleCore(data, objective("EN", "PD"))
 #' evaluateCore(core, data, objective("EN", "PD"))
 #' evaluateCore(core, data, objective("AN", "MR"))
 #' evaluateCore(core, data, objective("EE", "GD"))
 #' evaluateCore(core, data, objective("CV"))
 #' evaluateCore(core, data, objective("HE"))
+#' }
 #'
 #' @seealso \code{\link{coreHunterData}}, \code{\link{objective}}
 #'

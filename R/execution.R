@@ -46,14 +46,14 @@
 #' }
 #'
 #' @examples
+#' \donttest{
 #' data <- exampleData()
 #'
 #' # maximize entry-to-nearest-entry distance between genotypes and phenotypes (equal weight)
 #' objectives <- list(objective("EN", "MR"), objective("EN", "GD"))
 #' # get normalization ranges for default size (20%)
-#' ranges <- getNormalizationRanges(data, obj = objectives, impr.time = 1)
+#' ranges <- getNormalizationRanges(data, obj = objectives, mode = "fast")
 #'
-#' \dontrun{
 #' # set normalization ranges and sample core
 #' objectives <- lapply(1:2, function(o){setRange(objectives[[o]], ranges[o,])})
 #' sampleCore(data, obj = objectives)
@@ -148,13 +148,15 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #'  of each objective function that was included in the optimization.
 #'
 #' @examples
+#' \donttest{
 #' data <- exampleData()
 #'
-#' # default size, fast mode, maximize entry-to-nearest-entry Modified Rogers distance
+#' # default size, maximize entry-to-nearest-entry Modified Rogers distance
 #' obj <- objective("EN", "MR")
-#' sampleCore(data, mode = "f", obj)
+#' sampleCore(data, obj)
 #'
-#' \dontrun{
+#' # fast mode
+#' sampleCore(data, obj, mode = "f")
 #' # absolute size
 #' sampleCore(data, obj, size = 25)
 #' # relative size

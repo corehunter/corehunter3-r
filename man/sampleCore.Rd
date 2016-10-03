@@ -71,13 +71,15 @@ Core subset (\code{chcore}). It has an element \code{sel}
 Sample a core collection from the given data.
 }
 \examples{
+\donttest{
 data <- exampleData()
 
-# default size, fast mode, maximize entry-to-nearest-entry Modified Rogers distance
+# default size, maximize entry-to-nearest-entry Modified Rogers distance
 obj <- objective("EN", "MR")
-sampleCore(data, mode = "f", obj)
+sampleCore(data, obj)
 
-\dontrun{
+# fast mode
+sampleCore(data, obj, mode = "f")
 # absolute size
 sampleCore(data, obj, size = 25)
 # relative size
