@@ -2,6 +2,7 @@
 
 ### Latest release
 
+[![CRAN version](http://www.r-pkg.org/badges/version/corehunter)](https://CRAN.R-project.org/package=corehunter)
 [![Coverage Status](http://img.shields.io/coveralls/corehunter/corehunter3-r/master.svg)](https://coveralls.io/r/corehunter/corehunter3-r)
 [![Build Status](https://img.shields.io/travis/corehunter/corehunter3-r/master.svg)](https://travis-ci.org/corehunter/corehunter3-r)
 
