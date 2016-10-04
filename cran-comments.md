@@ -1,3 +1,9 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+ - Made the contents of the  'Description' field in the DESCRIPTION file more comprehensive.
+
 ## Test environments
 
 * local OS X install, R 3.2.4
