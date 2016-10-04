@@ -13,7 +13,7 @@ Description: Core Hunter is a tool to sample diverse, representative subsets fro
     representativeness, or allelic richness). In addition, multiple measures can be simultaneously
     optimized as part of a weighted index to bring the different perspectives closer together.
     The Core Hunter library is implemented in Java 8 as an open source project (see
-    http://www.corehunter.org).
+    <http://www.corehunter.org>).
 Depends: R (>= 3.2.3), rJava (>= 0.9-8)
 Imports: naturalsort (>= 0.1.2), methods
 SystemRequirements: Java JRE 8 or higher

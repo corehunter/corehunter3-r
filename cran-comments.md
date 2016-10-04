@@ -4,6 +4,7 @@ This is a resubmission. In this version I have:
 
  - Made the contents of the  'Description' field in the DESCRIPTION file more comprehensive.
  - Modified the `.onLoad` function to check the available Java version (should be >= 8). The 'SystemRequirements' field in DESCRIPTION and the README also state that Java JRE 8 or higher is required.
+ - Replaced 'http://www.corehunter.org' with '<http://www.corehunter.org>' in 'Desription' field for auto-linking.
 
 ## Test environments
 
