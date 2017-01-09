@@ -4,7 +4,8 @@ Core Hunter 3
 Version 3.0.1.9000 (dev)
 ------------------------
 
- - ...
+ - Fixed issues when reading files with (single) quoted ids, names, or string encoded data (INCOMPLETE).
+ - Improved test coverage.
 
 Version 3.0.1 (04/10/2016)
 --------------------------

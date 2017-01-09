@@ -990,14 +990,15 @@ print.chpheno <- function(x, ...){
 #'
 #' @importFrom utils read.delim
 #' @export
-read.autodelim <- function(file, row.names = 1, check.names = FALSE, stringsAsFactors = FALSE, strip.white = TRUE, ...){
+read.autodelim <- function(file, row.names = 1, check.names = FALSE, stringsAsFactors = FALSE,
+                           strip.white = TRUE, quote = "'\"", ...){
   sep <- switch(tolower(tools::file_ext(file)),
                 "csv" = ",",
                 "txt" = "\t")
   read.delim(file, sep = sep,
              row.names = row.names, check.names = check.names,
              stringsAsFactors = stringsAsFactors, strip.white = strip.white,
-             ...)
+             quote = quote, ...)
 }
 
 # ----------------- #
