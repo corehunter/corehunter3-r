@@ -495,7 +495,7 @@ print.chobj <- function(x, ...){
   }
   if(!is.null(x$meas)){
     cat(sprintf("%s: %s (measure = %s, weight = %.2f, range = %s)", prefix, x$type, x$meas, x$weight, range))
-  } else {range()
+  } else {
     cat(sprintf("%s: %s (weight = %.2f, range = %s)", prefix, x$type, x$weight, range))
   }
 }

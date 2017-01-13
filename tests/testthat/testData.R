@@ -36,7 +36,7 @@ test_that("read distance data from file", {
   expect_equal(colnames(dist$data), dist$ids)
   expect_equal(dist$names, getNames())
   # small dataset
-  dist <- distanceData(dataset = "small")
+  dist <- distanceData(size = "small")
   expected <- matrix(c(
     0.0, 0.2, 0.4, 0.6, 0.8,
     0.2, 0.0, 0.2, 0.4, 0.6,
@@ -44,11 +44,11 @@ test_that("read distance data from file", {
     0.6, 0.4, 0.1, 0.0, 0.2,
     0.8, 0.6, 0.4, 0.2, 0.0
   ), nrow = 5, ncol = 5)
-  rownames(expected) <- colnames(expected) <- getIds(dataset = "small")
+  rownames(expected) <- colnames(expected) <- getIds(size = "small")
   expect_equal(dist$data, expected)
   expect_equal(dist$size, 5)
-  expect_equal(dist$ids, getIds(dataset = "small"))
-  expect_equal(dist$names, getNames(dataset = "small"))
+  expect_equal(dist$ids, getIds(size = "small"))
+  expect_equal(dist$names, getNames(size = "small"))
 })
 
 test_that("create distance data from matrix", {
@@ -79,29 +79,29 @@ test_that("create distance data from matrix", {
     0.6, 0.4, 0.1, 0.0, 0.2,
     0.8, 0.6, 0.4, 0.2, 0.0
   ), nrow = 5, ncol = 5)
-  rownames(matrix) <- colnames(matrix) <- getIds(dataset = "small")
+  rownames(matrix) <- colnames(matrix) <- getIds(size = "small")
   # as numeric matrix (no explicit names)
   dist <- distances(matrix)
   expect_true(is.null(dist$file))
   expect_equal(dist$size, 5)
   expect_equal(dist$data, matrix)
-  expect_equal(dist$ids, getIds(dataset = "small"))
-  expect_equal(dist$names, getIds(dataset = "small"))
+  expect_equal(dist$ids, getIds(size = "small"))
+  expect_equal(dist$names, getIds(size = "small"))
   # as data frame (no explicit names)
   dist <- distances(as.data.frame(matrix))
   expect_true(is.null(dist$file))
   expect_equal(dist$size, 5)
   expect_equal(dist$data, matrix)
-  expect_equal(dist$ids, getIds(dataset = "small"))
-  expect_equal(dist$names, getIds(dataset = "small"))
+  expect_equal(dist$ids, getIds(size = "small"))
+  expect_equal(dist$names, getIds(size = "small"))
   # as data frame (with names)
   data <- cbind(NAME = c(NA, NA, "Bob", "Bob", NA), as.data.frame(matrix))
   dist <- distances(data)
   expect_true(is.null(dist$file))
   expect_equal(dist$size, 5)
   expect_equal(dist$data, matrix)
-  expect_equal(dist$ids, getIds(dataset = "small"))
-  expect_equal(dist$names, getNames(dataset = "small"))
+  expect_equal(dist$ids, getIds(size = "small"))
+  expect_equal(dist$names, getNames(size = "small"))
 
 })
 
@@ -180,12 +180,12 @@ test_that("read genotype data from file", {
     }
   }
   # 2: small dataset (default format)
-  geno <- genotypeData(dataset = "small", format = "default")
+  geno <- genotypeData(size = "small", format = "default")
   expect_equal(geno$size, 5)
-  expect_equal(geno$ids, getIds(dataset = "small"))
+  expect_equal(geno$ids, getIds(size = "small"))
   expect_equal(rownames(geno$data), geno$ids)
-  expect_equal(geno$names, getNames(dataset = "small"))
-  expect_equal(geno$markers, getMarkerNames(dataset = "small"))
+  expect_equal(geno$names, getNames(size = "small"))
+  expect_equal(geno$markers, getMarkerNames(size = "small"))
   expect_equal(names(geno$alleles), geno$markers)
   expect_equal(length(geno$alleles), 4)
   expect_equal(geno$alleles[[1]], c("1", "2", "3"))
@@ -193,11 +193,30 @@ test_that("read genotype data from file", {
   expect_equal(geno$alleles[[3]], c("a1", "a2"))
   expect_equal(geno$alleles[[4]], c("+", "-"))
   # 3: small dataset (biparental format)
-  # TODO
-  # ...
+  geno <- genotypeData(size = "small", format = "biparental")
+  expect_equal(geno$size, 5)
+  expect_equal(geno$ids, getIds(size = "small"))
+  expect_equal(rownames(geno$data), geno$ids)
+  expect_equal(geno$names, getNames(size = "small"))
+  expect_equal(geno$markers, getMarkerNames(size = "small"))
+  expect_equal(names(geno$alleles), geno$markers)
+  expect_equal(length(geno$alleles), 4)
+  for(m in 1:4){
+    expect_equal(geno$alleles[[m]], c("0", "1"))
+  }
   # 4: small dataset (frequency format)
-  # TODO
-  # ...
+  geno <- genotypeData(size = "small", format = "frequency")
+  expect_equal(geno$size, 5)
+  expect_equal(geno$ids, getIds(size = "small"))
+  expect_equal(rownames(geno$data), geno$ids)
+  expect_equal(geno$names, getNames(size = "small"))
+  expect_equal(geno$markers, getMarkerNames(size = "small"))
+  expect_equal(names(geno$alleles), geno$markers)
+  expect_equal(length(geno$alleles), 4)
+  expect_equal(geno$alleles[[1]], c("mk1-1", "mk1-2", "mk1-3"))
+  expect_equal(geno$alleles[[2]], c("mk2-1", "mk2-2"))
+  expect_equal(geno$alleles[[3]], c(NA, "mk3-2", NA))
+  expect_equal(geno$alleles[[4]], c("mk4-1", "mk4-2", "mk4-3", "mk4-4"))
 })
 
 test_that("create default genotype data from data frame", {
@@ -417,15 +436,14 @@ test_that("read phenotype data from file", {
   gd <- gd[lower.tri(gd)]
   expect_equal(mean(gd), evaluateCore(no.missing.data, pheno, objective("EE", "GD")))
   # 2: small dataset
-  pheno <- phenotypeData(dataset = "small")
+  pheno <- phenotypeData(size = "small")
   expect_equal(pheno$size, 5)
-  # TODO: the three lines below fail due to an issue in the Core Hunter
+  # TODO: some tests below fail due to an issue in the Core Hunter
   #       (ids and names are not unquoted when reading phenotypes from a file)
-  expect_equal(pheno$ids, getIds(dataset = "small"))
+  expect_equal(pheno$ids, getIds(size = "small"))
   expect_equal(rownames(pheno$data), pheno$ids)
-  expect_equal(pheno$names, getNames(dataset = "small"))
-  expect_equal(pheno$ranges, getRanges(dataset = "small"))
-  # TODO: compare values read by R with those in Java
+  expect_equal(pheno$names, getNames(size = "small"))
+  expect_equal(pheno$ranges, getRanges(size = "small"))
   for(r in 1:pheno$size){
     # extract row from Java object
     row <- pheno$java$getRow(as.integer(r-1))
@@ -436,8 +454,6 @@ test_that("read phenotype data from file", {
       expect_equal(as.character(Java.value), as.character(R.value))
     }
   }
-  # TODO: check below fails due to unquoting issue in Core Hunter for phenotype data
-  #       (all values for string encoded variables should be unquoted)
   # check average Gower distance (no missing data in small dataset)
   gd <- StatMatch::gower.dist(pheno$data, rngs = pheno$ranges)
   gd <- gd[lower.tri(gd)]
