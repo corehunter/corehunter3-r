@@ -145,7 +145,7 @@ print.chdata <- function(x, ...){
   if(length(available) > 1){
     available <- paste(paste(available[1:(length(available)-1)], collapse = ", "), tail(available, n = 1), sep = " & ")
   }
-  cat(sprintf("Core Hunter data containing %s for %d individuals.", available, x$size))
+  cat(sprintf("Core Hunter data containing %s for %d individuals.\n", available, x$size))
 }
 
 # -------------------- #
@@ -286,7 +286,7 @@ distances <- function(data, file){
 
 #' @export
 print.chdist <- function(x, ...){
-  cat(sprintf("Precomputed distance matrix for %d individuals.", x$size))
+  cat(sprintf("Precomputed distance matrix for %d individuals.\n", x$size))
 }
 
 # ------------- #
@@ -625,7 +625,7 @@ getAlleleFrequencies <- function(data){
 
 #' @export
 print.chgeno <- function(x, ...){
-  cat(sprintf("Genotypes for %d individuals (%d markers).", x$size, x$java$getNumberOfMarkers()))
+  cat(sprintf("Genotypes for %d individuals (%d markers).\n", x$size, x$java$getNumberOfMarkers()))
 }
 
 # -------------- #
@@ -969,7 +969,7 @@ convert.column <- function(col, type){
 
 #' @export
 print.chpheno <- function(x, ...){
-  cat(sprintf("Phenotypes for %d individuals (%d traits).", x$size , x$java$getFeatures()$size()))
+  cat(sprintf("Phenotypes for %d individuals (%d traits).\n", x$size , x$java$getFeatures()$size()))
 }
 
 # --- #
