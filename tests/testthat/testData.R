@@ -151,6 +151,25 @@ test_that("class", {
   expect_is(genotypeData()$data, "data.frame")
 })
 
+test_that("warned when reading frequency or biparental data as default", {
+  expect_warning(genotypes(
+    file = genotypeFile(format = "biparental"),
+    format = "default"
+  ), "'biparental' format, not 'default'")
+  expect_warning(genotypes(
+    file = genotypeFile(format = "biparental", size = "small"),
+    format = "default"
+  ), "'biparental' format, not 'default'")
+  expect_warning(genotypes(
+    file = genotypeFile(format = "frequency"),
+    format = "default"
+  ), "'frequency' format, not 'default'")
+  expect_warning(genotypes(
+    file = genotypeFile(format = "frequency", size = "small"),
+    format = "default"
+  ), "'frequency' format, not 'default'")
+})
+
 test_that("read genotype data from file", {
   # 1: default dataset
   for(format in c("default", "biparental", "frequency")){

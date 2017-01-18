@@ -610,6 +610,27 @@ genotypes <- function(data, alleles, file, format){
   geno$format <- format
   class(geno) <- c("chgeno", "chdata", class(geno))
 
+  # some checks to detect likely misspecified default format
+  if(format == "default"){
+    if(length(setdiff(unique(unlist(alleles)), c(0,1,2))) == 0){
+      warning("Genotypes seem to be in 'biparental' format, not 'default'. Please check.")
+    } else {
+      # function to check whether all allele names are in fact frequencies (suspicious!)
+      alleles.are.frequencies <- function(a){
+        a <- suppressWarnings(as.numeric(unlist(a)))
+        if(any(is.na(a))){
+          # not all allele names could be converted to numeric
+          return(FALSE)
+        }
+        # all allele names successfully converted to numeric: check range
+        return(all(a >= 0.0 & a <= 1.0))
+      }
+      if(ids[1] == "ALLELE" || alleles.are.frequencies(alleles)){
+        warning("Genotypes seem to be in 'frequency' format, not 'default'. Please check.")
+      }
+    }
+  }
+
   return(geno)
 
 }
