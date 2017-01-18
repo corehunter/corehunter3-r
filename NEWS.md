@@ -4,7 +4,7 @@ Core Hunter 3
 Version 3.0.1.9000 (dev)
 ------------------------
 
- - It is now required to explicitly specify the format when reading genotype data (no default). Moreover, some checks have been built in that warn the user when the wrong format may have been selected, based on an inspection of the data that was read.
+ - It is now required to explicitly specify the format when reading genotype data (no default). Moreover, a warning is raised when it seems that the wrong format may have been selected, based on an inspection of the data that was read.
  - Fixed issues when reading files with single or double quoted values.
  - Improved test coverage.
 
