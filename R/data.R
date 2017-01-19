@@ -133,21 +133,17 @@ coreHunterData <- function(genotypes, phenotypes, distances){
 
 #' @export
 print.chdata <- function(x, ...){
-  data <- x$java
-  available <- c()
-  if(data$hasGenotypes()){
-    available <- c(available, "genotypes")
+  cat("Core Hunter data\n")
+  cat("----------------\n\n")
+
+  cat("Number of accessions =", x$size, "\n")
+
+  for(data.type in c("geno", "pheno", "dist")){
+    if(!is.null(x[[data.type]])){
+      cat("\n")
+      print(x[[data.type]], include.size = FALSE)
+    }
   }
-  if(data$hasPhenotypes()){
-    available <- c(available, "phenotypes")
-  }
-  if(data$hasDistances()){
-    available <- c(available, "precomputed distances")
-  }
-  if(length(available) > 1){
-    available <- paste(paste(available[1:(length(available)-1)], collapse = ", "), tail(available, n = 1), sep = " & ")
-  }
-  cat(sprintf("Core Hunter data containing %s for %d individuals.\n", available, x$size))
 }
 
 # -------------------- #
@@ -287,8 +283,15 @@ distances <- function(data, file){
 }
 
 #' @export
-print.chdist <- function(x, ...){
-  cat(sprintf("Precomputed distance matrix for %d individuals.\n", x$size))
+print.chdist <- function(x, include.size = TRUE, ...){
+  n <- x$size
+  cat("# Precomputed distance matrix\n")
+  if(include.size){
+    cat(sprintf("\nNumber of accessions = %d\n", n))
+  }
+  if(!is.null(x$file)){
+    cat(sprintf("\nRead from file: \"%s\"\n", x$file))
+  }
 }
 
 # ------------- #
@@ -350,15 +353,21 @@ print.chdist <- function(x, ...){
 #'  \item{\code{ids}}{Unique item identifiers (\code{character}).}
 #'  \item{\code{names}}{Item names (\code{character}). Names of individuals to which no explicit name
 #'    has been assigned are equal to the unique \code{ids}.}
-#'  \item{\code{markers}}{Marker names (\code{character}, if specified).
+#'  \item{\code{markers}}{Marker names (\code{character}).
+#'    May contain \code{NA} values in case only some or no marker names were specified.
 #'    Marker names are always included for the \code{default} and \code{frequency} format
-#'    but optional for the \code{biparental} format.}
-#'  \item{\code{alleles}}{List of character vectors with allele names per marker
-#'    (inferred from the data/file, or manually specified when creating \code{frequency}
-#'    data from a matrix or data frame through the optional \code{alleles} argument).}
+#'    but are optional for the \code{biparental} format.}
+#'  \item{\code{alleles}}{List of character vectors with allele names per marker.
+#'    Vectors may contain \code{NA} values in case only some or no allele names were
+#'    specified. For \code{biparental} data the two alleles are name \code{"0"} and
+#'    \code{"1"}, respectively, for all markers. For the \code{default} format allele
+#'    names are inferred from the provided data. Finally, for \code{frequency} data
+#'    allele names are optional and may be specified either in the file or through
+#'    the \code{alleles} argument when creating this type of data from a matrix or
+#'    data frame.}
 #'  \item{\code{java}}{Java version of the data object.}
-#'  \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 #'  \item{\code{format}}{Genotype data format used.}
+#'  \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 #' }
 #'
 #' @examples
@@ -588,26 +597,24 @@ genotypes <- function(data, alleles, file, format){
   names <- api$getNames(j.data)
   markers <- api$getMarkerNames(j.data)
   alleles <- lapply(.jevalArray(api$getAlleles(j.data)), .jevalArray)
+  if(!all(is.na(markers))){
+    names(alleles) <- markers
+  }
 
   # create R object
   geno <- list(
     data = data,
     size = j.data$getSize(),
     ids = ids,
-    names = names
+    names = names,
+    markers = markers,
+    alleles = alleles,
+    java = j.data,
+    format = format
   )
-  if(!all(is.na(markers))){
-    geno$markers <- markers
-    names(alleles) <- markers
-  }
-  if(!all(is.na(unlist(alleles)))){
-    geno$alleles <- alleles
-  }
-  geno$java <- j.data
   if(!missing(file)){
     geno$file <- file
   }
-  geno$format <- format
   class(geno) <- c("chgeno", "chdata", class(geno))
 
   # some checks to detect likely misspecified default format
@@ -660,8 +667,25 @@ getAlleleFrequencies <- function(data){
 }
 
 #' @export
-print.chgeno <- function(x, ...){
-  cat(sprintf("Genotypes for %d individuals (%d markers).\n", x$size, x$java$getNumberOfMarkers()))
+print.chgeno <- function(x, include.size = TRUE, ...){
+  n <- x$size
+  m <- length(x$markers)
+  a <- range(sapply(x$alleles, length))
+  a <- ifelse(a[1] == a[2],
+              as.character(a[1]),
+              sprintf("%d-%d", a[1], a[2])
+  )
+  cat("# Genotypes\n\n")
+  if(include.size){
+    cat(sprintf("Number of accessions = %d\n", n))
+  }
+  cat(sprintf("Number of markers = %d", m),
+      sprintf("Number of alleles per marker = %s", a),
+      sprintf("Format = %s", x$format),
+      sep = "\n")
+  if(!is.null(x$file)){
+    cat(sprintf("\nRead from file: \"%s\"\n", x$file))
+  }
 }
 
 # -------------- #
@@ -1004,8 +1028,28 @@ convert.column <- function(col, type){
 }
 
 #' @export
-print.chpheno <- function(x, ...){
-  cat(sprintf("Phenotypes for %d individuals (%d traits).\n", x$size , x$java$getFeatures()$size()))
+print.chpheno <- function(x, include.size = TRUE, ...){
+  n <- x$size
+  types <- x$types
+  m <- length(types)
+  scales <- sapply(types, substr, 1, 1)
+  # count number of qualitative traits (nominal)
+  m.qual <- sum(scales == "N")
+  # count number of quantitative traits (ordinal, interval, ratio)
+  m.quan <- sum(scales %in% c("O", "I", "R"))
+
+  cat("# Phenotypes\n\n")
+  if(include.size){
+    cat(sprintf("Number of accessions = %d\n", n))
+  }
+
+  cat(sprintf("Number of traits = %d", m),
+      sprintf("Number of qualitative traits = %d", m.qual),
+      sprintf("Number of quantitative traits = %d", m.quan),
+      sep = "\n")
+  if(!is.null(x$file)){
+    cat(sprintf("\nRead from file: \"%s\"\n", x$file))
+  }
 }
 
 # --- #

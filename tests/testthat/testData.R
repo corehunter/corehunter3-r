@@ -107,7 +107,14 @@ test_that("create distance data from matrix", {
 
 test_that("print", {
   data <- distanceData()
-  expect_output(print(data), "Precomputed distance matrix for 218 individuals.")
+  expect_output(print(data), "# Precomputed distance matrix")
+  expect_output(print(data), "accessions = 218")
+  expect_output(print(data), "extdata/distances.csv")
+
+  data <- distanceData(size = "small")
+  expect_output(print(data), "# Precomputed distance matrix")
+  expect_output(print(data), "accessions = 5")
+  expect_output(print(data), "testthat/data/distances-small.txt")
 })
 
 ########################
@@ -180,18 +187,18 @@ test_that("read genotype data from file", {
     expect_equal(rownames(geno$data), geno$ids)
     expect_equal(geno$names, getNames())
     expect_equal(geno$markers, getMarkerNames())
-    if(!is.null(geno$alleles)){
-      expect_equal(names(geno$alleles), geno$markers)
-      expect_equal(length(geno$alleles), geno$java$getNumberOfMarkers())
-      for(m in 1:length(geno$alleles)){
-        expect_equal(length(geno$alleles[[m]]), geno$java$getNumberOfAlleles(toJavaIndices(m)))
-        if(format == "default"){ # homozygous test data
-          expected <- unique(geno$data[,m])
-          expected <- as.character(expected[!is.na(expected)])
-          expect_equal(sort(geno$alleles[[m]]), sort(expected))
-        } else if(format == "biparental"){
-          expect_equal(geno$alleles[[m]], c("0", "1"))
-        }
+    expect_equal(names(geno$alleles), geno$markers)
+    expect_equal(length(geno$alleles), geno$java$getNumberOfMarkers())
+    for(m in 1:length(geno$alleles)){
+      expect_equal(length(geno$alleles[[m]]), geno$java$getNumberOfAlleles(toJavaIndices(m)))
+      if(format == "default"){ # homozygous test data
+        expected <- unique(geno$data[,m])
+        expected <- as.character(expected[!is.na(expected)])
+        expect_equal(sort(geno$alleles[[m]]), sort(expected))
+      } else if(format == "biparental"){
+        expect_equal(geno$alleles[[m]], c("0", "1"))
+      } else {
+        expect_true(all(is.na(geno$alleles[[m]])))
       }
     }
     if(format == "frequency" || format == "biparental"){
@@ -287,6 +294,20 @@ test_that("create default genotype data from data frame", {
   expect_equal(geno$markers, markers)
   expect_equal(geno$alleles, alleles)
   expect_equal(geno$format, "default")
+  # from data read from file
+  geno <- genotypeData(format = "default")
+  m <- cbind(NAME = geno$names, geno$data)
+  geno <- genotypes(m, format = "default")
+  expect_equal(geno$size,218)
+  expect_equal(geno$ids, getIds())
+  expect_equal(geno$names, getNames())
+  expect_equal(geno$data, m[,2:ncol(m)])
+  expect_equal(geno$markers, getMarkerNames())
+  expect_equal(names(geno$alleles), geno$markers)
+  for(marker.alleles in geno$alleles){
+    expect_equal(marker.alleles, c("A", "B"))
+  }
+  expect_equal(geno$format, "default")
 })
 
 test_that("create biparental genotype data from matrix or data frame", {
@@ -315,7 +336,7 @@ test_that("create biparental genotype data from matrix or data frame", {
   colnames(m2) <- NULL
   geno <- genotypes(m2, format = "biparental")
   expect_equal(geno$data, m2)
-  expect_null(geno$markers)
+  expect_equal(geno$markers, as.character(rep(NA, ncol(m2))))
   expect_null(names(geno$alleles))
   # from data frame with ids, names and marker names
   names <- letters[1:10]
@@ -343,7 +364,7 @@ test_that("create biparental genotype data from matrix or data frame", {
   geno <- genotypes(df, format = "biparental")
   expect_equal(geno$data, m2)
   expect_equal(geno$names, ids)
-  expect_null(geno$markers)
+  expect_true(all(is.na(geno$markers)))
   expect_null(names(geno$alleles))
   expect_equal(geno$format, "biparental")
   # from data frame with names, no marker names
@@ -352,7 +373,7 @@ test_that("create biparental genotype data from matrix or data frame", {
   geno <- genotypes(df, format = "biparental")
   expect_equal(geno$data, m2)
   expect_equal(geno$names, names)
-  expect_null(geno$markers)
+  expect_true(all(is.na(geno$markers)))
   expect_null(names(geno$alleles))
   expect_equal(geno$format, "biparental")
   # from data read from file
@@ -362,6 +383,10 @@ test_that("create biparental genotype data from matrix or data frame", {
   expect_equal(geno$ids, getIds())
   expect_equal(geno$names, getIds())
   expect_equal(geno$markers, getMarkerNames())
+  expect_equal(names(geno$alleles), geno$markers)
+  for(marker.alleles in geno$alleles){
+    expect_equal(marker.alleles, c("0", "1"))
+  }
   expect_equal(geno$format, "biparental")
 })
 
@@ -404,8 +429,11 @@ test_that("create frequency data from matrix or data frame", {
   expect_equal(geno$format, "frequency")
   # from matrix without allele names
   geno <- genotypes(m, format = "freq")
-  expect_null(geno$alleles)
   expect_equal(geno$data, m)
+  expect_equal(names(geno$alleles), geno$markers)
+  expect_equal(geno$alleles$M1, as.character(rep(NA, 3)))
+  expect_equal(geno$alleles$M2, as.character(rep(NA, 2)))
+  expect_equal(geno$alleles$M3, as.character(rep(NA, 2)))
   expect_equal(geno$format, "frequency")
   # from data read from file
   m <- genotypeData(format = "freq")$data
@@ -414,12 +442,61 @@ test_that("create frequency data from matrix or data frame", {
   expect_equal(geno$ids, getIds())
   expect_equal(geno$names, getIds())
   expect_equal(geno$markers, getMarkerNames())
+  expect_equal(names(geno$alleles), geno$markers)
+  for(marker.alleles in geno$alleles){
+    expect_equal(marker.alleles, as.character(rep(NA, 2)))
+  }
   expect_equal(geno$format, "frequency")
 })
 
 test_that("print", {
-  data <- genotypeData()
-  expect_output(print(data), "Genotypes for 218 individuals \\(190 markers\\).")
+  data <- genotypeData(format = "default")
+  expect_output(print(data), "# Genotypes")
+  expect_output(print(data), "accessions = 218")
+  expect_output(print(data), "markers = 190")
+  expect_output(print(data), "alleles per marker = 2")
+  expect_output(print(data), "Format = default")
+  expect_output(print(data), "extdata/genotypes.csv")
+
+  data <- genotypeData(format = "biparental")
+  expect_output(print(data), "# Genotypes")
+  expect_output(print(data), "accessions = 218")
+  expect_output(print(data), "markers = 190")
+  expect_output(print(data), "alleles per marker = 2")
+  expect_output(print(data), "Format = biparental")
+  expect_output(print(data), "extdata/genotypes-biparental.csv")
+
+  data <- genotypeData(format = "freq")
+  expect_output(print(data), "# Genotypes")
+  expect_output(print(data), "accessions = 218")
+  expect_output(print(data), "markers = 190")
+  expect_output(print(data), "alleles per marker = 2")
+  expect_output(print(data), "Format = frequency")
+  expect_output(print(data), "extdata/genotypes-frequency.csv")
+
+  data <- genotypeData(format = "default", size = "small")
+  expect_output(print(data), "# Genotypes")
+  expect_output(print(data), "accessions = 5")
+  expect_output(print(data), "markers = 4")
+  expect_output(print(data), "alleles per marker = 2-4")
+  expect_output(print(data), "Format = default")
+  expect_output(print(data), "testthat/data/genotypes-small.csv")
+
+  data <- genotypeData(format = "biparental", size = "small")
+  expect_output(print(data), "# Genotypes")
+  expect_output(print(data), "accessions = 5")
+  expect_output(print(data), "markers = 4")
+  expect_output(print(data), "alleles per marker = 2")
+  expect_output(print(data), "Format = biparental")
+  expect_output(print(data), "testthat/data/genotypes-bi-small.csv")
+
+  data <- genotypeData(format = "freq", size = "small")
+  expect_output(print(data), "# Genotypes")
+  expect_output(print(data), "accessions = 5")
+  expect_output(print(data), "markers = 4")
+  expect_output(print(data), "alleles per marker = 2-4")
+  expect_output(print(data), "Format = frequency")
+  expect_output(print(data), "testthat/data/genotypes-freq-small.csv")
 })
 
 #########################
@@ -581,7 +658,20 @@ test_that("create phenotype data from data frame", {
 
 test_that("print", {
   data <- phenotypeData()
-  expect_output(print(data), "Phenotypes for 218 individuals \\(4 traits\\).")
+  expect_output(print(data), "# Phenotypes")
+  expect_output(print(data), "accessions = 218")
+  expect_output(print(data), "traits = 4")
+  expect_output(print(data), "qualitative traits = 0")
+  expect_output(print(data), "quantitative traits = 4")
+  expect_output(print(data), "extdata/phenotypes.csv")
+
+  data <- phenotypeData(size = "small")
+  expect_output(print(data), "# Phenotypes")
+  expect_output(print(data), "accessions = 5")
+  expect_output(print(data), "traits = 5")
+  expect_output(print(data), "qualitative traits = 2")
+  expect_output(print(data), "quantitative traits = 3")
+  expect_output(print(data), "testthat/data/phenotypes-small.csv")
 })
 
 ###########################
@@ -623,13 +713,11 @@ test_that("example data", {
 
 test_that("print", {
   data <- testData()
-  expect_output(print(data), "Core Hunter data containing genotypes, phenotypes & precomputed distances for 218 individuals.")
-  data <- coreHunterData(geno = genotypeData())
-  expect_output(print(data), "Core Hunter data containing genotypes for 218 individuals.")
-  data <- coreHunterData(pheno = phenotypeData())
-  expect_output(print(data), "Core Hunter data containing phenotypes for 218 individuals.")
-  data <- coreHunterData(dist = distanceData())
-  expect_output(print(data), "Core Hunter data containing precomputed distances for 218 individuals.")
+  expect_output(print(data), "Core Hunter data")
+  expect_output(print(data), "accessions = 218")
+  expect_output(print(data), "# Genotypes")
+  expect_output(print(data), "# Phenotypes")
+  expect_output(print(data), "# Precomputed distance matrix")
 })
 
 

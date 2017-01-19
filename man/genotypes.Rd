@@ -60,15 +60,21 @@ Genotype data of class \code{chgeno} with elements
  \item{\code{ids}}{Unique item identifiers (\code{character}).}
  \item{\code{names}}{Item names (\code{character}). Names of individuals to which no explicit name
    has been assigned are equal to the unique \code{ids}.}
- \item{\code{markers}}{Marker names (\code{character}, if specified).
+ \item{\code{markers}}{Marker names (\code{character}).
+   May contain \code{NA} values in case only some or no marker names were specified.
    Marker names are always included for the \code{default} and \code{frequency} format
-   but optional for the \code{biparental} format.}
- \item{\code{alleles}}{List of character vectors with allele names per marker
-   (inferred from the data/file, or manually specified when creating \code{frequency}
-   data from a matrix or data frame through the optional \code{alleles} argument).}
+   but are optional for the \code{biparental} format.}
+ \item{\code{alleles}}{List of character vectors with allele names per marker.
+   Vectors may contain \code{NA} values in case only some or no allele names were
+   specified. For \code{biparental} data the two alleles are name \code{"0"} and
+   \code{"1"}, respectively, for all markers. For the \code{default} format allele
+   names are inferred from the provided data. Finally, for \code{frequency} data
+   allele names are optional and may be specified either in the file or through
+   the \code{alleles} argument when creating this type of data from a matrix or
+   data frame.}
  \item{\code{java}}{Java version of the data object.}
- \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
  \item{\code{format}}{Genotype data format used.}
+ \item{\code{file}}{Normalized path of file from which data was read (if applicable).}
 }
 }
 \description{
