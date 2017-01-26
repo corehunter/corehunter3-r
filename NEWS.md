@@ -5,7 +5,7 @@ Version 3.0.1.9000 (dev)
 ------------------------
 
  - More informative output when printing Core Hunter data objects.
- - It is now required to explicitly specify the format when reading genotype data. Moreover, a warning is raised when it seems that the wrong format may have been selected, based on an inspection of the data that was read.
+ - It is now required to explicitly specify the format when reading genotype data. Moreover, a warning is raised in case it seems that the wrong format may have been selected, through an inspection of the data that was read.
  - Fixed issues when reading files with single or double quoted values.
  - Improved test coverage.
 
