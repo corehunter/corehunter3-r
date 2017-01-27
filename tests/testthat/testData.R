@@ -109,12 +109,12 @@ test_that("print", {
   data <- distanceData()
   expect_output(print(data), "# Precomputed distance matrix")
   expect_output(print(data), "accessions = 218")
-  expect_output(print(data), "extdata/distances.csv")
+  expect_output(print(data), "extdata[\\/]*distances.csv")
 
   data <- distanceData(size = "small")
   expect_output(print(data), "# Precomputed distance matrix")
   expect_output(print(data), "accessions = 5")
-  expect_output(print(data), "testthat/data/distances-small.txt")
+  expect_output(print(data), "testthat[\\/]*data[\\/]*distances-small.txt")
 })
 
 ########################
@@ -456,7 +456,7 @@ test_that("print", {
   expect_output(print(data), "markers = 190")
   expect_output(print(data), "alleles per marker = 2")
   expect_output(print(data), "Format = default")
-  expect_output(print(data), "extdata/genotypes.csv")
+  expect_output(print(data), "extdata[\\/]*genotypes.csv")
 
   data <- genotypeData(format = "biparental")
   expect_output(print(data), "# Genotypes")
@@ -464,7 +464,7 @@ test_that("print", {
   expect_output(print(data), "markers = 190")
   expect_output(print(data), "alleles per marker = 2")
   expect_output(print(data), "Format = biparental")
-  expect_output(print(data), "extdata/genotypes-biparental.csv")
+  expect_output(print(data), "extdata[\\/]*genotypes-biparental.csv")
 
   data <- genotypeData(format = "freq")
   expect_output(print(data), "# Genotypes")
@@ -472,7 +472,7 @@ test_that("print", {
   expect_output(print(data), "markers = 190")
   expect_output(print(data), "alleles per marker = 2")
   expect_output(print(data), "Format = frequency")
-  expect_output(print(data), "extdata/genotypes-frequency.csv")
+  expect_output(print(data), "extdata[\\/]*genotypes-frequency.csv")
 
   data <- genotypeData(format = "default", size = "small")
   expect_output(print(data), "# Genotypes")
@@ -480,7 +480,7 @@ test_that("print", {
   expect_output(print(data), "markers = 4")
   expect_output(print(data), "alleles per marker = 2-4")
   expect_output(print(data), "Format = default")
-  expect_output(print(data), "testthat/data/genotypes-small.csv")
+  expect_output(print(data), "testthat[\\/]*data[\\/]*genotypes-small.csv")
 
   data <- genotypeData(format = "biparental", size = "small")
   expect_output(print(data), "# Genotypes")
@@ -488,7 +488,7 @@ test_that("print", {
   expect_output(print(data), "markers = 4")
   expect_output(print(data), "alleles per marker = 2")
   expect_output(print(data), "Format = biparental")
-  expect_output(print(data), "testthat/data/genotypes-bi-small.csv")
+  expect_output(print(data), "testthat[\\/]*data[\\/]*genotypes-bi-small.csv")
 
   data <- genotypeData(format = "freq", size = "small")
   expect_output(print(data), "# Genotypes")
@@ -496,7 +496,7 @@ test_that("print", {
   expect_output(print(data), "markers = 4")
   expect_output(print(data), "alleles per marker = 2-4")
   expect_output(print(data), "Format = frequency")
-  expect_output(print(data), "testthat/data/genotypes-freq-small.csv")
+  expect_output(print(data), "testthat[\\/]*data[\\/]*genotypes-freq-small.csv")
 })
 
 #########################
@@ -663,7 +663,7 @@ test_that("print", {
   expect_output(print(data), "traits = 4")
   expect_output(print(data), "qualitative traits = 0")
   expect_output(print(data), "quantitative traits = 4")
-  expect_output(print(data), "extdata/phenotypes.csv")
+  expect_output(print(data), "extdata[\\/]*phenotypes.csv")
 
   data <- phenotypeData(size = "small")
   expect_output(print(data), "# Phenotypes")
@@ -671,7 +671,7 @@ test_that("print", {
   expect_output(print(data), "traits = 5")
   expect_output(print(data), "qualitative traits = 2")
   expect_output(print(data), "quantitative traits = 3")
-  expect_output(print(data), "testthat/data/phenotypes-small.csv")
+  expect_output(print(data), "testthat[\\/]*data[\\/]*phenotypes-small.csv")
 })
 
 ###########################

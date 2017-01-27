@@ -1,14 +1,6 @@
-## Resubmission
-
-This is a resubmission. In this version I have:
-
- - Made the contents of the  'Description' field in the DESCRIPTION file more comprehensive.
- - Modified the `.onLoad` function to check the available Java version (should be >= 8). The 'SystemRequirements' field in DESCRIPTION and the README also state that Java JRE 8 or higher is required.
- - Replaced 'http://www.corehunter.org' with '<http://www.corehunter.org>' in 'Desription' field for auto-linking.
-
 ## Test environments
 
-* local OS X install, R 3.2.4
+* local OS X install, R 3.3.2
 * ubuntu 12.04 (on travis-ci), R 3.2.5, R 3.3.1 & R devel
 * win-builder (devel and release)
 
