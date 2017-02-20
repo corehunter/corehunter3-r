@@ -1,3 +1,9 @@
+## Resubmission
+
+This is a resubmission with the following changes:
+
+- Updated file LICENSE to comply with template for MIT
+
 ## Test environments
 
 * local OS X install, R 3.3.2
