@@ -93,7 +93,7 @@ test_that("seed is respected (multi-objective, with normalization)", {
   )
   cores <- lapply(1:5, function(i){
     set.seed(42)
-    naturalsort(sampleCore(geno, obj, size = 2, time = 2)$sel)
+    naturalsort(sampleCore(geno, obj, size = 2, time = 4)$sel)
   })
   expect_true(all(sapply(cores, function(core){all.equal(core, cores[[1]])})))
 })
