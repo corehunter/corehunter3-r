@@ -71,7 +71,7 @@ test_that("seed is respected", {
   geno <- genotypeData()
   cores <- lapply(1:5, function(i){
     set.seed(42)
-    naturalsort(sampleCore(geno, size = 2, time = 1)$sel)
+    naturalsort(sampleCore(geno, size = 2, time = 2)$sel)
   })
   expect_true(all(sapply(cores, function(core){all.equal(core, cores[[1]])})))
 })
@@ -80,7 +80,7 @@ test_that("seed is respected (fast mode)", {
   geno <- genotypeData()
   cores <- lapply(1:5, function(i){
     set.seed(42)
-    naturalsort(sampleCore(geno, size = 2, time = 1, mode = "fast")$sel)
+    naturalsort(sampleCore(geno, size = 2, time = 2, mode = "fast")$sel)
   })
   expect_true(all(sapply(cores, function(core){all.equal(core, cores[[1]])})))
 })
@@ -106,7 +106,7 @@ test_that("seed is respected (multi-objective, no normalization)", {
   )
   cores <- lapply(1:5, function(i){
     set.seed(42)
-    naturalsort(sampleCore(geno, obj, size = 2, time = 1, normalize = FALSE)$sel)
+    naturalsort(sampleCore(geno, obj, size = 2, time = 4, normalize = FALSE)$sel)
   })
   expect_true(all(sapply(cores, function(core){all.equal(core, cores[[1]])})))
 })
