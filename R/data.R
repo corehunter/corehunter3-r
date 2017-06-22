@@ -140,6 +140,12 @@ print.chdata <- function(x, ...){
   cat("----------------\n\n")
 
   cat("Number of accessions =", x$size, "\n")
+  cat("Ids:")
+  str(x$ids)
+  if(!isTRUE(all.equal(x$ids, x$names))){
+    cat("Names:")
+    str(x$names)
+  }
 
   for(data.type in c("geno", "pheno", "dist")){
     if(!is.null(x[[data.type]])){
@@ -291,6 +297,12 @@ print.chdist <- function(x, include.size = TRUE, ...){
   cat("# Precomputed distance matrix\n")
   if(include.size){
     cat(sprintf("\nNumber of accessions = %d\n", n))
+    cat("Ids:")
+    str(x$ids)
+    if(!isTRUE(all.equal(x$ids, x$names))){
+      cat("Names:")
+      str(x$names)
+    }
   }
   if(!is.null(x$file)){
     cat(sprintf("\nRead from file: \"%s\"\n", x$file))
@@ -678,14 +690,29 @@ print.chgeno <- function(x, include.size = TRUE, ...){
               as.character(a[1]),
               sprintf("%d-%d", a[1], a[2])
   )
-  cat("# Genotypes\n\n")
+
+  cat("# Genotypes\n")
+
+  cat(sprintf("\nFormat = %s\n", x$format))
+
   if(include.size){
-    cat(sprintf("Number of accessions = %d\n", n))
+    cat(sprintf("\nNumber of accessions = %d\n", n))
+    cat("Ids:")
+    str(x$ids)
+    if(!isTRUE(all.equal(x$ids, x$names))){
+      cat("Names:")
+      str(x$names)
+    }
   }
-  cat(sprintf("Number of markers = %d", m),
-      sprintf("Number of alleles per marker = %s", a),
-      sprintf("Format = %s", x$format),
-      sep = "\n")
+
+  cat(sprintf("\nNumber of markers = %d\n", m))
+  if(!all(is.na(x$markers))){
+    cat("Marker names:")
+    str(x$markers)
+  }
+
+  cat(sprintf("Number of alleles per marker = %s\n", a))
+
   if(!is.null(x$file)){
     cat(sprintf("\nRead from file: \"%s\"\n", x$file))
   }
@@ -1033,23 +1060,45 @@ convert.column <- function(col, type){
 #' @export
 print.chpheno <- function(x, include.size = TRUE, ...){
   n <- x$size
+  traits <- colnames(x$data)
   types <- x$types
-  m <- length(types)
+  m <- length(traits)
   scales <- sapply(types, substr, 1, 1)
-  # count number of qualitative traits (nominal)
-  m.qual <- sum(scales == "N")
-  # count number of quantitative traits (ordinal, interval, ratio)
-  m.quan <- sum(scales %in% c("O", "I", "R"))
+  # find qualitative traits (nominal)
+  qual <- traits[which(scales == "N")]
+  # find quantitative traits (ordinal, interval, ratio)
+  quan <- traits[which(scales %in% c("O", "I", "R"))]
 
-  cat("# Phenotypes\n\n")
+  cat("# Phenotypes\n")
+
   if(include.size){
-    cat(sprintf("Number of accessions = %d\n", n))
+    cat(sprintf("\nNumber of accessions = %d\n", n))
+    cat("Ids:")
+    str(x$ids)
+    if(!isTRUE(all.equal(x$ids, x$names))){
+      cat("Names:")
+      str(x$names)
+    }
   }
 
-  cat(sprintf("Number of traits = %d", m),
-      sprintf("Number of qualitative traits = %d", m.qual),
-      sprintf("Number of quantitative traits = %d", m.quan),
-      sep = "\n")
+  format.traits <- function(traits){
+    if(length(traits) > 0){
+      # wrap in double quotes
+      traits <- sprintf('"%s"', traits)
+      # collapse
+      traits <- paste(traits, collapse = " ")
+    } else {
+      traits <- "n/a"
+    }
+    return(traits)
+  }
+
+  cat(sprintf("\nNumber of traits = %d\n", m))
+  cat(sprintf("Traits: %s\n", format.traits(traits)))
+
+  cat(sprintf("Quantitative traits: %s\n", format.traits(quan)))
+  cat(sprintf("Qualitative traits: %s\n", format.traits(qual)))
+
   if(!is.null(x$file)){
     cat(sprintf("\nRead from file: \"%s\"\n", x$file))
   }
