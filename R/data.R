@@ -19,6 +19,9 @@
 #'         Selection Index to Real and Simulated Data",
 #'         \url{http://hdl.handle.net/11529/10199} V10
 #'
+#' @examples
+#' exampleData()
+#'
 #' @return Core Hunter data of class \code{chdata}
 #' @export
 exampleData <- function(){
@@ -704,7 +707,7 @@ print.chgeno <- function(x, include.size = TRUE, ...){
 #'   to some or all individuals.
 #'
 #' @param types Variable types (optional).
-#'   Vector of characters of length one or two.
+#'   Vector of characters, each of length one or two.
 #'   Ignored when reading from file.
 #'
 #'   The first letter indicates the scale type and should be one of \code{N} (nominal),
@@ -1070,15 +1073,20 @@ print.chpheno <- function(x, include.size = TRUE, ...){
 #'
 #' @importFrom utils read.delim
 #' @export
-read.autodelim <- function(file, row.names = 1, check.names = FALSE, stringsAsFactors = FALSE,
-                           strip.white = TRUE, quote = "'\"", ...){
+read.autodelim <- function(file, quote = "'\"",
+                           row.names = 1,
+                           na.strings = "",
+                           check.names = FALSE,
+                           strip.white = TRUE,
+                           stringsAsFactors = FALSE,
+                           ...){
   sep <- switch(tolower(tools::file_ext(file)),
                 "csv" = ",",
                 "txt" = "\t")
-  read.delim(file, sep = sep,
-             row.names = row.names, check.names = check.names,
-             stringsAsFactors = stringsAsFactors, strip.white = strip.white,
-             quote = quote, ...)
+  read.delim(file, sep = sep, quote = quote,
+             row.names = row.names, na.string = na.strings, check.names = check.names,
+             strip.white = strip.white, stringsAsFactors = stringsAsFactors,
+             ...)
 }
 
 # ----------------- #

@@ -13,7 +13,7 @@ The data frame may optionally include a first column \code{NAME} used to assign 
 to some or all individuals.}
 
 \item{types}{Variable types (optional).
-  Vector of characters of length one or two.
+  Vector of characters, each of length one or two.
   Ignored when reading from file.
 
   The first letter indicates the scale type and should be one of \code{N} (nominal),

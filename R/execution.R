@@ -13,6 +13,16 @@
 #' is being minimized, the roles of upper and lower bound are interchanged, and the
 #' Pareto maximum is used instead.
 #'
+#' Because Core Hunter uses stochastic algorithms, repeated runs may produce different
+#' results. To eliminate randomness, you may set a random number generation seed using
+#' \code{\link{set.seed}} prior to executing Core Hunter. Note however that Core Hunter
+#' uses runtime-based stop conditions, meaning that it is not entirely guaranteed that
+#' the same final selection will be obtained when using the same seed, since runtimes
+#' may be influenced by external factors such as the current CPU workload. Therefore,
+#' the number of executed steps may vary across runs, which may affect the returned
+#' solution. When aiming for reproducible results, it is thus also important to allow
+#' sufficient execution time to ensure convergence of the optimization algorithm.
+#'
 #' @param data Core Hunter data (\code{chdata}) containing genotypes,
 #'   phenotypes and/or a precomputed distance matrix. Can also be an
 #'   object of class \code{chdist}, \code{chgeno} or \code{chpheno}
@@ -21,7 +31,7 @@
 #'   If no objectives are specified Core Hunter maximizes a weighted
 #'   index including the default entry-to-nearest-entry distance
 #'   (\code{EN}) for each available data type.
-#'   For genotyes, the Modified Roger's distance (\code{MR}) is
+#'   For genotypes, the Modified Roger's distance (\code{MR}) is
 #'   used. For phenotypes, Gower's distance (\code{GD}) is applied.
 #' @param size Desired core subset size (numeric). If larger than one the value
 #'   is used as the absolute core size after rounding. Else it is used as the
@@ -29,8 +39,8 @@
 #'   the core. The default sampling rate is 0.2.
 #' @param mode Execution mode (\code{default} or \code{fast}). In default mode,
 #'   the normalization searches terminate when no improvement is found for ten
-#'   seconds. In fast mode, searches terminated as soon as no improvement is
-#'   made for two seconds. Stop conditions can be overriden with arguments
+#'   seconds. In fast mode, searches terminate as soon as no improvement is
+#'   made for two seconds. These stop conditions can be overriden using arguments
 #'   \code{time} and \code{impr.time}.
 #' @param time Absolute runtime limit in seconds. Not used by default. If used
 #'   it should be a strictly positive value and is rounded to the nearest integer.
@@ -80,7 +90,10 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 
   # run Core Hunter normalization
   api <- ch.api()
-  ranges <- .jevalArray(api$getNormalizationRanges(j.args, mode, time, impr.time), simplify = TRUE)
+  ranges <- .jevalArray(
+    api$getNormalizationRanges(j.args, mode, time, impr.time, genSeed()),
+    simplify = TRUE
+  )
   obj.ids <- sapply(obj, function(o){
     id <- o$type
     if(!is.null(o$meas)){
@@ -96,7 +109,19 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 
 }
 
+#' Sample a core collection.
+#'
 #' Sample a core collection from the given data.
+#'
+#' Because Core Hunter uses stochastic algorithms, repeated runs may produce different
+#' results. To eliminate randomness, you may set a random number generation seed using
+#' \code{\link{set.seed}} prior to executing Core Hunter. Note however that Core Hunter
+#' uses runtime-based stop conditions, meaning that it is not entirely guaranteed that
+#' the same final selection will be obtained when using the same seed, since runtimes
+#' may be influenced by external factors such as the current CPU workload. Therefore,
+#' the number of executed steps may vary across runs, which may affect the returned
+#' solution. When aiming for reproducible results, it is thus also important to allow
+#' sufficient execution time to ensure convergence of the optimization algorithm.
 #'
 #' @param data Core Hunter data (\code{chdata}) containing genotypes,
 #'   phenotypes and/or a precomputed distance matrix. Typically the
@@ -213,7 +238,7 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), norma
 
   # run Core Hunter
   api <- ch.api()
-  sel <- api$sampleCore(j.args, mode, time, impr.time, !verbose)
+  sel <- api$sampleCore(j.args, mode, time, impr.time, genSeed(), !verbose)
   if(indices){
     sel <- toRIndices(sel)
   } else {
@@ -321,6 +346,11 @@ createArguments <- function(data, obj, size, normalize){
 
   return(j.args)
 
+}
+
+#' @importFrom stats runif
+genSeed <- function(){
+  .jlong(ceiling(runif(1, 0, 2^31-1)))
 }
 
 # ---------- #
