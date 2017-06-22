@@ -19,6 +19,9 @@
 #'         Selection Index to Real and Simulated Data",
 #'         \url{http://hdl.handle.net/11529/10199} V10
 #'
+#' @examples
+#' exampleData()
+#'
 #' @return Core Hunter data of class \code{chdata}
 #' @export
 exampleData <- function(){

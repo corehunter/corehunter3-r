@@ -348,6 +348,7 @@ createArguments <- function(data, obj, size, normalize){
 
 }
 
+#' @importFrom stats runif
 genSeed <- function(){
   .jlong(ceiling(runif(1, 0, 2^31-1)))
 }
