@@ -2,7 +2,7 @@
 % Please edit documentation in R/execution.R
 \name{sampleCore}
 \alias{sampleCore}
-\title{Sample a core collection from the given data.}
+\title{Sample a core collection.}
 \usage{
 sampleCore(data, obj, size = 0.2, mode = c("default", "fast"),
   normalize = TRUE, time = NA, impr.time = NA, indices = FALSE,
@@ -69,6 +69,17 @@ Core subset (\code{chcore}). It has an element \code{sel}
 }
 \description{
 Sample a core collection from the given data.
+}
+\details{
+Because Core Hunter uses stochastic algorithms, repeated runs may produce different
+results. To eliminate randomness, you may set a random number generation seed using
+\code{\link{set.seed}} prior to executing Core Hunter. Note however that Core Hunter
+uses runtime-based stop conditions, meaning that it is not entirely guaranteed that
+the same final selection will be obtained when using the same seed, since runtimes
+may be influenced by external factors such as the current CPU workload. Therefore,
+the number of executed steps may vary across runs, which may affect the returned
+solution. When aiming for reproducible results, it is thus also important to allow
+sufficient execution time to ensure convergence of the optimization algorithm.
 }
 \examples{
 \donttest{

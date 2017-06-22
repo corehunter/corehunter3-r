@@ -17,7 +17,7 @@ if only one type of data is provided.}
 If no objectives are specified Core Hunter maximizes a weighted
 index including the default entry-to-nearest-entry distance
 (\code{EN}) for each available data type.
-For genotyes, the Modified Roger's distance (\code{MR}) is
+For genotypes, the Modified Roger's distance (\code{MR}) is
 used. For phenotypes, Gower's distance (\code{GD}) is applied.}
 
 \item{size}{Desired core subset size (numeric). If larger than one the value
@@ -27,8 +27,8 @@ the core. The default sampling rate is 0.2.}
 
 \item{mode}{Execution mode (\code{default} or \code{fast}). In default mode,
 the normalization searches terminate when no improvement is found for ten
-seconds. In fast mode, searches terminated as soon as no improvement is
-made for two seconds. Stop conditions can be overriden with arguments
+seconds. In fast mode, searches terminate as soon as no improvement is
+made for two seconds. These stop conditions can be overriden using arguments
 \code{time} and \code{impr.time}.}
 
 \item{time}{Absolute runtime limit in seconds. Not used by default. If used
@@ -55,6 +55,17 @@ the lower bound is set to the Pareto minimum, i.e. the minimum value obtained wh
 evaluating all optimal solutions with the considered objective. For an objective that
 is being minimized, the roles of upper and lower bound are interchanged, and the
 Pareto maximum is used instead.
+}
+\details{
+Because Core Hunter uses stochastic algorithms, repeated runs may produce different
+results. To eliminate randomness, you may set a random number generation seed using
+\code{\link{set.seed}} prior to executing Core Hunter. Note however that Core Hunter
+uses runtime-based stop conditions, meaning that it is not entirely guaranteed that
+the same final selection will be obtained when using the same seed, since runtimes
+may be influenced by external factors such as the current CPU workload. Therefore,
+the number of executed steps may vary across runs, which may affect the returned
+solution. When aiming for reproducible results, it is thus also important to allow
+sufficient execution time to ensure convergence of the optimization algorithm.
 }
 \examples{
 \donttest{

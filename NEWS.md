@@ -1,6 +1,11 @@
 Core Hunter 3
 =============
 
+Version 3.1.0.9000 (dev)
+------------------------
+
+ - Using `set.seed` prior to executing Core Hunter now yields reproducible results.
+
 Version 3.1.0 (27/01/2017)
 --------------------------
 
