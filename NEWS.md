@@ -4,6 +4,7 @@ Core Hunter 3
 Version 3.1.0.9000 (dev)
 ------------------------
 
+ - New option to specify a set of always and/or never selected items.
  - Using `set.seed` prior to executing Core Hunter now yields reproducible results.
 
 Version 3.1.0 (27/01/2017)
