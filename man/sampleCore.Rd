@@ -4,7 +4,8 @@
 \alias{sampleCore}
 \title{Sample a core collection.}
 \usage{
-sampleCore(data, obj, size = 0.2, mode = c("default", "fast"),
+sampleCore(data, obj, size = 0.2, always.selected = integer(0),
+  never.selected = integer(0), mode = c("default", "fast"),
   normalize = TRUE, time = NA, impr.time = NA, indices = FALSE,
   verbose = FALSE)
 }
@@ -26,6 +27,12 @@ used. For phenotypes, Gower's distance (\code{GD}) is applied.}
 is used as the absolute core size after rounding. Else it is used as the
 sampling rate and multiplied with the dataset size to determine the size of
 the core. The default sampling rate is 0.2.}
+
+\item{always.selected}{vector with indices (integer) or ids (character) of
+items that should always be selected in the core collection}
+
+\item{never.selected}{vector with indices (integer) or ids (character) of
+items that should never be selected in the core collection}
 
 \item{mode}{Execution mode (\code{default} or \code{fast}). In default mode,
 Core Hunter uses an advanced parallel tempering search algorithm and terminates
