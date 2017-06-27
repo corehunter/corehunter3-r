@@ -53,18 +53,21 @@ or manually specified in the objectives to save computation time when sampling c
 collections. This is especially useful when multiple cores are sampled for the same
 objectives, with possibly varying weights.}
 
-\item{time}{Absolute runtime limit in seconds. Not used by default. If used
-it should be a strictly positive value and is rounded to the nearest integer.}
+\item{time}{Absolute runtime limit in seconds. Not used by default (\code{NA}).
+If used, it should be a strictly positive value, which is rounded to the
+nearest integer.}
 
-\item{impr.time}{Maximum time without improvement in seconds. When set to
-\code{NA} a default value is set depending on the execution \code{mode}.
-If set to another value it should be strictly positive and is rounded
-to the nearest integer.}
+\item{impr.time}{Maximum time without improvement in seconds. If neither
+\code{time} nor \code{impr.time} are specified (\code{NA}), the maximum
+time without improvement defaults to ten or two seconds, when executing
+Core Hunter in \code{default} or \code{fast} mode, respecitvely. If a
+custom improvement time is specified, it should be strictly positive
+and is rounded to the nearest integer.}
 
-\item{indices}{If \code{TRUE} the result contains the indices instead of unique
-identifiers (default) of the selected individuals.}
+\item{indices}{If \code{TRUE}, the result contains the indices instead of ids
+(default) of the selected individuals.}
 
-\item{verbose}{If \code{TRUE} search progress messages are printed to the console.
+\item{verbose}{If \code{TRUE}, search progress messages are printed to the console.
 Defaults to \code{FALSE}.}
 }
 \value{

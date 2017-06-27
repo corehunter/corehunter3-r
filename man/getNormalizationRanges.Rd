@@ -38,13 +38,16 @@ seconds. In fast mode, searches terminate as soon as no improvement is
 made for two seconds. These stop conditions can be overriden using arguments
 \code{time} and \code{impr.time}.}
 
-\item{time}{Absolute runtime limit in seconds. Not used by default. If used
-it should be a strictly positive value and is rounded to the nearest integer.}
+\item{time}{Absolute runtime limit in seconds. Not used by default (\code{NA}).
+If used, it should be a strictly positive value, which is rounded to the
+nearest integer.}
 
-\item{impr.time}{Maximum time without improvement in seconds. When set to
-\code{NA} a default value is set depending on the execution \code{mode}.
-If set to another value it should be strictly positive and is rounded
-to the nearest integer.}
+\item{impr.time}{Maximum time without improvement in seconds. If neither
+\code{time} nor \code{impr.time} are specified (\code{NA}), the maximum
+time without improvement defaults to ten or two seconds, when executing
+Core Hunter in \code{default} or \code{fast} mode, respecitvely. If a
+custom improvement time is specified, it should be strictly positive
+and is rounded to the nearest integer.}
 }
 \value{
 Numeric matrix with one row per objective and two columns:
