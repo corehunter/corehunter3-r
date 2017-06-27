@@ -37,6 +37,10 @@
 #'   is used as the absolute core size after rounding. Else it is used as the
 #'   sampling rate and multiplied with the dataset size to determine the size of
 #'   the core. The default sampling rate is 0.2.
+#' @param always.selected vector with indices (integer) or ids (character) of
+#'   items that should always be selected in the core collection
+#' @param never.selected vector with indices (integer) or ids (character) of
+#'   items that should never be selected in the core collection
 #' @param mode Execution mode (\code{default} or \code{fast}). In default mode,
 #'   the normalization searches terminate when no improvement is found for ten
 #'   seconds. In fast mode, searches terminate as soon as no improvement is
@@ -74,7 +78,10 @@
 #' @import rJava
 #' @importFrom methods is
 #' @export
-getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "fast"),
+getNormalizationRanges <- function(data, obj, size = 0.2,
+                                   always.selected = integer(0),
+                                   never.selected = integer(0),
+                                   mode = c("default", "fast"),
                                    time = NA, impr.time = NA){
 
   # check mode
@@ -86,7 +93,7 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
   # check objectives or set default
   obj <- defaultObjectives(data, obj)
   # create arguments
-  j.args <- createArguments(data, obj, size, normalize = TRUE)
+  j.args <- createArguments(data, obj, size, always.selected, never.selected, normalize = TRUE)
 
   # run Core Hunter normalization
   api <- ch.api()
@@ -138,6 +145,10 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #'   is used as the absolute core size after rounding. Else it is used as the
 #'   sampling rate and multiplied with the dataset size to determine the size of
 #'   the core. The default sampling rate is 0.2.
+#' @param always.selected vector with indices (integer) or ids (character) of
+#'   items that should always be selected in the core collection
+#' @param never.selected vector with indices (integer) or ids (character) of
+#'   items that should never be selected in the core collection
 #' @param mode Execution mode (\code{default} or \code{fast}). In default mode,
 #'   Core Hunter uses an advanced parallel tempering search algorithm and terminates
 #'   when no improvement is found for ten seconds. In fast mode, a simple stochastic
@@ -167,7 +178,7 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #'   Defaults to \code{FALSE}.
 #'
 #' @return Core subset (\code{chcore}). It has an element \code{sel}
-#'  which is a character or numeric vector containing the ids or indices,
+#'  which is a character or numeric vector containing the sorted ids or indices,
 #'  respectively, of the selected individuals (see argument \code{indices}).
 #'  In addition the result has one or more elements that indicate the value
 #'  of each objective function that was included in the optimization.
@@ -212,8 +223,11 @@ getNormalizationRanges <- function(data, obj, size = 0.2, mode = c("default", "f
 #' @import rJava naturalsort
 #' @importFrom methods is
 #' @export
-sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), normalize = TRUE,
-                       time = NA, impr.time = NA, indices = FALSE, verbose = FALSE){
+sampleCore <- function(data, obj, size = 0.2,
+                       always.selected = integer(0), never.selected = integer(0),
+                       mode = c("default", "fast"), normalize = TRUE,
+                       time = NA, impr.time = NA,
+                       indices = FALSE, verbose = FALSE){
   # check mode
   mode <- match.arg(mode)
   # check and process stop conditions
@@ -234,7 +248,7 @@ sampleCore <- function(data, obj, size = 0.2, mode = c("default", "fast"), norma
   # check objectives or set default
   obj <- defaultObjectives(data, obj)
   # create arguments
-  j.args <- createArguments(data, obj, size, normalize)
+  j.args <- createArguments(data, obj, size, always.selected, never.selected, normalize)
 
   # run Core Hunter
   api <- ch.api()
@@ -317,7 +331,10 @@ defaultObjectives <- function(data, obj){
   return(obj)
 }
 
-createArguments <- function(data, obj, size, normalize){
+createArguments <- function(data, obj, size,
+                            always.selected,
+                            never.selected,
+                            normalize){
 
   # wrap and check data class
   data <- wrapData(data)
@@ -334,15 +351,38 @@ createArguments <- function(data, obj, size, normalize){
     stop(sprintf("Core 'size' should be >= 2 and < %d (dataset size). Got: %d.", n, size))
   }
 
+  # init API
+  api <- ch.api()
+
+  # check always/never selected and convert to Java indices
+  convert <- function(subset){
+    if(is.character(subset)){
+      ind <- api$getIndicesFromIds(data$java, .jarray(subset))
+    } else if(is.integer(subset) || (is.numeric(subset) && all(subset == as.integer(subset)))){
+      ind <- toJavaIndices(subset)
+    } else {
+      stop("Arguments 'always.selected' and 'never.selected' ",
+           "should be of type integer (indices) or character (ids).")
+    }
+    return(ind)
+  }
+  always.selected <- convert(always.selected)
+  never.selected <- convert(never.selected)
+
   # convert objectives to Java objects
   j.obj <- ch.objectives(obj)
 
   # create Core Hunter arguments
-  api <- ch.api()
   j.data <- data$java
   j.size <- as.integer(size)
   j.obj.array <- .jarray(j.obj, contents.class = ch.obj()@name)
-  j.args <- api$createArguments(j.data, j.size, j.obj.array, normalize)
+  j.always.selected <- .jarray(always.selected)
+  j.never.selected <- .jarray(never.selected)
+  j.args <- api$createArguments(
+    j.data, j.size, j.obj.array,
+    j.always.selected, j.never.selected,
+    normalize
+  )
 
   return(j.args)
 
