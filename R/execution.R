@@ -178,7 +178,7 @@ getNormalizationRanges <- function(data, obj, size = 0.2,
 #'   Defaults to \code{FALSE}.
 #'
 #' @return Core subset (\code{chcore}). It has an element \code{sel}
-#'  which is a character or numeric vector containing the ids or indices,
+#'  which is a character or numeric vector containing the sorted ids or indices,
 #'  respectively, of the selected individuals (see argument \code{indices}).
 #'  In addition the result has one or more elements that indicate the value
 #'  of each objective function that was included in the optimization.
@@ -358,7 +358,7 @@ createArguments <- function(data, obj, size,
   convert <- function(subset){
     if(is.character(subset)){
       ind <- api$getIndicesFromIds(data$java, .jarray(subset))
-    } else if(is.integer(subset)){
+    } else if(is.integer(subset) || (is.numeric(subset) && all(subset == as.integer(subset)))){
       ind <- toJavaIndices(subset)
     } else {
       stop("Arguments 'always.selected' and 'never.selected' ",

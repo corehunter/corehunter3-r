@@ -581,7 +581,7 @@ genotypes <- function(data, alleles, file, format){
       stop("Argument 'file' should be a file path (character).")
     }
     if(!file.exists(file)){
-      stop("File 'file' does not exist.")
+      stop("File '", file, "' does not exist.")
     }
     file <- normalizePath(file)
 

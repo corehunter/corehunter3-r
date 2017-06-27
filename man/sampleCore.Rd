@@ -69,7 +69,7 @@ Defaults to \code{FALSE}.}
 }
 \value{
 Core subset (\code{chcore}). It has an element \code{sel}
- which is a character or numeric vector containing the ids or indices,
+ which is a character or numeric vector containing the sorted ids or indices,
  respectively, of the selected individuals (see argument \code{indices}).
  In addition the result has one or more elements that indicate the value
  of each objective function that was included in the optimization.
