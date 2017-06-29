@@ -17,7 +17,7 @@ ch.distances <- function(){
   J("org.corehunter.data.DistanceMatrixData")
 }
 ch.genotypes <- function(){
-  J("org.corehunter.data.GenotypeData")
+  J("org.corehunter.data.FrequencyGenotypeData")
 }
 ch.phenotypes <- function(){
   J("uno.informatics.data.dataset.FeatureData")

@@ -34,9 +34,7 @@ read.autodelim(file, quote = "'\\"", row.names = 1, na.strings = "",
 \item{na.strings}{a character vector of strings which are to be
     interpreted as \code{\link{NA}} values.  Blank fields are also
     considered to be missing values in logical, integer, numeric and
-    complex fields.  Note that the test happens \emph{after} 
-    white space is stripped from the input, so \code{na.strings} 
-    values may need their own white space stripped in advance.}
+    complex fields.}
 
 \item{check.names}{logical.  If \code{TRUE} then the names of the
     variables in the data frame are checked to ensure that they are
