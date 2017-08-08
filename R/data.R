@@ -520,7 +520,9 @@ genotypes <- function(data, alleles, file, format){
       }
 
       # create data
-      j.matrix <- .jarray(matrix(as.integer(data), nrow = nrow(data)), dispatch = TRUE)
+      j.matrix <- .jbyte(data)
+      j.matrix[is.na(j.matrix)] <- ch.constants()$MISSING_ALLELE_SCORE
+      j.matrix <- .jarray(j.matrix, dispatch = TRUE)
       j.ids <- .jarray(rownames(data))
       j.names <- .jarray(names)
       marker.names <- colnames(data)

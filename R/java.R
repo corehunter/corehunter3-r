@@ -6,6 +6,14 @@ ch.api <- function(){
   J("org.corehunter.API")
 }
 
+# --------- #
+# CONSTANTS #
+# --------- #
+
+ch.constants <- function(){
+  J("org.corehunter.util.CoreHunterConstants")
+}
+
 # ---- #
 # DATA #
 # ---- #
