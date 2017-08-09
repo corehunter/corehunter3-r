@@ -619,8 +619,16 @@ genotypes <- function(data, alleles, file, format){
   markers <- api$getMarkerNames(j.data)
   # obtain allele names per marker from Java object
   alleles <- .jevalArray(api$getAlleles(j.data), simplify = TRUE)
-  # convert matrix to list of row vectors
-  alleles <- split(t(alleles), rep(1:nrow(alleles), each = ncol(alleles)))
+  # convert to list of vectors
+  if(is.list(alleles)){
+    # different number of alleles per marker
+    alleles <- lapply(alleles, as.vector)
+  } else {
+    # same number of alleles for each marker
+    alleles <- split(t(alleles), rep(1:nrow(alleles), each = ncol(alleles)))
+  }
+  # assign marker names to alleles (if specified)
+  names(alleles) <- NULL
   if(!all(is.na(markers))){
     names(alleles) <- markers
   }
