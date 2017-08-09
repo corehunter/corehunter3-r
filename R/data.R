@@ -520,8 +520,12 @@ genotypes <- function(data, alleles, file, format){
       }
 
       # create data
+      missing.allele.score <- ch.constants()$MISSING_ALLELE_SCORE
       j.matrix <- .jbyte(data)
-      j.matrix[is.na(j.matrix)] <- ch.constants()$MISSING_ALLELE_SCORE
+      missing <- is.na(j.matrix)
+      if(any(missing)){
+        j.matrix[missing] <- missing.allele.score
+      }
       j.matrix <- .jarray(j.matrix, dispatch = TRUE)
       j.ids <- .jarray(rownames(data))
       j.names <- .jarray(names)
@@ -609,11 +613,14 @@ genotypes <- function(data, alleles, file, format){
 
   }
 
-  # obtain ids, names, marker names and allele names from Java object
+  # obtain ids, names and marker names from Java object
   ids <- api$getIds(j.data)
   names <- api$getNames(j.data)
   markers <- api$getMarkerNames(j.data)
-  alleles <- lapply(.jevalArray(api$getAlleles(j.data)), .jevalArray)
+  # obtain allele names per marker from Java object
+  alleles <- .jevalArray(api$getAlleles(j.data), simplify = TRUE)
+  # convert matrix to list of row vectors
+  alleles <- split(t(alleles), rep(1:nrow(alleles), each = ncol(alleles)))
   if(!all(is.na(markers))){
     names(alleles) <- markers
   }
