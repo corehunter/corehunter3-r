@@ -675,6 +675,15 @@ test_that("create phenotype data from data frame", {
   pheno <- phenotypes(df)
   expect_equal(pheno$names, letters[1:5])
 
+  # single trait
+  df <- df[, "r", drop = FALSE]
+  pheno <- phenotypes(df)
+  expect_equal(pheno$size, 5)
+  expect_equal(pheno$ids, as.character(1:5))
+  expect_equal(pheno$names, as.character(1:5))
+  expect_equal(pheno$types, "R")
+  expect_equal(pheno$ranges, max(df$r) - min(df$r))
+
 })
 
 test_that("print", {
