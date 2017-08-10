@@ -864,7 +864,7 @@ phenotypes <- function(data, types, min, max, file){
       stop("Variable types are required.")
     }
     # drop type, min, max
-    data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), ]
+    data <- data[!(rownames(data) %in% c("TYPE", "MIN", "MAX")), , drop = FALSE]
     # convert columns accordingly
     for(c in 1:ncol(data)){
       data[[c]] <- convert.column(data[[c]], types[c])

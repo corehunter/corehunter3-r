@@ -565,8 +565,6 @@ test_that("read phenotype data from file", {
   # 2: small dataset
   pheno <- phenotypeData(size = "small")
   expect_equal(pheno$size, 5)
-  # TODO: some tests below fail due to an issue in the Core Hunter
-  #       (ids and names are not unquoted when reading phenotypes from a file)
   expect_equal(pheno$ids, getIds(size = "small"))
   expect_equal(rownames(pheno$data), pheno$ids)
   expect_equal(pheno$names, getNames(size = "small"))
@@ -585,6 +583,18 @@ test_that("read phenotype data from file", {
   gd <- StatMatch::gower.dist(pheno$data, rngs = pheno$ranges)
   gd <- gd[lower.tri(gd)]
   expect_equal(mean(gd), evaluateCore(1:5, pheno, objective("EE", "GD")))
+})
+
+test_that("phenotype file with single trait", {
+  pheno.file <- "data/phenotypes-single.csv"
+  pheno <- phenotypes(file = pheno.file)
+  expect_equal(pheno$file, normalizePath(pheno.file))
+  expect_equal(pheno$size, 10)
+  expect_equal(pheno$ids, as.character(1:10))
+  expect_equal(rownames(pheno$data), pheno$ids)
+  expect_equal(pheno$names, c("ABBUOTO", "ABRUSCO", "AGLIANICO", "ALBANA", "ALBANELLO", "ALBAROSSA",
+                              "UVA_MELONA", "ALBARANZEULI_BIANCO", "ALEATICO", "ALICANTE_BOUSCHET"))
+  expect_equal(pheno$ranges, 17.5)
 })
 
 test_that("create phenotype data from data frame", {
