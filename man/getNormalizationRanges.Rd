@@ -6,7 +6,7 @@
 \usage{
 getNormalizationRanges(data, obj, size = 0.2, always.selected = integer(0),
   never.selected = integer(0), mode = c("default", "fast"), time = NA,
-  impr.time = NA)
+  impr.time = NA, steps = NA, impr.steps = NA)
 }
 \arguments{
 \item{data}{Core Hunter data (\code{chdata}) containing genotypes,
@@ -36,18 +36,33 @@ items that should never be selected in the core collection}
 the normalization searches terminate when no improvement is found for ten
 seconds. In fast mode, searches terminate as soon as no improvement is
 made for two seconds. These stop conditions can be overriden using arguments
-\code{time} and \code{impr.time}.}
+\code{time}, \code{impr.time}, \code{steps} and/or \code{impr.steps}. In
+\code{default} mode, the value of the latter two, step-based conditions is
+multiplied with 500, in line with the behaviour of \code{\link{sampleCore}}
+when executed in \code{default} mode.}
 
 \item{time}{Absolute runtime limit in seconds. Not used by default (\code{NA}).
 If used, it should be a strictly positive value, which is rounded to the
 nearest integer.}
 
-\item{impr.time}{Maximum time without improvement in seconds. If neither
-\code{time} nor \code{impr.time} are specified (\code{NA}), the maximum
-time without improvement defaults to ten or two seconds, when executing
-Core Hunter in \code{default} or \code{fast} mode, respecitvely. If a
-custom improvement time is specified, it should be strictly positive
-and is rounded to the nearest integer.}
+\item{impr.time}{Maximum time without improvement in seconds. If no explicit
+stop conditions are specified, the maximum time without improvement defaults
+to ten or two seconds, when executing Core Hunter in \code{default} or
+\code{fast} mode, respecitvely. If a custom improvement time is specified,
+it should be strictly positive and is rounded to the nearest integer.}
+
+\item{steps}{Maximum number of search steps. Not used by default (\code{NA}).
+If used, it should be a strictly positive value, which is rounded
+to the nearest integer. In \code{default} mode, the value is
+multiplied with 500, in line with the behaviour of
+\code{\link{sampleCore}} when executed in \code{default} mode.}
+
+\item{impr.steps}{Maximum number of steps without improvement. Not used by
+default (\code{NA}). If used, it should be a strictly
+positive value, which is rounded to the nearest integer.
+In \code{default} mode, the value is multiplied with 500,
+in line with the behaviour of \code{\link{sampleCore}}
+when executed in \code{default} mode.}
 }
 \value{
 Numeric matrix with one row per objective and two columns:
@@ -57,25 +72,25 @@ Numeric matrix with one row per objective and two columns:
 }
 }
 \description{
-Executes an independent stochastic hill-climbing search per objective (in parallel) to
-approximate the optimal solution for each objective from which a suitable normalization
-range is inferred based on the Pareto minima/maxima. For an objective that is being maximized,
-the upper bound is set to the value of the best solution for that objective, while
-the lower bound is set to the Pareto minimum, i.e. the minimum value obtained when
-evaluating all optimal solutions with the considered objective. For an objective that
-is being minimized, the roles of upper and lower bound are interchanged, and the
-Pareto maximum is used instead.
+Executes an independent stochastic hill-climbing search (random descent) per objective
+to approximate the optimal solution for each objective, from which a suitable normalization
+range is inferred based on the Pareto minima/maxima. These normalization searches are
+executed in parallel.
 }
 \details{
+For an objective that is being maximized, the upper bound is set to the value of the best
+solution for that objective, while the lower bound is set to the Pareto minimum, i.e. the
+minimum value obtained when evaluating all optimal solutions (for each single objective)
+with the considered objective. For an objective that is being minimized, the roles of
+upper and lower bound are interchanged, and the Pareto maximum is used instead.
+
 Because Core Hunter uses stochastic algorithms, repeated runs may produce different
 results. To eliminate randomness, you may set a random number generation seed using
-\code{\link{set.seed}} prior to executing Core Hunter. Note however that Core Hunter
-uses runtime-based stop conditions, meaning that it is not entirely guaranteed that
-the same final selection will be obtained when using the same seed, since runtimes
-may be influenced by external factors such as the current CPU workload. Therefore,
-the number of executed steps may vary across runs, which may affect the returned
-solution. When aiming for reproducible results, it is thus also important to allow
-sufficient execution time to ensure convergence of the optimization algorithm.
+\code{\link{set.seed}} prior to executing Core Hunter. In addition, when reproducible
+results are desired, it is advised to use step-based stop conditions instead of the
+(default) time-based criteria, because runtimes may be affected by external factors,
+and, therefore, a different number of steps may have been performed in repeated runs
+when using time-based stop conditions.
 }
 \examples{
 \donttest{

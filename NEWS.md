@@ -5,8 +5,9 @@ Version 3.1.0.9000 (dev)
 ------------------------
 
  - New option to specify a set of always and/or never selected accessions.
+ - Added support for step-based in addition to time-based stop conditions.
+ - Using `set.seed` prior to executing Core Hunter, in combination with step-based stop conditions, now yields reproducible results.
  - Largely reduced memory footprint of genotype and distance data.
- - Using `set.seed` prior to executing Core Hunter now yields reproducible results.
  - Default maximum time without improvement is now only applied in case no explicit stop conditions have been specified.
  - Fixed issue when loading phenotype data with a single trait.
 
