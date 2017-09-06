@@ -1,13 +1,7 @@
-## Resubmission
-
-This is a resubmission with the following changes:
-
-- Updated file LICENSE to comply with template for MIT
-
 ## Test environments
 
 * local OS X install, R 3.3.2
-* ubuntu 12.04 (on travis-ci), R 3.2.5, R 3.3.2 & R devel
+* ubuntu 12.04 (on travis-ci), R 3.4.1 (release) & R devel
 * win-builder (devel and release)
 
 ## R CMD check results
