@@ -136,4 +136,3 @@ geno.file <- system.file("extdata", "genotypes-frequency.csv", package = "corehu
 geno <- genotypes(file = geno.file, format = "frequency")
 
 }
-

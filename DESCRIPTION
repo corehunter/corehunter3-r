@@ -19,6 +19,6 @@ Imports: naturalsort (>= 0.1.2), methods
 SystemRequirements: Java JRE 8 or higher
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Suggests: testthat, StatMatch
 Encoding: UTF-8

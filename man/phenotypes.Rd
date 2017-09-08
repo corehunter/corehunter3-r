@@ -108,4 +108,3 @@ pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
 pheno <- phenotypes(file = pheno.file)
 
 }
-

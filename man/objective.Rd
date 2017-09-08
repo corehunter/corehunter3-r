@@ -115,4 +115,3 @@ objective("AN", "MR", weight = 0.5, range = c(0.150, 0.300))
 \seealso{
 \code{\link{getNormalizationRanges}}, \code{\link{setRange}}
 }
-

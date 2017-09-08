@@ -110,4 +110,3 @@ core <- sampleCore(data, obj = objectives)
 \seealso{
 \code{\link{coreHunterData}}, \code{\link{objective}}
 }
-

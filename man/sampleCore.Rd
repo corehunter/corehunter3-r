@@ -149,4 +149,3 @@ core <- sampleCore(data, obj, verbose = TRUE)
 \seealso{
 \code{\link{coreHunterData}}, \code{\link{objective}}, \code{\link{getNormalizationRanges}}
 }
-
