@@ -48,7 +48,7 @@ nearest integer.}
 \item{impr.time}{Maximum time without improvement in seconds. If no explicit
 stop conditions are specified, the maximum time without improvement defaults
 to ten or two seconds, when executing Core Hunter in \code{default} or
-\code{fast} mode, respecitvely. If a custom improvement time is specified,
+\code{fast} mode, respectively. If a custom improvement time is specified,
 it should be strictly positive and is rounded to the nearest integer.}
 
 \item{steps}{Maximum number of search steps. Not used by default (\code{NA}).
