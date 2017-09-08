@@ -1,7 +1,7 @@
 Core Hunter 3
 =============
 
-Version 3.2.0 (06/09/2017)
+Version 3.2.0 (08/09/2017)
 --------------------------
 
  - New option to specify a set of always and/or never selected accessions.
