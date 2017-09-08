@@ -35,7 +35,7 @@ items that should never be selected in the core collection}
 \item{mode}{Execution mode (\code{default} or \code{fast}). In default mode,
 the normalization searches terminate when no improvement is found for ten
 seconds. In fast mode, searches terminate as soon as no improvement is
-made for two seconds. These stop conditions can be overriden using arguments
+made for two seconds. These stop conditions can be overridden using arguments
 \code{time}, \code{impr.time}, \code{steps} and/or \code{impr.steps}. In
 \code{default} mode, the value of the latter two, step-based conditions is
 multiplied with 500, in line with the behaviour of \code{\link{sampleCore}}
