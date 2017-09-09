@@ -20,7 +20,7 @@ if only one type of data is provided.}
 If no objectives are specified Core Hunter maximizes a weighted
 index including the default entry-to-nearest-entry distance
 (\code{EN}) for each available data type, with equal weight.
-For genotyes, the Modified Roger's distance (\code{MR}) is
+For genotypes, the Modified Roger's distance (\code{MR}) is
 used. For phenotypes, Gower's distance (\code{GD}) is applied.}
 
 \item{size}{Desired core subset size (numeric). If larger than one the value
@@ -38,7 +38,7 @@ items that should never be selected in the core collection}
 Core Hunter uses an advanced parallel tempering search algorithm and terminates
 when no improvement is found for ten seconds. In fast mode, a simple stochastic
 hill-climbing algorithm is applied and Core Hunter terminates as soon as no
-improvement is made for two seconds. Stop conditions can be overriden with
+improvement is made for two seconds. Stop conditions can be overridden with
 arguments \code{time} and \code{impr.time}.}
 
 \item{normalize}{If \code{TRUE} (default), the applied objectives in a multi-objective
@@ -65,7 +65,7 @@ nearest integer.}
 \item{impr.time}{Maximum time without improvement in seconds. If no explicit
 stop conditions are specified, the maximum time without improvement defaults
 to ten or two seconds, when executing Core Hunter in \code{default} or
-\code{fast} mode, respecitvely. If a custom improvement time is specified,
+\code{fast} mode, respectively. If a custom improvement time is specified,
 it should be strictly positive and is rounded to the nearest integer.}
 
 \item{steps}{Maximum number of search steps. Not used by default (\code{NA}).
@@ -149,4 +149,3 @@ core <- sampleCore(data, obj, verbose = TRUE)
 \seealso{
 \code{\link{coreHunterData}}, \code{\link{objective}}, \code{\link{getNormalizationRanges}}
 }
-

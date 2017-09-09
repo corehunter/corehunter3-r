@@ -35,7 +35,7 @@ items that should never be selected in the core collection}
 \item{mode}{Execution mode (\code{default} or \code{fast}). In default mode,
 the normalization searches terminate when no improvement is found for ten
 seconds. In fast mode, searches terminate as soon as no improvement is
-made for two seconds. These stop conditions can be overriden using arguments
+made for two seconds. These stop conditions can be overridden using arguments
 \code{time}, \code{impr.time}, \code{steps} and/or \code{impr.steps}. In
 \code{default} mode, the value of the latter two, step-based conditions is
 multiplied with 500, in line with the behaviour of \code{\link{sampleCore}}
@@ -48,7 +48,7 @@ nearest integer.}
 \item{impr.time}{Maximum time without improvement in seconds. If no explicit
 stop conditions are specified, the maximum time without improvement defaults
 to ten or two seconds, when executing Core Hunter in \code{default} or
-\code{fast} mode, respecitvely. If a custom improvement time is specified,
+\code{fast} mode, respectively. If a custom improvement time is specified,
 it should be strictly positive and is rounded to the nearest integer.}
 
 \item{steps}{Maximum number of search steps. Not used by default (\code{NA}).
@@ -110,4 +110,3 @@ core <- sampleCore(data, obj = objectives)
 \seealso{
 \code{\link{coreHunterData}}, \code{\link{objective}}
 }
-

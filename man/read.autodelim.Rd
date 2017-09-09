@@ -65,4 +65,3 @@ Delegates to \code{\link{read.delim}} where the separator is inferred from the f
 For CSV files the delimiter is set to \code{","} while for TXT file \code{"\t"} is used. Also sets
 some default argument values as used by Core Hunter.
 }
-

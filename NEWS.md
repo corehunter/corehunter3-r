@@ -1,8 +1,8 @@
 Core Hunter 3
 =============
 
-Version 3.1.0.9000 (dev)
-------------------------
+Version 3.2.0 (08/09/2017)
+--------------------------
 
  - New option to specify a set of always and/or never selected accessions.
  - Added support for step-based in addition to time-based stop conditions.
