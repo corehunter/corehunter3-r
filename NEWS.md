@@ -4,7 +4,7 @@ Core Hunter 3
 Version 3.2.0.9000 (dev)
 ------------------------
 
- - ...
+ - Added support for Java 9.
 
 Version 3.2.0 (08/09/2017)
 --------------------------
