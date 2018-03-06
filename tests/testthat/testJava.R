@@ -4,7 +4,6 @@ source("testUtils.R")
 context("Java")
 ###############
 
-#' @importFrom mockr with_mock
 test_that("version correctly parsed for JDK 8", {
   # mock version string function
   with_mock(
@@ -13,7 +12,6 @@ test_that("version correctly parsed for JDK 8", {
   )
 })
 
-#' @importFrom mockr with_mock
 test_that("version correctly parsed for JDK 9", {
   # mock version string function
   version.strings <- c(

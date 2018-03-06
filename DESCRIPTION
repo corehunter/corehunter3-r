@@ -20,5 +20,5 @@ SystemRequirements: Java JRE 8 or higher
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.0.1
-Suggests: testthat, StatMatch, mockr
+Suggests: testthat, mockr, StatMatch
 Encoding: UTF-8
