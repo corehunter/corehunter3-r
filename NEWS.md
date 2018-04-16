@@ -1,7 +1,7 @@
 Core Hunter 3
 =============
 
-Version 3.2.1 (04/03/2018)
+Version 3.2.1 (16/04/2018)
 --------------------------
 
  - Added support for Java 9.

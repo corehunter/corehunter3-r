@@ -1,3 +1,7 @@
+This is a resubmission that addresses the NOTEs raised by CRAN's automatic checks.
+The following changes have been made:
+ * updated Date field
+
 ## Test environments
 
 * local OS X install, R 3.4.3
