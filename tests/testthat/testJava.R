@@ -33,3 +33,21 @@ test_that("version correctly parsed for JDK 9", {
     )
   }
 })
+
+test_that("version correctly parsed for JDK 10", {
+  # mock version string function
+  version.strings <- c(
+    "10",
+    "10.0",
+    "10.0.4",
+    "10.1.2",
+    "10.0.2",
+    "10.0.2.1"
+  )
+  for(version.string in version.strings){
+    with_mock(
+      java.version.string = function(){version.string},
+      expect_equal(java.version(), 10)
+    )
+  }
+})
