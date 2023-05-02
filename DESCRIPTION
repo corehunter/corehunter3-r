@@ -16,7 +16,7 @@ Description: Core Hunter is a tool to sample diverse, representative subsets fro
     <http://www.corehunter.org>).
 Depends: R (>= 3.2.3), rJava (>= 0.9-8)
 Imports: naturalsort (>= 0.1.2), methods
-SystemRequirements: Java JRE 8 or higher
+SystemRequirements: Java (>= 8)
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.0.1
