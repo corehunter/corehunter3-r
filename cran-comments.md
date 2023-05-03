@@ -1,6 +1,6 @@
 ## Test environments
 
-* local Windows install: R 4.3.0
+* local Windows 11 install: R 4.3.0
 * GitHub actions:
   * Windows Server 2022: R 4.3.0
   * Mac OS: R 4.3.0
@@ -8,8 +8,8 @@
 
 ## R CMD check results
 
-There were no ERRORs, WARNINGs or NOTES.
+0 errors | 0 warnings | 0 notes
 
-## Downstream dependencies
+## Reverse dependencies
 
-There are currently no downstream dependencies for this package.
+There are currently no reverse dependencies for this package.
