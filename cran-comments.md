@@ -1,10 +1,6 @@
-This is a resubmission that addresses the NOTEs raised by CRAN's automatic checks.
-The following changes have been made:
- * updated Date field
-
 ## Test environments
 
-* local OS X install, R 3.4.3
+* local Windows install, R 4.3.0
 * ubuntu 14.04 (on travis-ci), R 3.4.2 & R devel
 * win-builder (devel and release)
 
