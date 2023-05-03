@@ -1,19 +1,14 @@
 ## Test environments
 
-* local Windows install, R 4.3.0
-* ubuntu 14.04 (on travis-ci), R 3.4.2 & R devel
-* win-builder (devel and release)
+* local Windows install: R 4.3.0
+* GitHub actions:
+  * Windows Server 2022: R 4.3.0
+  * Mac OS: R 4.3.0
+  * Ubuntu 22.04: R 4.3.0, R 4.2.3 & R devel
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs.
-
-There was one NOTE on Travis CI:
-
-* checking R code for possible problems ... NOTE
-  Picked up _JAVA_OPTIONS: -Xmx2048m -Xms512m
-
-  This note is due to the Travis build server's Java options.
+There were no ERRORs, WARNINGs or NOTES.
 
 ## Downstream dependencies
 
