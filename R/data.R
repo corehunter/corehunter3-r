@@ -162,7 +162,7 @@ print.chdata <- function(x, ...){
 #' Create Core Hunter distance data from matrix or file.
 #'
 #' Specify either a symmetric distance matrix or the file from which to read the matrix.
-#' See \url{www.corehunter.org} for documentation and examples of the distance matrix
+#' See \url{https://www.corehunter.org} for documentation and examples of the distance matrix
 #' file format used by Core Hunter.
 #'
 #' @param data Symmetric distance matrix. Unique row and column headers are required,
@@ -316,7 +316,7 @@ print.chdist <- function(x, include.size = TRUE, ...){
 #' Create Core Hunter genotype data from data frame, matrix or file.
 #'
 #' Specify either a data frame or matrix, or a file from which to read the genotypes.
-#' See \url{www.corehunter.org} for documentation and examples of the genotype data
+#' See \url{https://www.corehunter.org} for documentation and examples of the genotype data
 #' file format used by Core Hunter.
 #'
 #' @param data Data frame or matrix containing the genotypes (individuals x markers)
@@ -347,7 +347,7 @@ print.chdist <- function(x, include.size = TRUE, ...){
 #'    In case a data frame is provided, an optional first column \code{NAME}
 #'    may be included to specify item names. The remaining columns should follow
 #'    the format as described above.
-#'    See \url{www.corehunter.org} for more details about the supported genotype formats.
+#'    See \url{https://www.corehunter.org} for more details about the supported genotype formats.
 #'    Note that both the \code{frequency} and \code{biparental} format syntactically also
 #'    comply with the \code{default} format but with different semantics, meaning that it
 #'    is very important to specify the correct format. Some checks have been built in that
@@ -742,7 +742,7 @@ print.chgeno <- function(x, include.size = TRUE, ...){
 #' Create Core Hunter phenotype data from data frame or file.
 #'
 #' Specify either a data frame containing the phenotypic trait observations
-#' or a file from which to read the data. See \url{www.corehunter.org} for
+#' or a file from which to read the data. See \url{https://www.corehunter.org} for
 #' documentation and examples of the phenotype data format used by Core Hunter.
 #'
 #' @param data Data frame containing one row per individual and one column per trait.
