@@ -64,6 +64,7 @@ exampleData <- function(){
 #' @return Core Hunter data of class \code{chdata}.
 #'
 #' @examples
+#' \donttest{
 #' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 #' pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
 #' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
@@ -73,6 +74,7 @@ exampleData <- function(){
 #'   phenotypes(file = pheno.file),
 #'   distances(file = dist.file)
 #' )
+#' }
 #'
 #' @seealso \code{\link{genotypes}}, \code{\link{phenotypes}}, \code{\link{distances}}
 #'
