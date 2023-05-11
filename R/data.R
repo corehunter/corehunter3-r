@@ -64,7 +64,7 @@ exampleData <- function(){
 #' @return Core Hunter data of class \code{chdata}.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' geno.file <- system.file("extdata", "genotypes.csv", package = "corehunter")
 #' pheno.file <- system.file("extdata", "phenotypes.csv", package = "corehunter")
 #' dist.file <- system.file("extdata", "distances.csv", package = "corehunter")
@@ -388,6 +388,7 @@ print.chdist <- function(x, include.size = TRUE, ...){
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' # create from data frame or matrix
 #'
 #' # default format
@@ -439,6 +440,7 @@ print.chdist <- function(x, include.size = TRUE, ...){
 #' # frequencies
 #' geno.file <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
 #' geno <- genotypes(file = geno.file, format = "frequency")
+#' }
 #'
 #' @import rJava
 #' @export

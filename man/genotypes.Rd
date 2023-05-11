@@ -83,6 +83,7 @@ See \url{https://www.corehunter.org} for documentation and examples of the genot
 file format used by Core Hunter.
 }
 \examples{
+\dontrun{
 # create from data frame or matrix
 
 # default format
@@ -134,5 +135,6 @@ geno <- genotypes(file = geno.file, format = "biparental")
 # frequencies
 geno.file <- system.file("extdata", "genotypes-frequency.csv", package = "corehunter")
 geno <- genotypes(file = geno.file, format = "frequency")
+}
 
 }
