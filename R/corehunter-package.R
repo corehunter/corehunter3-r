@@ -1,4 +1,5 @@
-#' Core Hunter 3
+#' @keywords internal
+#' #' Core Hunter 3 (Test)
 #'
 #' Core Hunter is a tool to sample diverse, representative subsets from large germplasm
 #' collections, with minimum redundancy. Such so-called core collections have applications in plant
@@ -56,6 +57,8 @@
 #'  \code{\link{sampleCore}}, \code{\link{evaluateCore}},
 #'  \code{\link{objective}}
 #'
-#' @docType package
-#' @name corehunter
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
 NULL
