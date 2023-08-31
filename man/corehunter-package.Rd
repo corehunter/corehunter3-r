@@ -70,8 +70,6 @@ Other contributors:
 }
 
 }
-\keyword{#'}
-\keyword{(Test)}
 \keyword{(e.g.}
 \keyword{(see}
 \keyword{3}

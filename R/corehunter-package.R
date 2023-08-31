@@ -1,5 +1,5 @@
 #' @keywords internal
-#' #' Core Hunter 3 (Test)
+#' Core Hunter 3
 #'
 #' Core Hunter is a tool to sample diverse, representative subsets from large germplasm
 #' collections, with minimum redundancy. Such so-called core collections have applications in plant
