@@ -1,4 +1,3 @@
-#' @keywords internal
 #' Core Hunter 3
 #'
 #' Core Hunter is a tool to sample diverse, representative subsets from large germplasm
@@ -10,6 +9,8 @@
 #' optimized as part of a weighted index to bring the different perspectives closer together.
 #' The Core Hunter library is implemented in Java 8 as an open source project
 #' (see \url{http://www.corehunter.org}).
+#'
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

@@ -4,9 +4,17 @@
 \name{corehunter-package}
 \alias{corehunter}
 \alias{corehunter-package}
-\title{corehunter: Multi-Purpose Core Subset Selection}
+\title{Core Hunter 3}
 \description{
-Core Hunter is a tool to sample diverse, representative subsets from large germplasm collections, with minimum redundancy. Such so-called core collections have applications in plant breeding and genetic resource management in general. Core Hunter can construct cores based on genetic marker data, phenotypic traits or precomputed distance matrices, optimizing one of many provided evaluation measures depending on the precise purpose of the core (e.g. high diversity, representativeness, or allelic richness). In addition, multiple measures can be simultaneously optimized as part of a weighted index to bring the different perspectives closer together. The Core Hunter library is implemented in Java 8 as an open source project (see \url{http://www.corehunter.org}).
+Core Hunter is a tool to sample diverse, representative subsets from large germplasm
+collections, with minimum redundancy. Such so-called core collections have applications in plant
+breeding and genetic resource management in general. Core Hunter can construct cores based on
+genetic marker data, phenotypic traits or precomputed distance matrices, optimizing one of many
+provided evaluation measures depending on the precise purpose of the core (e.g. maximum diversity,
+representativeness, or allelic richness). In addition, multiple measures can be simultaneously
+optimized as part of a weighted index to bring the different perspectives closer together.
+The Core Hunter library is implemented in Java 8 as an open source project
+(see \url{http://www.corehunter.org}).
 }
 \examples{
 \dontrun{
@@ -70,92 +78,4 @@ Other contributors:
 }
 
 }
-\keyword{(e.g.}
-\keyword{(see}
-\keyword{3}
-\keyword{8}
-\keyword{Core}
-\keyword{Hunter}
-\keyword{In}
-\keyword{Java}
-\keyword{Such}
-\keyword{The}
-\keyword{\url{http://www.corehunter.org}).}
-\keyword{a}
-\keyword{addition,}
-\keyword{allelic}
-\keyword{an}
-\keyword{and}
-\keyword{applications}
-\keyword{as}
-\keyword{based}
-\keyword{be}
-\keyword{breeding}
-\keyword{bring}
-\keyword{can}
-\keyword{closer}
-\keyword{collections}
-\keyword{collections,}
-\keyword{construct}
-\keyword{core}
-\keyword{cores}
-\keyword{data,}
-\keyword{depending}
-\keyword{different}
-\keyword{distance}
-\keyword{diverse,}
-\keyword{diversity,}
-\keyword{evaluation}
-\keyword{from}
-\keyword{general.}
-\keyword{genetic}
-\keyword{germplasm}
-\keyword{have}
-\keyword{implemented}
-\keyword{in}
-\keyword{index}
 \keyword{internal}
-\keyword{is}
-\keyword{large}
-\keyword{library}
-\keyword{management}
-\keyword{many}
-\keyword{marker}
-\keyword{matrices,}
-\keyword{maximum}
-\keyword{measures}
-\keyword{minimum}
-\keyword{multiple}
-\keyword{of}
-\keyword{on}
-\keyword{one}
-\keyword{open}
-\keyword{optimized}
-\keyword{optimizing}
-\keyword{or}
-\keyword{part}
-\keyword{perspectives}
-\keyword{phenotypic}
-\keyword{plant}
-\keyword{precise}
-\keyword{precomputed}
-\keyword{project}
-\keyword{provided}
-\keyword{purpose}
-\keyword{redundancy.}
-\keyword{representative}
-\keyword{representativeness,}
-\keyword{resource}
-\keyword{richness).}
-\keyword{sample}
-\keyword{simultaneously}
-\keyword{so-called}
-\keyword{source}
-\keyword{subsets}
-\keyword{the}
-\keyword{to}
-\keyword{together.}
-\keyword{tool}
-\keyword{traits}
-\keyword{weighted}
-\keyword{with}
