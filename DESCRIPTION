@@ -20,4 +20,5 @@ SystemRequirements: Java (>= 8)
 License: MIT + file LICENSE
 RoxygenNote: 7.2.3
 Suggests: testthat, mockr, StatMatch
+BugReports: https://github.com/corehunter/corehunter3-r/issues
 Encoding: UTF-8
