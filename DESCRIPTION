@@ -1,7 +1,7 @@
 Package: corehunter
 Title: Multi-Purpose Core Subset Selection
-Version: 3.2.2
-Date: 2023-05-02
+Version: 3.2.3
+Date: 2023-08-31
 Authors@R: c(person("Herman", "De Beukelaer", email = "herman.debeukelaer@gmail.com", role = c("aut", "cre")),
              person("Guy", "Davenport", email = "daveneti@gmail.com", role = "aut"),
              person("Veerle", "Fack", email = "veerle.fack@ugent.be", role = "ths"))
