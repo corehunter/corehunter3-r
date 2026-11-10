@@ -1,6 +1,11 @@
 Core Hunter 3
 =============
 
+Version 3.2.4 (10/11/2026)
+--------------------------
+
+ - Fixed print output of data objects for compatibility with changes to `str()` in R-devel.
+
 Version 3.2.3 (31/08/2023)
 --------------------------
 

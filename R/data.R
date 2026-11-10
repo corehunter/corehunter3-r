@@ -142,11 +142,9 @@ print.chdata <- function(x, ...){
   cat("----------------\n\n")
 
   cat("Number of accessions =", x$size, "\n")
-  cat("Ids:")
-  str(x$ids)
+  printStr("Ids:", x$ids)
   if(!isTRUE(all.equal(x$ids, x$names))){
-    cat("Names:")
-    str(x$names)
+    printStr("Names:", x$names)
   }
 
   for(data.type in c("geno", "pheno", "dist")){
@@ -299,11 +297,9 @@ print.chdist <- function(x, include.size = TRUE, ...){
   cat("# Precomputed distance matrix\n")
   if(include.size){
     cat(sprintf("\nNumber of accessions = %d\n", n))
-    cat("Ids:")
-    str(x$ids)
+    printStr("Ids:", x$ids)
     if(!isTRUE(all.equal(x$ids, x$names))){
-      cat("Names:")
-      str(x$names)
+      printStr("Names:", x$names)
     }
   }
   if(!is.null(x$file)){
@@ -718,18 +714,15 @@ print.chgeno <- function(x, include.size = TRUE, ...){
 
   if(include.size){
     cat(sprintf("\nNumber of accessions = %d\n", n))
-    cat("Ids:")
-    str(x$ids)
+    printStr("Ids:", x$ids)
     if(!isTRUE(all.equal(x$ids, x$names))){
-      cat("Names:")
-      str(x$names)
+      printStr("Names:", x$names)
     }
   }
 
   cat(sprintf("\nNumber of markers = %d\n", m))
   if(!all(is.na(x$markers))){
-    cat("Marker names:")
-    str(x$markers)
+    printStr("Marker names:", x$markers)
   }
 
   cat(sprintf("Number of alleles per marker = %s\n", a))
@@ -1094,11 +1087,9 @@ print.chpheno <- function(x, include.size = TRUE, ...){
 
   if(include.size){
     cat(sprintf("\nNumber of accessions = %d\n", n))
-    cat("Ids:")
-    str(x$ids)
+    printStr("Ids:", x$ids)
     if(!isTRUE(all.equal(x$ids, x$names))){
-      cat("Names:")
-      str(x$names)
+      printStr("Names:", x$names)
     }
   }
 
@@ -1219,3 +1210,14 @@ extract.matrix <- function(data){
 
 
 
+
+# print a label followed by the compact str() representation of an object,
+# separated by exactly one space (independent of whether str() itself
+# prepends a space, which changed in R-devel r90805)
+#' @importFrom utils str capture.output
+#' @noRd
+printStr <- function(label, object){
+  out <- capture.output(str(object))
+  out[1] <- paste(label, sub("^\\s+", "", out[1]))
+  cat(out, sep = "\n")
+}
