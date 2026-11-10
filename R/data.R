@@ -1214,7 +1214,7 @@ extract.matrix <- function(data){
 # print a label followed by the compact str() representation of an object,
 # separated by exactly one space (independent of whether str() itself
 # prepends a space, which changed in R-devel r90805)
-#' @importFrom utils str capture.output
+#' @importFrom utils capture.output
 #' @noRd
 printStr <- function(label, object){
   out <- capture.output(str(object))
