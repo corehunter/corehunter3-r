@@ -1,10 +1,16 @@
+## Submission
+
+This version fixes the test failures on r-devel reported by CRAN, caused by
+the change to `str()` output in R-devel r90805 (no longer prepending a space).
+The print methods of the package's data objects now format this output
+consistently across R versions.
+
 ## Test environments
 
-* local Windows 11 install: R 4.3.0
 * GitHub actions:
-  * Windows Server 2022: R 4.3.0
-  * Mac OS: R 4.3.0
-  * Ubuntu 22.04: R 4.3.0, R 4.2.3 & R devel
+  * Windows Server 2022: R 4.6.2
+  * macOS Tahoe 26.7: R 4.6.2
+  * Ubuntu 26.04: R 4.6.2, R 4.5.3 & R devel (2026-11-08 r90859)
 
 ## R CMD check results
 
